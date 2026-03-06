@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="BackRomo.API/BackRomo.API.csproj" />
+  <Project Path="BackRomo.Application/BackRomo.Application.csproj" />
+  <Project Path="BackRomo.Domain/BackRomo.Domain.csproj" />
+  <Project Path="BackRomo.Infrastructure/BackRomo.Infrastructure.csproj" />
+</Solution>
