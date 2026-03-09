@@ -2,6 +2,7 @@ using System.Text;
 using BackRomo.API.Middlewares;
 using BackRomo.Application.Interfaces;
 using BackRomo.Application.Services;
+using BackRomo.Infrastructure.Repositories;
 using BackRomo.Infrastructure.Auth;
 using BackRomo.Infrastructure.Data;
 using BackRomo.Infrastructure.Repositories;
@@ -18,6 +19,10 @@ builder.Services.AddSingleton(new DbConnectionFactory(connectionString));
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddSingleton<IJwtService, JwtService>();
+
+// Reservas
+builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
+builder.Services.AddScoped<ReservaService>();
 
 // Controllers
 builder.Services.AddControllers();

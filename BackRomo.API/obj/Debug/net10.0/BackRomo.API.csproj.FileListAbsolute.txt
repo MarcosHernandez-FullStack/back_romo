@@ -77,3 +77,4 @@ C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\refint\BackRomo.API.dll
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.pdb
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.genruntimeconfig.cache
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\ref\BackRomo.API.dll
+C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.sourcelink.json
