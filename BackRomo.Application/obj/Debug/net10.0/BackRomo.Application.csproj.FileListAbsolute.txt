@@ -13,3 +13,4 @@ C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.dll
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\refint\BackRomo.Application.dll
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.pdb
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\ref\BackRomo.Application.dll
+C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.sourcelink.json

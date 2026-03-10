@@ -15,3 +15,4 @@ C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructu
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\refint\BackRomo.Infrastructure.dll
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.pdb
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\ref\BackRomo.Infrastructure.dll
+C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.sourcelink.json

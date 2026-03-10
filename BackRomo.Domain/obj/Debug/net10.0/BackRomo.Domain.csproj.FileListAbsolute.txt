@@ -9,3 +9,4 @@ C:\dev\back_romo\BackRomo.Domain\obj\Debug\net10.0\BackRomo.Domain.dll
 C:\dev\back_romo\BackRomo.Domain\obj\Debug\net10.0\refint\BackRomo.Domain.dll
 C:\dev\back_romo\BackRomo.Domain\obj\Debug\net10.0\BackRomo.Domain.pdb
 C:\dev\back_romo\BackRomo.Domain\obj\Debug\net10.0\ref\BackRomo.Domain.dll
+C:\dev\back_romo\BackRomo.Domain\obj\Debug\net10.0\BackRomo.Domain.sourcelink.json
