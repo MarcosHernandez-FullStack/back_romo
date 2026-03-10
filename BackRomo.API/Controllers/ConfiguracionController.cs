@@ -24,4 +24,15 @@ public class ConfiguracionController : ControllerBase
 
         return Ok(tarifa);
     }
+
+    [HttpGet("parametro-operativo")]
+    public async Task<IActionResult> ObtenerParametroOperativo()
+    {
+        var parametro = await _configuracionService.ObtenerParametroOperativoAsync();
+
+        if (parametro is null)
+            return NoContent();
+
+        return Ok(parametro);
+    }
 }
