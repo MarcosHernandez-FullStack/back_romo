@@ -4,5 +4,6 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IConfiguracionRepository
 {
-    Task<TarifaDto?> ObtenerTarifarioGlobalAsync();
+    Task<TarifaDto?>   ObtenerTarifarioGlobalAsync();
+    Task<ParametroDto?> ObtenerParametroOperativoAsync();
 }

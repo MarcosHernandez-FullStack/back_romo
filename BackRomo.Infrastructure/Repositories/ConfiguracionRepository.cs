@@ -24,4 +24,14 @@ public class ConfiguracionRepository : IConfiguracionRepository
             commandType: CommandType.StoredProcedure
         );
     }
+
+    public async Task<ParametroDto?> ObtenerParametroOperativoAsync()
+    {
+        using var conn = _db.CreateConnection();
+
+        return await conn.QueryFirstOrDefaultAsync<ParametroDto>(
+            "sp_ParametroOperativo",
+            commandType: CommandType.StoredProcedure
+        );
+    }
 }

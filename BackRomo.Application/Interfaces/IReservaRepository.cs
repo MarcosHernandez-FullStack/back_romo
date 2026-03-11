@@ -4,5 +4,6 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IReservaRepository
 {
-    Task<IEnumerable<HorarioDisponibleDto>> ListarHorariosDisponiblesAsync(DateOnly fecha, string rol);
+    Task<IEnumerable<HorarioDisponibleDto>>  ListarHorariosDisponiblesAsync(DateOnly fecha, string rol, short capacidad);
+    Task<ValidarHorarioResultDto>            ValidarHorarioAsync(CrearReservaDto dto);
 }

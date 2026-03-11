@@ -14,4 +14,7 @@ public class ConfiguracionService
 
     public async Task<TarifaDto?> ObtenerTarifarioGlobalAsync()
         => await _configuracionRepository.ObtenerTarifarioGlobalAsync();
+
+    public async Task<ParametroDto?> ObtenerParametroOperativoAsync()
+        => await _configuracionRepository.ObtenerParametroOperativoAsync();
 }
