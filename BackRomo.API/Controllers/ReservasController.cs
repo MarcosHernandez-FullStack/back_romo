@@ -1,3 +1,4 @@
+using BackRomo.Application.DTOs.Reserva;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,13 +16,24 @@ public class ReservasController : ControllerBase
     }
 
     [HttpGet("horarios-disponibles")]
-    public async Task<IActionResult> ListarHorariosDisponibles([FromQuery] DateOnly fecha, [FromQuery] string rol)
+    public async Task<IActionResult> ListarHorariosDisponibles([FromQuery] DateOnly fecha, [FromQuery] string rol, [FromQuery] short capacidad)
     {
-        var horarios = await _reservaService.ListarHorariosDisponiblesAsync(fecha, rol);
+        var horarios = await _reservaService.ListarHorariosDisponiblesAsync(fecha, rol, capacidad);
 
         if (!horarios.Any())
             return NoContent();
 
         return Ok(horarios);
+    }
+
+    [HttpPost("validar-horario")]
+    public async Task<IActionResult> ValidarHorario([FromBody] CrearReservaDto dto)
+    {
+        var result = await _reservaService.ValidarHorarioAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result.Mensaje);
+
+        return Ok(result.Mensaje);
     }
 }
