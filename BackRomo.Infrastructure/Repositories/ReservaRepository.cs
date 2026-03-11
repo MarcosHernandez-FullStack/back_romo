@@ -70,6 +70,23 @@ public class ReservaRepository : IReservaRepository
         return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al validar el horario." };
     }
 
+    public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        var result = await conn.QueryFirstOrDefaultAsync<ValidarHorarioResultDto>(
+            "sp_CreateReserva",
+            new
+            {
+                IdTimerReserva = dto.IdTimerReserva,
+                ActualizadoPor = dto.ActualizadoPor,
+            },
+            commandType: CommandType.StoredProcedure
+        );
+
+        return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al crear la reserva." };
+    }
+
     private class SpHorarioResult
     {
         public TimeSpan? HoraDisponible { get; set; }

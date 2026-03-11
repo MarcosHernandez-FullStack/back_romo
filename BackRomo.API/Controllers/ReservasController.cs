@@ -34,6 +34,17 @@ public class ReservasController : ControllerBase
         if (result.Exitoso == 0)
             return Conflict(result.Mensaje);
 
-        return Ok(result.Mensaje);
+        return Ok(result);
+    }
+
+    [HttpPost("crear-reserva")]
+    public async Task<IActionResult> CrearReserva([FromBody] ConfirmarReservaDto dto)
+    {
+        var result = await _reservaService.CrearReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result.Mensaje);
+
+        return Ok(result);
     }
 }

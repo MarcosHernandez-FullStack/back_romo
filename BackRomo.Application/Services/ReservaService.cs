@@ -17,4 +17,7 @@ public class ReservaService
 
     public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
         => await _reservaRepository.ValidarHorarioAsync(dto);
+
+    public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
+        => await _reservaRepository.CrearReservaAsync(dto);
 }
