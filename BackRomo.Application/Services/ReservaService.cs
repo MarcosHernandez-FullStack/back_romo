@@ -6,17 +6,22 @@ namespace BackRomo.Application.Services;
 public class ReservaService
 {
     private readonly IReservaRepository _reservaRepository;
+    private readonly IFechaService      _fechaService;
 
-    public ReservaService(IReservaRepository reservaRepository)
+    public ReservaService(IReservaRepository reservaRepository, IFechaService fechaService)
     {
         _reservaRepository = reservaRepository;
+        _fechaService      = fechaService;
     }
 
     public async Task<IEnumerable<HorarioDisponibleDto>> ListarHorariosDisponiblesAsync(DateOnly fecha, string rol, short capacidad)
         => await _reservaRepository.ListarHorariosDisponiblesAsync(fecha, rol, capacidad);
 
     public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
-        => await _reservaRepository.ValidarHorarioAsync(dto);
+    {
+        dto.FechaCreacion = await _fechaService.AhoraAsync();
+        return await _reservaRepository.ValidarHorarioAsync(dto);
+    }
 
     public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
         => await _reservaRepository.CrearReservaAsync(dto);

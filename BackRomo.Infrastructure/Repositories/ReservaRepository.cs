@@ -74,12 +74,22 @@ public class ReservaRepository : IReservaRepository
     {
         using var conn = _db.CreateConnection();
 
+        var tvp = new DataTable();
+        tvp.Columns.Add("Tipo",        typeof(string));
+        tvp.Columns.Add("Placa",       typeof(string));
+        tvp.Columns.Add("Descripcion", typeof(string));
+        tvp.Columns.Add("Observacion", typeof(string));
+
+        foreach (var v in dto.Vehiculos)
+            tvp.Rows.Add(v.Tipo, v.Placa, v.Descripcion, v.Observacion);
+
         var result = await conn.QueryFirstOrDefaultAsync<ValidarHorarioResultDto>(
             "sp_CreateReserva",
             new
             {
                 IdTimerReserva = dto.IdTimerReserva,
                 ActualizadoPor = dto.ActualizadoPor,
+                Vehiculos      = tvp.AsTableValuedParameter("dbo.TipoVehiculoDetalle"),
             },
             commandType: CommandType.StoredProcedure
         );

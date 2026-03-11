@@ -28,6 +28,9 @@ builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<IConfiguracionRepository, ConfiguracionRepository>();
 builder.Services.AddScoped<ConfiguracionService>();
 
+// Fecha local (zona horaria centralizada)
+builder.Services.AddScoped<IFechaService, FechaService>();
+
 // Reservas
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<ReservaService>();
