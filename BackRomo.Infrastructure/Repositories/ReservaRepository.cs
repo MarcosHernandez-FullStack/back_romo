@@ -88,7 +88,7 @@ public class ReservaRepository : IReservaRepository
             new
             {
                 IdTimerReserva = dto.IdTimerReserva,
-                ActualizadoPor = dto.ActualizadoPor,
+                CreadoPor      = dto.CreadoPor,
                 Vehiculos      = tvp.AsTableValuedParameter("dbo.TipoVehiculoDetalle"),
             },
             commandType: CommandType.StoredProcedure
