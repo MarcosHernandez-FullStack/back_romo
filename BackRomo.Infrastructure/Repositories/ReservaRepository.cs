@@ -88,13 +88,22 @@ public class ReservaRepository : IReservaRepository
             new
             {
                 IdTimerReserva = dto.IdTimerReserva,
-                CreadoPor      = dto.CreadoPor,
                 Vehiculos      = tvp.AsTableValuedParameter("dbo.TipoVehiculoDetalle"),
             },
             commandType: CommandType.StoredProcedure
         );
 
         return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al crear la reserva." };
+    }
+
+    public async Task EliminarTimerAsync(int idTimer)
+    {
+        using var conn = _db.CreateConnection();
+        await conn.ExecuteAsync(
+            "sp_DeleteTimerReserva",
+            new { Id = idTimer },
+            commandType: CommandType.StoredProcedure
+        );
     }
 
     private class SpHorarioResult

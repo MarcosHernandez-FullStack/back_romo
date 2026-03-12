@@ -11,6 +11,5 @@ public class VehiculoDetalleDto
 public class ConfirmarReservaDto
 {
     public int                       IdTimerReserva { get; set; }
-    public int                       CreadoPor      { get; set; }
     public List<VehiculoDetalleDto>  Vehiculos      { get; set; } = [];
 }

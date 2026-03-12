@@ -47,4 +47,11 @@ public class ReservasController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpDelete("timer/{id}")]
+    public async Task<IActionResult> EliminarTimer(int id)
+    {
+        await _reservaService.EliminarTimerAsync(id);
+        return NoContent();
+    }
 }
