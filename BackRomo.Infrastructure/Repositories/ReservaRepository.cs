@@ -15,7 +15,7 @@ public class ReservaRepository : IReservaRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<HorarioDisponibleDto>> ListarHorariosDisponiblesAsync(DateOnly fecha, string rol, short capacidad)
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosAsync(DateOnly fecha, string rol, short capacidad)
     {
         using var conn = _db.CreateConnection();
 
@@ -26,8 +26,8 @@ public class ReservaRepository : IReservaRepository
         );
 
         return results
-            .Where(r => r.HoraDisponible.HasValue)
-            .Select(r => new HorarioDisponibleDto { HoraDisponible = r.HoraDisponible!.Value });
+            .Where(r => r.Hora.HasValue)
+            .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
     }
 
     public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
@@ -42,6 +42,7 @@ public class ReservaRepository : IReservaRepository
                 HoraInicio        = dto.HoraInicio.ToTimeSpan(),
                 HoraFin           = dto.HoraFin.ToTimeSpan(),
                 CantidadCarga     = dto.CantidadCarga,
+                Rol               = dto.Rol,
                 IdCliente         = dto.IdCliente,
                 IdOperador        = dto.IdOperador,
                 DireccionOrigen   = dto.DireccionOrigen,
@@ -59,6 +60,7 @@ public class ReservaRepository : IReservaRepository
                 CostoBase         = dto.CostoBase,
                 TimerExpiracion      = dto.TimerExpiracion,
                 CreadoPor            = dto.CreadoPor,
+                TipoHorario          = dto.TipoHorario,
                 EstadoOperacion      = dto.EstadoOperacion,
                 EstadoAdministrativo = dto.EstadoAdministrativo,
                 Estado               = dto.Estado,
@@ -88,6 +90,7 @@ public class ReservaRepository : IReservaRepository
             new
             {
                 IdTimerReserva = dto.IdTimerReserva,
+                Rol            = dto.Rol,
                 Vehiculos      = tvp.AsTableValuedParameter("dbo.TipoVehiculoDetalle"),
             },
             commandType: CommandType.StoredProcedure
@@ -108,8 +111,9 @@ public class ReservaRepository : IReservaRepository
 
     private class SpHorarioResult
     {
-        public TimeSpan? HoraDisponible { get; set; }
-        public int?      Exitoso        { get; set; }
-        public string?   Mensaje        { get; set; }
+        public TimeSpan? Hora    { get; set; }
+        public string?   Estado  { get; set; }
+        public int?      Exitoso { get; set; }
+        public string?   Mensaje { get; set; }
     }
 }

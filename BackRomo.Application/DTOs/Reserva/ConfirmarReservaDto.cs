@@ -11,5 +11,6 @@ public class VehiculoDetalleDto
 public class ConfirmarReservaDto
 {
     public int                       IdTimerReserva { get; set; }
+    public string                    Rol            { get; set; } = string.Empty;
     public List<VehiculoDetalleDto>  Vehiculos      { get; set; } = [];
 }

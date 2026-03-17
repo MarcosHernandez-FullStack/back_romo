@@ -15,10 +15,10 @@ public class ReservasController : ControllerBase
         _reservaService = reservaService;
     }
 
-    [HttpGet("horarios-disponibles")]
-    public async Task<IActionResult> ListarHorariosDisponibles([FromQuery] DateOnly fecha, [FromQuery] string rol, [FromQuery] short capacidad)
+    [HttpGet("horarios")]
+    public async Task<IActionResult> ListarHorarios([FromQuery] DateOnly fecha, [FromQuery] string rol, [FromQuery] short capacidad)
     {
-        var horarios = await _reservaService.ListarHorariosDisponiblesAsync(fecha, rol, capacidad);
+        var horarios = await _reservaService.ListarHorariosAsync(fecha, rol, capacidad);
 
         if (!horarios.Any())
             return NoContent();
