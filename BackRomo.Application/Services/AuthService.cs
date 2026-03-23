@@ -25,14 +25,18 @@ public class AuthService
 
         return new LoginResponseDto
         {
-            Token     = token,
-            Id        = usuario.Id,
-            Alias     = usuario.Alias,
-            Nombres   = usuario.Nombres,
-            Apellidos = usuario.Apellidos,
-            Correo    = usuario.Correo,
-            Telefono  = usuario.Telefono,
-            Rol       = usuario.Rol
+            Token      = token,
+            Id         = usuario.Id,
+            Alias      = usuario.Alias,
+            Nombres    = usuario.Nombres,
+            Apellidos  = usuario.Apellidos,
+            Correo     = usuario.Correo,
+            Telefono   = usuario.Telefono,
+            Rol        = usuario.Rol,
+            IdCliente  = usuario.IdCliente,
+            TarifaKm   = usuario.TarifaKm,
+            TarifaBase = usuario.TarifaBase,
+            Empresa    = usuario.Empresa
         };
     }
 }

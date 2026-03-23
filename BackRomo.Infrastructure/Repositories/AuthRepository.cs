@@ -33,13 +33,17 @@ public class AuthRepository : IAuthRepository
 
         return new Usuario
         {
-            Id        = result.Id,
-            Alias     = result.Alias,
-            Nombres   = result.Nombres,
-            Apellidos = result.Apellidos,
-            Correo    = result.Correo,
-            Telefono  = result.Telefono,
-            Rol       = result.Rol
+            Id         = result.Id,
+            Alias      = result.Alias,
+            Nombres    = result.Nombres,
+            Apellidos  = result.Apellidos,
+            Correo     = result.Correo,
+            Telefono   = result.Telefono,
+            Rol        = result.Rol,
+            IdCliente  = result.IdCliente,
+            TarifaKm   = result.TarifaKmCliente,
+            TarifaBase = result.TarifaBaseCliente,
+            Empresa    = result.EmpresaCliente
         };
     }
 
@@ -58,7 +62,11 @@ public class AuthRepository : IAuthRepository
         public string Nombres   { get; set; } = string.Empty;
         public string Apellidos { get; set; } = string.Empty;
         public string Correo    { get; set; } = string.Empty;
-        public string? Telefono { get; set; }
-        public string Rol       { get; set; } = string.Empty;
+        public string? Telefono  { get; set; }
+        public string  Rol       { get; set; } = string.Empty;
+        public int?    IdCliente         { get; set; }
+        public decimal? TarifaKmCliente  { get; set; }
+        public decimal? TarifaBaseCliente { get; set; }
+        public string?  EmpresaCliente    { get; set; }
     }
 }
