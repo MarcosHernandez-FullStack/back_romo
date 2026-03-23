@@ -43,7 +43,7 @@ public class ReservasController : ControllerBase
         var result = await _reservaService.CrearReservaAsync(dto);
 
         if (result.Exitoso == 0)
-            return Conflict(result.Mensaje);
+            return Conflict(result);
 
         return Ok(result);
     }
