@@ -1,5 +1,6 @@
 using BackRomo.Application.DTOs.Auth;
 using BackRomo.Application.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace BackRomo.Application.Services;
 
@@ -7,25 +8,36 @@ public class AuthService
 {
     private readonly IAuthRepository _authRepository;
     private readonly IJwtService _jwtService;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IAuthRepository authRepository, IJwtService jwtService)
+    public AuthService(IAuthRepository authRepository, IJwtService jwtService, ILogger<AuthService> logger)
     {
         _authRepository = authRepository;
         _jwtService     = jwtService;
+        _logger         = logger;
     }
 
     public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
     {
+        _logger.LogInformation("Intento de login para identificador {Identificador}", request.Identificador);
+
         var usuario = await _authRepository.LoginAsync(request.Identificador, request.Contrasena);
 
         if (usuario is null)
+        {
+            _logger.LogWarning("Login fallido para identificador {Identificador}", request.Identificador);
             return null;
+        }
 
-        var token = _jwtService.GenerarToken(usuario);
+        var (token, expiresAt) = _jwtService.GenerarToken(usuario);
+
+        _logger.LogInformation("Login exitoso para usuario {UserId} ({Rol}), token expira {ExpiresAt}",
+            usuario.Id, usuario.Rol, expiresAt);
 
         return new LoginResponseDto
         {
             Token      = token,
+            ExpiresAt  = expiresAt,
             Id         = usuario.Id,
             Alias      = usuario.Alias,
             Nombres    = usuario.Nombres,

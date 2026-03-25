@@ -78,3 +78,13 @@ C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.pdb
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.genruntimeconfig.cache
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\ref\BackRomo.API.dll
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.sourcelink.json
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Microsoft.Extensions.DependencyModel.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.AspNetCore.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Extensions.Hosting.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Extensions.Logging.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Formatting.Compact.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Settings.Configuration.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Sinks.Console.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Sinks.File.dll

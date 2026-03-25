@@ -3,6 +3,7 @@ namespace BackRomo.Application.DTOs.Auth;
 public class LoginResponseDto
 {
     public string Token { get; set; } = string.Empty;
+    public DateTime ExpiresAt { get; set; }
     public int Id { get; set; }
     public string Alias { get; set; } = string.Empty;
     public string Nombres { get; set; } = string.Empty;

@@ -4,5 +4,5 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IJwtService
 {
-    string GenerarToken(Usuario usuario);
+    (string Token, DateTime ExpiresAt) GenerarToken(Usuario usuario);
 }

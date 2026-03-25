@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "caWGpGuTkt0=",
+  "dgSpecHash": "B5ULUdDKhNg=",
   "success": true,
   "projectFilePath": "C:\\dev\\back_romo\\BackRomo.Application\\BackRomo.Application.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\mhern\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\10.0.5\\microsoft.extensions.dependencyinjection.abstractions.10.0.5.nupkg.sha512",
+    "C:\\Users\\mhern\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.5\\microsoft.extensions.logging.abstractions.10.0.5.nupkg.sha512"
+  ],
   "logs": []
 }

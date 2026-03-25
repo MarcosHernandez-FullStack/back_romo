@@ -1,0 +1,49 @@
+[2026-03-25 08:49:20 INF] Now listening on: http://localhost:5016
+[2026-03-25 08:49:20 INF] Application started. Press Ctrl+C to shut down.
+[2026-03-25 08:49:20 INF] Hosting environment: Development
+[2026-03-25 08:49:20 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-03-25 08:51:45 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 55.3899 ms
+[2026-03-25 08:51:45 INF] HTTP OPTIONS /api/clientes responded 204 in 55.3474 ms
+[2026-03-25 08:51:47 INF] HTTP GET /api/clientes responded 200 in 1367.5757 ms
+[2026-03-25 08:51:47 INF] HTTP GET /api/reservas/horarios responded 200 in 1476.0063 ms
+[2026-03-25 08:53:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2404 ms
+[2026-03-25 08:53:39 INF] HTTP GET /api/reservas/horarios responded 200 in 414.2217 ms
+[2026-03-25 08:53:40 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1824 ms
+[2026-03-25 08:53:40 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 60.9410 ms
+[2026-03-25 08:55:21 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2896 ms
+[2026-03-25 08:55:21 INF] HTTP GET /api/clientes responded 200 in 27.9325 ms
+[2026-03-25 08:55:21 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1313 ms
+[2026-03-25 08:55:21 INF] HTTP GET /api/reservas/horarios responded 200 in 137.9129 ms
+[2026-03-25 08:55:22 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1773 ms
+[2026-03-25 08:55:22 INF] HTTP GET /api/reservas/horarios responded 200 in 15.2916 ms
+[2026-03-25 08:55:24 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2521 ms
+[2026-03-25 08:55:24 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 6.6997 ms
+[2026-03-25 08:55:26 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2807 ms
+[2026-03-25 08:55:27 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 68.1541 ms
+[2026-03-25 08:55:50 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2696 ms
+[2026-03-25 08:55:51 INF] HTTP GET /api/reservas/horarios responded 200 in 160.9488 ms
+[2026-03-25 08:56:00 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1417 ms
+[2026-03-25 08:56:00 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1121 ms
+[2026-03-25 08:56:00 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 5.8612 ms
+[2026-03-25 08:56:00 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 11.3017 ms
+[2026-03-25 08:56:04 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1999 ms
+[2026-03-25 08:56:04 INF] HTTP GET /api/reservas/horarios responded 200 in 17.3065 ms
+[2026-03-25 08:56:24 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1286 ms
+[2026-03-25 08:56:25 INF] HTTP POST /api/reservas/validar-horario responded 200 in 610.4610 ms
+[2026-03-25 08:56:53 INF] Application is shutting down...
+[2026-03-25 09:01:57 INF] Now listening on: http://localhost:5016
+[2026-03-25 09:01:57 INF] Application started. Press Ctrl+C to shut down.
+[2026-03-25 09:01:57 INF] Hosting environment: Development
+[2026-03-25 09:01:57 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-03-25 09:02:06 INF] HTTP GET /api/clientes responded 200 in 3149.7977 ms
+[2026-03-25 09:05:10 INF] Application is shutting down...
+[2026-03-25 09:05:30 INF] Now listening on: http://localhost:5016
+[2026-03-25 09:05:30 INF] Application started. Press Ctrl+C to shut down.
+[2026-03-25 09:05:30 INF] Hosting environment: Development
+[2026-03-25 09:05:30 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-03-25 09:05:36 INF] HTTP GET /api/clientes responded 401 in 241.4370 ms
+[2026-03-25 09:05:46 INF] Intento de login para identificador mxe
+[2026-03-25 09:05:47 INF] Login exitoso para usuario 804 (CLIENTE), token expira "2026-03-25T22:05:47.2853148Z"
+[2026-03-25 09:05:47 INF] HTTP POST /api/auth/login responded 200 in 1300.2860 ms
+[2026-03-25 09:06:15 INF] HTTP GET /api/clientes responded 200 in 180.8121 ms
+[2026-03-25 09:07:37 INF] Application is shutting down...
