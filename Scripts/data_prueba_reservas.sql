@@ -905,3 +905,51 @@ FROM Demanda
 ORDER BY SlotDT
 OPTION (MAXRECURSION 100);
 
+
+--DATA DE USUARIOS PARA OPERADOR
+-- 1. Activar Devon Mayer (Id 801)
+UPDATE Usuario 
+SET Estado = 'ACTIVO', FechaActualizacion = GETDATE(), ActualizadoPor = 803 
+WHERE Id = 801;
+
+-- 2. Insertar 8 operadores nuevos
+-- Contraseña: Operador2026
+INSERT INTO Usuario (Alias, Contraseña, Correo, Nombres, Apellidos, Rol, Estado, Telefono, FechaCreacion, CreadoPor)
+VALUES
+('cme', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'carlos.mendoza@romo.pe',   'Carlos',   'Mendoza Rios',    'OPERADOR', 'ACTIVO', '987654321', GETDATE(), 803),
+('lfl', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'luis.flores@romo.pe',      'Luis',     'Flores Vega',     'OPERADOR', 'ACTIVO', '976543210', GETDATE(), 803),
+('jqu', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'jose.quispe@romo.pe',      'José',     'Quispe Huanca',   'OPERADOR', 'ACTIVO', '965432109', GETDATE(), 803),
+('mto', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'miguel.torres@romo.pe',    'Miguel',   'Torres Salas',    'OPERADOR', 'ACTIVO', '954321098', GETDATE(), 803),
+('rhu', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'roberto.huanca@romo.pe',   'Roberto',  'Huanca Condori',  'OPERADOR', 'ACTIVO', '943210987', GETDATE(), 803),
+('fes', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'fernando.espinoza@romo.pe','Fernando', 'Espinoza Cruz',   'OPERADOR', 'ACTIVO', '932109876', GETDATE(), 803),
+('ema', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'eduardo.mamani@romo.pe',   'Eduardo',  'Mamani Ticona',   'OPERADOR', 'ACTIVO', '921098765', GETDATE(), 803),
+('ava', '3AF7F73E-06C2-F00B-90E0-7F844688A9DA', 'antonio.vargas@romo.pe',   'Antonio',  'Vargas Paredes',  'OPERADOR', 'ACTIVO', '910987654', GETDATE(), 803);
+
+
+--3. Insertar Operadores
+INSERT INTO Operador (NroLicencia, FecVenLic, IdUsuario, Estado, FechaCreacion, CreadorPor)
+VALUES
+('Q02345678', '2027-03-15', 801, 'ACTIVO', GETDATE(), 803),  -- Devon Mayer
+('Q01987654', '2026-11-20', 809, 'ACTIVO', GETDATE(), 803),  -- Ramiro Berger
+('Q03124567', '2028-01-10', 811, 'ACTIVO', GETDATE(), 803),  -- Carlos Mendoza
+('Q04561237', '2027-06-25', 812, 'ACTIVO', GETDATE(), 803),  -- Luis Flores
+('Q05876543', '2026-09-30', 813, 'ACTIVO', GETDATE(), 803),  -- José Quispe
+('Q06234567', '2028-04-18', 814, 'ACTIVO', GETDATE(), 803),  -- Miguel Torres
+('Q07456789', '2027-12-05', 815, 'ACTIVO', GETDATE(), 803),  -- Roberto Huanca
+('Q08678912', '2026-08-22', 816, 'ACTIVO', GETDATE(), 803),  -- Fernando Espinoza
+('Q09345126', '2028-02-14', 817, 'ACTIVO', GETDATE(), 803),  -- Eduardo Mamani
+('Q01123784', '2027-07-09', 818, 'ACTIVO', GETDATE(), 803);  -- Antonio Vargas
+
+-- Inserción de disponibilidad
+-- Devon (IdOperador = 1) - Lunes a Sábado 08:00-18:00
+-- Miércoles y Viernes con turno partido
+INSERT INTO Disponibilidad (NroDia, NombreDia, HoraInicio, HoraFin, Estado, IdOperador, FechaCreacion, CreadoPor)
+VALUES
+(1, 'Lunes',    '08:00', '18:00', 'ACTIVO', 1, GETDATE(), 803),
+(2, 'Martes',   '08:00', '18:00', 'ACTIVO', 1, GETDATE(), 803),
+(3, 'Miércoles','08:00', '12:00', 'ACTIVO', 1, GETDATE(), 803),  -- turno partido
+(3, 'Miércoles','14:00', '18:00', 'ACTIVO', 1, GETDATE(), 803),  -- turno partido
+(4, 'Jueves',   '08:00', '18:00', 'ACTIVO', 1, GETDATE(), 803),
+(5, 'Viernes',  '08:00', '11:00', 'ACTIVO', 1, GETDATE(), 803),  -- turno partido
+(5, 'Viernes',  '13:00', '18:00', 'ACTIVO', 1, GETDATE(), 803),  -- turno partido
+(6, 'Sábado',   '08:00', '18:00', 'ACTIVO', 1, GETDATE(), 803);

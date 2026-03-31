@@ -15,4 +15,6 @@ public class ParametroDto
     public int      TimerAdministrativo     { get; set; }
     public int      TimerCliente            { get; set; }
     public string   ZonaHoraria            { get; set; } = string.Empty;
+    public int      MinutosCerca           { get; set; }
+    public int      MinutosMedio           { get; set; }
 }

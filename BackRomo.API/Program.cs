@@ -2,10 +2,10 @@ using System.Text;
 using BackRomo.API.Middlewares;
 using BackRomo.Application.Interfaces;
 using BackRomo.Application.Services;
-using BackRomo.Infrastructure.Repositories;
 using BackRomo.Infrastructure.Auth;
 using BackRomo.Infrastructure.Data;
 using BackRomo.Infrastructure.Repositories;
+using BackRomo.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
@@ -38,6 +38,13 @@ builder.Services.AddScoped<IFechaService, FechaService>();
 // Reservas
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<ReservaService>();
+
+// Operaciones
+builder.Services.AddScoped<IOperacionRepository, OperacionRepository>();
+builder.Services.AddScoped<OperacionService>();
+
+// Google Maps
+builder.Services.AddHttpClient<IGoogleMapsService, GoogleMapsService>();
 
 // Controllers
 builder.Services.AddControllers();
