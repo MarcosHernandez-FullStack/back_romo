@@ -21,10 +21,6 @@ public class OperacionesController : ControllerBase
         [FromQuery] int?    id)
     {
         var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id);
-
-        if (!reservas.Any())
-            return NoContent();
-
         return Ok(reservas);
     }
 
