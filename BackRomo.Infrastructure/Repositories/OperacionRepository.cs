@@ -33,7 +33,7 @@ public class OperacionRepository : IOperacionRepository
 
         await conn.ExecuteAsync(
             "sp_CancelarReserva",
-            new { dto.Id, dto.MotivoCancelacion },
+            new { dto.Id, dto.MotivoCancelacion, dto.ActualizadoPor },
             commandType: CommandType.StoredProcedure
         );
     }
@@ -59,7 +59,7 @@ public class OperacionRepository : IOperacionRepository
 
         return await conn.QueryFirstOrDefaultAsync<OperacionResultDto>(
             "sp_AsignarServicio",
-            new { dto.IdReserva, dto.IdGrua, dto.IdOperador },
+            new { dto.IdReserva, dto.IdGrua, dto.IdOperador, dto.ActualizadoPor },
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al asignar el servicio." };
     }

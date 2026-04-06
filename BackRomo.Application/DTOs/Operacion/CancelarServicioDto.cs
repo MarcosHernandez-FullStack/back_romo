@@ -4,4 +4,5 @@ public class CancelarServicioDto
 {
     public int    Id                 { get; set; }
     public string MotivoCancelacion  { get; set; } = string.Empty;
+    public int    ActualizadoPor     { get; set; }
 }

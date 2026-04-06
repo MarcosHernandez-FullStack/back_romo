@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BackRomo.Application.DTOs.Operacion;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ public class OperacionesController : ControllerBase
     [HttpPatch("cancelar")]
     public async Task<IActionResult> CancelarReserva([FromBody] CancelarServicioDto dto)
     {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         await _operacionService.CancelarReservaAsync(dto);
         return NoContent();
     }
@@ -42,6 +44,8 @@ public class OperacionesController : ControllerBase
     [HttpPatch("asignar")]
     public async Task<IActionResult> AsignarServicio([FromBody] AsignarServicioDto dto)
     {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
         var result = await _operacionService.AsignarReservaAsync(dto);
 
         if (result.Exitoso == 0)

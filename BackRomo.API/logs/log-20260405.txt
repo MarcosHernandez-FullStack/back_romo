@@ -669,3 +669,192 @@ System.IndexOutOfRangeException: Index was outside the bounds of the array.
 [2026-04-05 21:41:53 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.4245 ms
 [2026-04-05 21:41:53 INF] HTTP GET /api/operaciones responded 200 in 79.0504 ms
 [2026-04-05 21:44:53 INF] Application is shutting down...
+[2026-04-05 23:08:56 INF] Now listening on: http://localhost:5016
+[2026-04-05 23:08:57 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-05 23:08:57 INF] Hosting environment: Development
+[2026-04-05 23:08:57 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-05 23:10:17 INF] HTTP OPTIONS /api/operaciones responded 204 in 90.3784 ms
+[2026-04-05 23:10:19 INF] HTTP OPTIONS /api/operaciones responded 204 in 12.9552 ms
+[2026-04-05 23:10:20 INF] HTTP GET /api/operaciones responded 200 in 2986.6455 ms
+[2026-04-05 23:10:20 INF] HTTP GET /api/operaciones responded 200 in 126.3717 ms
+[2026-04-05 23:10:24 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.6751 ms
+[2026-04-05 23:10:24 INF] HTTP GET /api/operaciones responded 200 in 171.9199 ms
+[2026-04-05 23:10:28 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1909 ms
+[2026-04-05 23:10:28 INF] HTTP GET /api/operaciones responded 200 in 17.1564 ms
+[2026-04-05 23:10:50 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.3934 ms
+[2026-04-05 23:10:52 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 1827.6610 ms
+[2026-04-05 23:11:18 INF] HTTP OPTIONS /api/clientes responded 204 in 0.1781 ms
+[2026-04-05 23:11:18 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1211 ms
+[2026-04-05 23:11:18 INF] HTTP GET /api/clientes responded 200 in 82.4311 ms
+[2026-04-05 23:11:18 INF] HTTP GET /api/reservas/horarios responded 204 in 224.6240 ms
+[2026-04-05 23:11:20 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1878 ms
+[2026-04-05 23:11:20 INF] HTTP GET /api/operaciones responded 200 in 33.1176 ms
+[2026-04-05 23:11:24 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2837 ms
+[2026-04-05 23:11:24 INF] HTTP GET /api/operaciones responded 200 in 5.7396 ms
+[2026-04-05 23:18:46 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2632 ms
+[2026-04-05 23:18:46 INF] HTTP GET /api/operaciones responded 200 in 65.6543 ms
+[2026-04-05 23:18:48 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2741 ms
+[2026-04-05 23:18:48 INF] HTTP GET /api/clientes responded 200 in 23.2917 ms
+[2026-04-05 23:18:48 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1043 ms
+[2026-04-05 23:18:49 INF] HTTP GET /api/reservas/horarios responded 204 in 160.5746 ms
+[2026-04-05 23:18:49 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3887 ms
+[2026-04-05 23:18:49 INF] HTTP GET /api/reservas/horarios responded 204 in 7.5855 ms
+[2026-04-05 23:18:50 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1902 ms
+[2026-04-05 23:18:50 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 54.1420 ms
+[2026-04-05 23:18:51 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1753 ms
+[2026-04-05 23:18:51 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 37.6810 ms
+[2026-04-05 23:24:37 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 0.1838 ms
+[2026-04-05 23:24:37 ERR] Error no controlado en PATCH /api/operaciones/asignar
+Microsoft.Data.SqlClient.SqlException (0x80131904): Procedure or function 'sp_AsignarServicio' expects parameter '@ActualizadoPor', which was not supplied.
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<ExecuteDbDataReaderAsync>b__195_0(Task`1 result)
+   at System.Threading.Tasks.ContinuationResultTaskFromResultTask`2.InnerInvoke()
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Threading.Tasks.Task.ExecuteWithThreadLocal(Task& currentTaskSlot, Thread threadPoolThread)
+--- End of stack trace from previous location ---
+   at Dapper.SqlMapper.QueryRowAsync[T](IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 489
+   at BackRomo.Infrastructure.Repositories.OperacionRepository.AsignarReservaAsync(AsignarServicioDto dto) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\OperacionRepository.cs:line 60
+   at BackRomo.Application.Services.OperacionService.AsignarReservaAsync(AsignarServicioDto dto) in C:\dev\back_romo\BackRomo.Application\Services\OperacionService.cs:line 31
+   at BackRomo.API.Controllers.OperacionesController.AsignarServicio(AsignarServicioDto dto) in C:\dev\back_romo\BackRomo.API\Controllers\OperacionesController.cs:line 45
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+ClientConnectionId:016959c4-fac0-4fee-a8f4-c390f9e5dd8d
+Error Number:201,State:4,Class:16
+[2026-04-05 23:24:37 ERR] HTTP PATCH /api/operaciones/asignar responded 500 in 219.4818 ms
+[2026-04-05 23:24:50 INF] Application is shutting down...
+[2026-04-05 23:25:06 INF] Now listening on: http://localhost:5016
+[2026-04-05 23:25:06 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-05 23:25:06 INF] Hosting environment: Development
+[2026-04-05 23:25:06 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-05 23:25:44 INF] HTTP OPTIONS /api/operaciones responded 204 in 47.2351 ms
+[2026-04-05 23:25:45 INF] HTTP GET /api/operaciones responded 200 in 1161.4844 ms
+[2026-04-05 23:25:46 INF] HTTP OPTIONS /api/operaciones responded 204 in 4.5158 ms
+[2026-04-05 23:25:46 INF] HTTP GET /api/operaciones responded 200 in 105.9991 ms
+[2026-04-05 23:25:48 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2983 ms
+[2026-04-05 23:25:49 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 1224.3483 ms
+[2026-04-05 23:26:00 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 0.2503 ms
+[2026-04-05 23:26:00 INF] HTTP PATCH /api/operaciones/asignar responded 204 in 167.6253 ms
+[2026-04-05 23:31:04 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2002 ms
+[2026-04-05 23:31:04 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2412 ms
+[2026-04-05 23:31:04 INF] HTTP GET /api/operaciones responded 200 in 152.6583 ms
+[2026-04-05 23:31:04 INF] HTTP GET /api/operaciones responded 200 in 136.4457 ms
+[2026-04-05 23:31:04 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2256 ms
+[2026-04-05 23:31:04 INF] HTTP GET /api/clientes responded 200 in 56.1019 ms
+[2026-04-05 23:31:05 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1230 ms
+[2026-04-05 23:31:05 INF] HTTP GET /api/reservas/horarios responded 204 in 283.2403 ms
+[2026-04-05 23:31:55 INF] HTTP OPTIONS /api/clientes responded 204 in 0.4670 ms
+[2026-04-05 23:31:55 INF] HTTP GET /api/clientes responded 200 in 18.8895 ms
+[2026-04-05 23:31:55 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1268 ms
+[2026-04-05 23:31:55 INF] HTTP GET /api/reservas/horarios responded 204 in 127.4782 ms
+[2026-04-05 23:31:57 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1203 ms
+[2026-04-05 23:31:57 INF] HTTP GET /api/operaciones responded 200 in 47.1415 ms
+[2026-04-05 23:36:39 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.3091 ms
+[2026-04-05 23:36:40 INF] HTTP GET /api/operaciones responded 200 in 135.6690 ms
+[2026-04-05 23:36:42 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2615 ms
+[2026-04-05 23:36:42 INF] HTTP GET /api/operaciones responded 200 in 11.8868 ms
+[2026-04-05 23:37:13 INF] HTTP OPTIONS /api/operaciones/cancelar responded 204 in 0.2340 ms
+[2026-04-05 23:37:13 ERR] Error no controlado en PATCH /api/operaciones/cancelar
+Microsoft.Data.SqlClient.SqlException (0x80131904): Procedure or function 'sp_CancelarReserva' expects parameter '@ActualizadoPor', which was not supplied.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location ---
+   at Dapper.SqlMapper.ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, Object param) in /_/Dapper/SqlMapper.Async.cs:line 662
+   at BackRomo.Infrastructure.Repositories.OperacionRepository.CancelarReservaAsync(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\OperacionRepository.cs:line 34
+   at BackRomo.Application.Services.OperacionService.CancelarReservaAsync(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.Application\Services\OperacionService.cs:line 28
+   at BackRomo.API.Controllers.OperacionesController.CancelarReserva(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.API\Controllers\OperacionesController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+ClientConnectionId:f50263fd-4687-4e60-901a-de7310887abe
+Error Number:201,State:4,Class:16
+[2026-04-05 23:37:13 ERR] HTTP PATCH /api/operaciones/cancelar responded 500 in 219.3889 ms
+[2026-04-05 23:37:18 INF] Application is shutting down...
+[2026-04-05 23:37:32 INF] Now listening on: http://localhost:5016
+[2026-04-05 23:37:32 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-05 23:37:32 INF] Hosting environment: Development
+[2026-04-05 23:37:32 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-05 23:37:35 INF] HTTP OPTIONS /api/operaciones responded 204 in 46.6247 ms
+[2026-04-05 23:37:37 INF] HTTP GET /api/operaciones responded 200 in 1165.6640 ms
+[2026-04-05 23:37:39 INF] HTTP OPTIONS /api/operaciones responded 204 in 2.8917 ms
+[2026-04-05 23:37:39 INF] HTTP GET /api/operaciones responded 200 in 130.2972 ms
+[2026-04-05 23:37:55 INF] HTTP OPTIONS /api/operaciones/cancelar responded 204 in 0.2060 ms
+[2026-04-05 23:37:55 ERR] Error no controlado en PATCH /api/operaciones/cancelar
+Microsoft.Data.SqlClient.SqlException (0x80131904): Procedure or function 'sp_CancelarReserva' expects parameter '@ActualizadoPor', which was not supplied.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at Microsoft.Data.SqlClient.SqlCommand.CompleteAsyncExecuteReader(Boolean isInternal, Boolean forDescribeParameterEncryption)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__193_1(IAsyncResult asyncResult)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location ---
+   at Dapper.SqlMapper.ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, Object param) in /_/Dapper/SqlMapper.Async.cs:line 662
+   at BackRomo.Infrastructure.Repositories.OperacionRepository.CancelarReservaAsync(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\OperacionRepository.cs:line 34
+   at BackRomo.Application.Services.OperacionService.CancelarReservaAsync(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.Application\Services\OperacionService.cs:line 28
+   at BackRomo.API.Controllers.OperacionesController.CancelarReserva(CancelarServicioDto dto) in C:\dev\back_romo\BackRomo.API\Controllers\OperacionesController.cs:line 33
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+ClientConnectionId:0aed7453-a7de-4251-a92d-a78bba598057
+Error Number:201,State:4,Class:16
+[2026-04-05 23:37:55 ERR] HTTP PATCH /api/operaciones/cancelar responded 500 in 257.8930 ms
+[2026-04-05 23:42:08 INF] Application is shutting down...
+[2026-04-05 23:42:17 INF] Now listening on: http://localhost:5016
+[2026-04-05 23:42:17 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-05 23:42:17 INF] Hosting environment: Development
+[2026-04-05 23:42:17 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-05 23:42:29 INF] HTTP OPTIONS /api/operaciones responded 204 in 48.4729 ms
+[2026-04-05 23:42:30 INF] HTTP GET /api/operaciones responded 200 in 1008.7954 ms
+[2026-04-05 23:42:33 INF] HTTP OPTIONS /api/operaciones responded 204 in 2.9772 ms
+[2026-04-05 23:42:33 INF] HTTP GET /api/operaciones responded 200 in 61.7183 ms
+[2026-04-05 23:42:52 INF] HTTP OPTIONS /api/operaciones/cancelar responded 204 in 0.2538 ms
+[2026-04-05 23:42:52 INF] HTTP PATCH /api/operaciones/cancelar responded 204 in 161.8625 ms
+[2026-04-05 23:43:49 INF] Application is shutting down...
