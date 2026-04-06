@@ -10,6 +10,10 @@ public class ReservaDto
     public TimeSpan  HoraInicio       { get; set; }
     public TimeSpan  HoraFin          { get; set; }
     public int      NroBloques       { get; set; }
+    public decimal  DistanciaKm      { get; set; }
+    public int      TiempoEstimado   { get; set; }
+    public int      TiempoManiobra   { get; set; }
+    public int      TiempoRetorno    { get; set; }
     public string   EstadoOperacion  { get; set; } = string.Empty;
     public string   Estado           { get; set; } = string.Empty;
 }

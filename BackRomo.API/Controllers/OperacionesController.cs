@@ -17,10 +17,11 @@ public class OperacionesController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> ListarReservas(
-        [FromQuery] string? estadoOperacion,
-        [FromQuery] int?    id)
+        [FromQuery] string?   estadoOperacion,
+        [FromQuery] int?      id,
+        [FromQuery] DateTime? fechaServicio)
     {
-        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id);
+        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio);
         return Ok(reservas);
     }
 
@@ -36,5 +37,16 @@ public class OperacionesController : ControllerBase
     {
         var sugerencias = await _operacionService.SugerirAsignacionAsync(idReserva);
         return Ok(sugerencias);
+    }
+
+    [HttpPatch("asignar")]
+    public async Task<IActionResult> AsignarServicio([FromBody] AsignarServicioDto dto)
+    {
+        var result = await _operacionService.AsignarReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result);
+
+        return NoContent();
     }
 }

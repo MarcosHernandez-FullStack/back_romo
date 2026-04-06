@@ -10,9 +10,9 @@ C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructu
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.AssemblyInfoInputs.cache
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.AssemblyInfo.cs
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.csproj.CoreCompileInputs.cache
+C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.sourcelink.json
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.B19EF037.Up2Date
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.dll
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\refint\BackRomo.Infrastructure.dll
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.pdb
 C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\ref\BackRomo.Infrastructure.dll
-C:\dev\back_romo\BackRomo.Infrastructure\obj\Debug\net10.0\BackRomo.Infrastructure.sourcelink.json

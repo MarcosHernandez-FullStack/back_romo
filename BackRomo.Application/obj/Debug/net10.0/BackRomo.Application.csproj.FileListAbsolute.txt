@@ -8,9 +8,9 @@ C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.Gen
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.AssemblyInfoInputs.cache
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.AssemblyInfo.cs
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.csproj.CoreCompileInputs.cache
+C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.sourcelink.json
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.9AE6CB5E.Up2Date
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.dll
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\refint\BackRomo.Application.dll
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.pdb
 C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\ref\BackRomo.Application.dll
-C:\dev\back_romo\BackRomo.Application\obj\Debug\net10.0\BackRomo.Application.sourcelink.json

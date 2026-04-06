@@ -16,13 +16,13 @@ public class OperacionRepository : IOperacionRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id)
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio)
     {
         using var conn = _db.CreateConnection();
 
         return await conn.QueryAsync<ReservaDto>(
             "sp_ListReservas",
-            new { EstadoOperacion = estadoOperacion, Id = id },
+            new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio },
             commandType: CommandType.StoredProcedure
         );
     }
@@ -53,15 +53,33 @@ public class OperacionRepository : IOperacionRepository
         return (gruas, operadores);
     }
 
+    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        return await conn.QueryFirstOrDefaultAsync<OperacionResultDto>(
+            "sp_AsignarServicio",
+            new { dto.IdReserva, dto.IdGrua, dto.IdOperador },
+            commandType: CommandType.StoredProcedure
+        ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al asignar el servicio." };
+    }
+
     public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva)
     {
         using var conn = _db.CreateConnection();
 
-        var result = await conn.QueryFirstOrDefaultAsync<(string, string)?>(
+        var result = await conn.QueryFirstOrDefaultAsync<OrigenReserva>(
             "SELECT CoordLatOrigen, CoordLonOrigen FROM Reserva WHERE Id = @Id",
             new { Id = idReserva }
         );
 
-        return result;
+        if (result is null) return null;
+        return (result.CoordLatOrigen, result.CoordLonOrigen);
+    }
+
+    private class OrigenReserva
+    {
+        public string CoordLatOrigen { get; set; } = string.Empty;
+        public string CoordLonOrigen { get; set; } = string.Empty;
     }
 }
