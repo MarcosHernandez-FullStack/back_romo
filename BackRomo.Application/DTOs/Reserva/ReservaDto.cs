@@ -16,4 +16,6 @@ public class ReservaDto
     public int      TiempoRetorno    { get; set; }
     public string   EstadoOperacion  { get; set; } = string.Empty;
     public string   Estado           { get; set; } = string.Empty;
+    public string?  GruaAsignada     { get; set; }
+    public string?  OperadorAsignado { get; set; }
 }
