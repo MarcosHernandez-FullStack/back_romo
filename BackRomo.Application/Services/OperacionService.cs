@@ -30,6 +30,9 @@ public class OperacionService
     public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
         => await _operacionRepository.AsignarReservaAsync(dto);
 
+    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
+        => await _operacionRepository.ReprogramarReservaAsync(dto);
+
     public async Task<SugerenciasDto> SugerirAsignacionAsync(int idReserva)
     {
         var parametro = await _configuracionRepository.ObtenerParametroOperativoAsync()

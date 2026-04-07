@@ -64,6 +64,26 @@ public class OperacionRepository : IOperacionRepository
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al asignar el servicio." };
     }
 
+    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        var horaInicio = TimeSpan.Parse(dto.NuevaHoraInicio);
+
+        return await conn.QueryFirstOrDefaultAsync<OperacionResultDto>(
+            "sp_ReprogramarReserva",
+            new
+            {
+                dto.IdReserva,
+                NuevaFecha      = dto.NuevaFecha.Date,
+                NuevaHoraInicio = horaInicio,
+                dto.NuevoNroBloques,
+                dto.ActualizadoPor,
+            },
+            commandType: CommandType.StoredProcedure
+        ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al reprogramar la reserva." };
+    }
+
     public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva)
     {
         using var conn = _db.CreateConnection();

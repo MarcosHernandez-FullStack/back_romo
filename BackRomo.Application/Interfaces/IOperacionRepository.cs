@@ -10,4 +10,5 @@ public interface IOperacionRepository
     Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva);
     Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva);
     Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto);
+    Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto);
 }

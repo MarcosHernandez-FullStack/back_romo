@@ -53,4 +53,17 @@ public class OperacionesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPatch("reprogramar")]
+    public async Task<IActionResult> ReprogramarReserva([FromBody] ReprogramarServicioDto dto)
+    {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _operacionService.ReprogramarReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result);
+
+        return NoContent();
+    }
 }
