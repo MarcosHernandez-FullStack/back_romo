@@ -26,6 +26,17 @@ public class ReservasController : ControllerBase
         return Ok(horarios);
     }
 
+    [HttpGet("horarios-reprogramacion")]
+    public async Task<IActionResult> ListarHorariosReprogramacion([FromQuery] DateOnly fecha, [FromQuery] string rol, [FromQuery] short capacidad, [FromQuery] int idReserva)
+    {
+        var horarios = await _reservaService.ListarHorariosReprogramacionAsync(fecha, rol, capacidad, idReserva);
+
+        if (!horarios.Any())
+            return NoContent();
+
+        return Ok(horarios);
+    }
+
     [HttpPost("validar-horario")]
     public async Task<IActionResult> ValidarHorario([FromBody] CrearReservaDto dto)
     {

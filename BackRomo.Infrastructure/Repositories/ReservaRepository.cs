@@ -30,6 +30,21 @@ public class ReservaRepository : IReservaRepository
             .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
     }
 
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva)
+    {
+        using var conn = _db.CreateConnection();
+
+        var results = await conn.QueryAsync<SpHorarioResult>(
+            "sp_ListHorariosReprogramacion",
+            new { FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue), Rol = rol, Capacidad = capacidad, IdReserva = idReserva },
+            commandType: CommandType.StoredProcedure
+        );
+
+        return results
+            .Where(r => r.Hora.HasValue)
+            .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
+    }
+
     public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
     {
         using var conn = _db.CreateConnection();

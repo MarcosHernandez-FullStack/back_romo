@@ -17,6 +17,9 @@ public class ReservaService
     public async Task<IEnumerable<HorarioDto>> ListarHorariosAsync(DateOnly fecha, string rol, short capacidad)
         => await _reservaRepository.ListarHorariosAsync(fecha, rol, capacidad);
 
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva)
+        => await _reservaRepository.ListarHorariosReprogramacionAsync(fecha, rol, capacidad, idReserva);
+
     public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
     {
         dto.FechaCreacion = await _fechaService.AhoraAsync();
