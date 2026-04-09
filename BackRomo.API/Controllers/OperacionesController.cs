@@ -58,6 +58,7 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> ReprogramarReserva([FromBody] ReprogramarServicioDto dto)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        dto.Rol            = User.FindFirstValue(ClaimTypes.Role) ?? "ADMINISTRADOR";
 
         var result = await _operacionService.ReprogramarReservaAsync(dto);
 

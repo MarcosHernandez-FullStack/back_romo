@@ -7,4 +7,5 @@ public class ReprogramarServicioDto
     public string   NuevaHoraInicio { get; set; } = string.Empty;   // "HH:mm"
     public int      NuevoNroBloques { get; set; }
     public int      ActualizadoPor  { get; set; }
+    public string   Rol             { get; set; } = "ADMINISTRADOR";
 }

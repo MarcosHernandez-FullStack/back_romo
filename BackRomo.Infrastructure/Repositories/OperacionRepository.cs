@@ -79,6 +79,7 @@ public class OperacionRepository : IOperacionRepository
                 NuevaHoraInicio = horaInicio,
                 dto.NuevoNroBloques,
                 dto.ActualizadoPor,
+                dto.Rol,
             },
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al reprogramar la reserva." };
