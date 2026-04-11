@@ -15,9 +15,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((ctx, config) =>
     config.ReadFrom.Configuration(ctx.Configuration));
 
-// Conexión a SQL Server
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-builder.Services.AddSingleton(new DbConnectionFactory(connectionString));
+// Conexión a base de datos — cambiar "DbProvider" en appsettings.json: "SqlServer" | "PostgreSQL"
+var dbProvider     = builder.Configuration["DbProvider"] ?? "SqlServer";
+var connectionString = builder.Configuration.GetConnectionString(dbProvider)!;
+builder.Services.AddSingleton(new DbConnectionFactory(connectionString, dbProvider));
 
 // Auth
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();

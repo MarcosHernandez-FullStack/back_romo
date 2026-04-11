@@ -22,10 +22,17 @@ public class AuthRepository : IAuthRepository
 
         using var conn = _db.CreateConnection();
 
+        // SQL Server — stored procedure
+        // var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
+        //     "sp_LoginUsuario",
+        //     new { Identificador = identificador, Contrasena = hashContrasena },
+        //     commandType: System.Data.CommandType.StoredProcedure
+        // );
+
+        // PostgreSQL — function (RETURNS TABLE)
         var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
-            "sp_LoginUsuario",
-            new { Identificador = identificador, Contrasena = hashContrasena },
-            commandType: System.Data.CommandType.StoredProcedure
+            "SELECT * FROM fn_LoginUsuario(@_Identificador, @_Contrasena)",
+            new { _Identificador = identificador, _Contrasena = hashContrasena }
         );
 
         if (result is null || result.Exitoso == 0)

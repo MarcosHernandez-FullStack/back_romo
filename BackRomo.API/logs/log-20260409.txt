@@ -490,3 +490,52 @@
 [2026-04-09 14:37:21 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1999 ms
 [2026-04-09 14:37:22 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 575.0654 ms
 [2026-04-09 14:37:30 INF] Application is shutting down...
+[2026-04-09 16:32:32 INF] Now listening on: http://localhost:5016
+[2026-04-09 16:32:32 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-09 16:32:32 INF] Hosting environment: Development
+[2026-04-09 16:32:32 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-09 16:33:44 INF] HTTP OPTIONS /api/operaciones responded 204 in 94.5330 ms
+[2026-04-09 16:33:44 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 94.4656 ms
+[2026-04-09 16:33:46 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 1996.9172 ms
+[2026-04-09 16:33:46 INF] HTTP GET /api/operaciones responded 200 in 2046.6361 ms
+[2026-04-09 16:33:49 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.4919 ms
+[2026-04-09 16:33:58 INF] HTTP GET /api/operaciones responded 200 in 9149.6185 ms
+[2026-04-09 16:38:27 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.7618 ms
+[2026-04-09 16:38:28 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 779.7932 ms
+[2026-04-09 16:39:32 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 1.1497 ms
+[2026-04-09 16:39:33 INF] HTTP PATCH /api/operaciones/asignar responded 204 in 329.5129 ms
+[2026-04-09 16:39:38 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1913 ms
+[2026-04-09 16:39:38 INF] HTTP GET /api/operaciones responded 200 in 102.8000 ms
+[2026-04-09 16:39:53 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1379 ms
+[2026-04-09 16:39:54 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 408.5713 ms
+[2026-04-09 16:40:18 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.4147 ms
+[2026-04-09 16:40:20 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 2043.5322 ms
+[2026-04-09 16:40:34 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.5409 ms
+[2026-04-09 16:40:36 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 2442.2594 ms
+[2026-04-09 16:43:05 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1907 ms
+[2026-04-09 16:43:07 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 2049.4356 ms
+[2026-04-09 16:43:52 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2930 ms
+[2026-04-09 16:43:52 INF] HTTP GET /api/operaciones responded 200 in 101.1626 ms
+[2026-04-09 16:43:53 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.3399 ms
+[2026-04-09 16:43:55 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 1381.9332 ms
+[2026-04-09 16:44:33 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.9722 ms
+[2026-04-09 16:44:33 INF] HTTP GET /api/operaciones responded 200 in 69.2536 ms
+[2026-04-09 16:49:58 INF] HTTP OPTIONS /api/operaciones/cancelar responded 204 in 0.1537 ms
+[2026-04-09 16:49:58 INF] HTTP PATCH /api/operaciones/cancelar responded 204 in 265.1679 ms
+[2026-04-09 16:50:00 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2194 ms
+[2026-04-09 16:50:01 INF] HTTP GET /api/operaciones responded 200 in 192.1477 ms
+[2026-04-09 16:50:39 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1263 ms
+[2026-04-09 16:50:40 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 710.9966 ms
+[2026-04-09 16:51:00 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1807 ms
+[2026-04-09 16:51:00 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 82.9762 ms
+[2026-04-09 16:52:36 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.2742 ms
+[2026-04-09 16:52:36 INF] HTTP PATCH /api/operaciones/reprogramar responded 204 in 697.2310 ms
+[2026-04-09 16:52:38 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2629 ms
+[2026-04-09 16:52:38 INF] HTTP GET /api/operaciones responded 200 in 118.9405 ms
+[2026-04-09 16:52:51 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1253 ms
+[2026-04-09 16:52:51 INF] HTTP GET /api/operaciones responded 200 in 94.9328 ms
+[2026-04-09 16:53:07 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1325 ms
+[2026-04-09 16:53:07 INF] HTTP GET /api/operaciones responded 200 in 15.4210 ms
+[2026-04-09 16:58:50 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1737 ms
+[2026-04-09 16:58:50 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 372.3372 ms
+[2026-04-09 17:20:21 INF] Application is shutting down...
