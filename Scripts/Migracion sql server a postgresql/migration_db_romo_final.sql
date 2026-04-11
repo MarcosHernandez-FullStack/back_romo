@@ -485,95 +485,89 @@ DECLARE
     v_NombresOp     VARCHAR(100);
     v_ApellidosOp   VARCHAR(100);
 BEGIN
-    BEGIN
-        SELECT r."FechaServicio", r."HoraInicio", r."HoraFin"
-        INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
-        FROM   "Reserva" r
-        WHERE  r."Id" = _IdReserva
-        FOR UPDATE;
+    SELECT r."FechaServicio", r."HoraInicio", r."HoraFin"
+    INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
+    FROM   "Reserva" r
+    WHERE  r."Id" = _IdReserva
+    FOR UPDATE;
 
-        v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
+    v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
 
-        SELECT "TiempoCorte" INTO v_TiempoCorte
-        FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+    SELECT "TiempoCorte" INTO v_TiempoCorte
+    FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
 
-        IF v_FechaServicio = CURRENT_DATE
-           AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
-        THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'No es posible asignar el servicio de las ' ||
-                        to_char(v_HoraInicio,'HH24:MI:SS') ||
-                        ', debe asignarse con ' || v_TiempoCorte::TEXT ||
-                        ' horas de anticipación.';
-            RETURN;
-        END IF;
-
-        SELECT "Placa" INTO v_PlacaGrua FROM "Grua" WHERE "Id" = _IdGrua;
-
-        IF EXISTS (
-            SELECT 1 FROM "Reserva"
-            WHERE  "IdGrua"          = _IdGrua
-              AND  "FechaServicio"   = v_FechaServicio
-              AND  "Id"             != _IdReserva
-              AND  "Estado"          = 'ACTIVO'
-              AND  "EstadoOperacion" != 'CANCELADO'
-              AND  "HoraInicio"      < v_HoraFin
-              AND  "HoraFin"         > v_HoraInicio
-        ) THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'La grúa con placa ' || v_PlacaGrua ||
-                        ' ya tiene asignado un servicio en el horario ' ||
-                        to_char(v_HoraInicio,'HH24:MI') || ' - ' ||
-                        to_char(v_HoraFin,'HH24:MI') || '.';
-            RETURN;
-        END IF;
-
-        SELECT u."Nombres", u."Apellidos"
-        INTO   v_NombresOp, v_ApellidosOp
-        FROM   "Operador" o
-        INNER JOIN "Usuario" u ON u."Id" = o."IdUsuario"
-        WHERE  o."Id" = _IdOperador;
-
-        IF EXISTS (
-            SELECT 1 FROM "Reserva"
-            WHERE  "IdOperador"      = _IdOperador
-              AND  "FechaServicio"   = v_FechaServicio
-              AND  "Id"             != _IdReserva
-              AND  "Estado"          = 'ACTIVO'
-              AND  "EstadoOperacion" != 'CANCELADO'
-              AND  "HoraInicio"      < v_HoraFin
-              AND  "HoraFin"         > v_HoraInicio
-        ) THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'El operador ' || v_NombresOp || ' ' || v_ApellidosOp ||
-                        ' ya tiene asignado un servicio en el horario ' ||
-                        to_char(v_HoraInicio,'HH24:MI') || ' - ' ||
-                        to_char(v_HoraFin,'HH24:MI') || '.';
-            RETURN;
-        END IF;
-
-        UPDATE "Reserva"
-        SET    "EstadoOperacion"    = 'ASIGNADO',
-               "IdGrua"             = _IdGrua,
-               "IdOperador"         = _IdOperador,
-               "FechaActualizacion" = NOW(),
-               "ActualizadoPor"     = _ActualizadoPor
-        WHERE  "Id" = _IdReserva;
-
-        COMMIT;
-        _Exitoso := 1;
-        _Mensaje := 'Servicio asignado correctamente a la grúa con placa ' ||
-                    v_PlacaGrua || ' y operador ' ||
-                    v_NombresOp || ' ' || v_ApellidosOp || '.';
-
-    EXCEPTION WHEN OTHERS THEN
+    IF v_FechaServicio = CURRENT_DATE
+       AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
+    THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := SQLERRM;
-    END;
+        _Mensaje := 'No es posible asignar el servicio de las ' ||
+                    to_char(v_HoraInicio,'HH24:MI:SS') ||
+                    ', debe asignarse con ' || v_TiempoCorte::TEXT ||
+                    ' horas de anticipación.';
+        RETURN;
+    END IF;
+
+    SELECT "Placa" INTO v_PlacaGrua FROM "Grua" WHERE "Id" = _IdGrua;
+
+    IF EXISTS (
+        SELECT 1 FROM "Reserva"
+        WHERE  "IdGrua"          = _IdGrua
+          AND  "FechaServicio"   = v_FechaServicio
+          AND  "Id"             != _IdReserva
+          AND  "Estado"          = 'ACTIVO'
+          AND  "EstadoOperacion" != 'CANCELADO'
+          AND  "HoraInicio"      < v_HoraFin
+          AND  "HoraFin"         > v_HoraInicio
+    ) THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'La grúa con placa ' || v_PlacaGrua ||
+                    ' ya tiene asignado un servicio en el horario ' ||
+                    to_char(v_HoraInicio,'HH24:MI') || ' - ' ||
+                    to_char(v_HoraFin,'HH24:MI') || '.';
+        RETURN;
+    END IF;
+
+    SELECT u."Nombres", u."Apellidos"
+    INTO   v_NombresOp, v_ApellidosOp
+    FROM   "Operador" o
+    INNER JOIN "Usuario" u ON u."Id" = o."IdUsuario"
+    WHERE  o."Id" = _IdOperador;
+
+    IF EXISTS (
+        SELECT 1 FROM "Reserva"
+        WHERE  "IdOperador"      = _IdOperador
+          AND  "FechaServicio"   = v_FechaServicio
+          AND  "Id"             != _IdReserva
+          AND  "Estado"          = 'ACTIVO'
+          AND  "EstadoOperacion" != 'CANCELADO'
+          AND  "HoraInicio"      < v_HoraFin
+          AND  "HoraFin"         > v_HoraInicio
+    ) THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'El operador ' || v_NombresOp || ' ' || v_ApellidosOp ||
+                    ' ya tiene asignado un servicio en el horario ' ||
+                    to_char(v_HoraInicio,'HH24:MI') || ' - ' ||
+                    to_char(v_HoraFin,'HH24:MI') || '.';
+        RETURN;
+    END IF;
+
+    UPDATE "Reserva"
+    SET    "EstadoOperacion"    = 'ASIGNADO',
+           "IdGrua"             = _IdGrua,
+           "IdOperador"         = _IdOperador,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdReserva;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'Servicio asignado correctamente a la grúa con placa ' ||
+                v_PlacaGrua || ' y operador ' ||
+                v_NombresOp || ' ' || v_ApellidosOp || '.';
+
 END;
 $$;
 
@@ -592,60 +586,53 @@ DECLARE
     v_SlotInicioDT  TIMESTAMP;
     v_TiempoCorte   INT;
 BEGIN
-    BEGIN
-        SELECT r."FechaServicio", r."HoraInicio"
-        INTO   v_FechaServicio, v_HoraInicio
-        FROM   "Reserva" r
-        WHERE  r."Id"              = _Id
-          AND  r."Estado"          = 'ACTIVO'
-          AND  r."EstadoOperacion" != 'CANCELADO'
-        FOR UPDATE;
+    SELECT r."FechaServicio", r."HoraInicio"
+    INTO   v_FechaServicio, v_HoraInicio
+    FROM   "Reserva" r
+    WHERE  r."Id"              = _Id
+      AND  r."Estado"          = 'ACTIVO'
+      AND  r."EstadoOperacion" != 'CANCELADO'
+    FOR UPDATE;
 
-        IF v_FechaServicio IS NULL THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'La reserva no existe o ya fue cancelada.';
-            RETURN;
-        END IF;
-
-        v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
-
-        SELECT "TiempoCorte" INTO v_TiempoCorte
-        FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
-
-        IF v_FechaServicio = CURRENT_DATE
-           AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
-        THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'No es posible cancelar el servicio de las ' ||
-                        to_char(v_HoraInicio,'HH24:MI:SS') ||
-                        ', debe cancelarse con ' || v_TiempoCorte::TEXT ||
-                        ' horas de anticipación.';
-            RETURN;
-        END IF;
-
-        UPDATE "Reserva"
-        SET    "EstadoOperacion"    = 'CANCELADO',
-               "MotivoCancelacion"  = _MotivoCancelacion,
-               "FechaActualizacion" = NOW(),
-               "ActualizadoPor"     = _ActualizadoPor,
-               "IdGrua"             = NULL,
-               "IdOperador"         = NULL
-        WHERE  "Id" = _Id;
-
-        COMMIT;
-        _Exitoso := 1;
-        _Mensaje := 'Reserva cancelada correctamente.';
-
-    EXCEPTION WHEN OTHERS THEN
+    IF v_FechaServicio IS NULL THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := SQLERRM;
-    END;
+        _Mensaje := 'La reserva no existe o ya fue cancelada.';
+        RETURN;
+    END IF;
+
+    v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
+
+    SELECT "TiempoCorte" INTO v_TiempoCorte
+    FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+
+    IF v_FechaServicio = CURRENT_DATE
+       AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
+    THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'No es posible cancelar el servicio de las ' ||
+                    to_char(v_HoraInicio,'HH24:MI:SS') ||
+                    ', debe cancelarse con ' || v_TiempoCorte::TEXT ||
+                    ' horas de anticipación.';
+        RETURN;
+    END IF;
+
+    UPDATE "Reserva"
+    SET    "EstadoOperacion"    = 'CANCELADO',
+           "MotivoCancelacion"  = _MotivoCancelacion,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor,
+           "IdGrua"             = NULL,
+           "IdOperador"         = NULL
+    WHERE  "Id" = _Id;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'Reserva cancelada correctamente.';
+
 END;
 $$;
-
 -- ── sp_ReprogramarReserva ────────────────────────────────────
 CREATE OR REPLACE PROCEDURE sp_ReprogramarReserva(
     _IdReserva       INT,
@@ -691,153 +678,144 @@ BEGIN
     DELETE FROM "TimerReserva"
     WHERE "FechaCreacion" + ("TimerExpiracion" || ' minutes')::INTERVAL <= NOW();
 
-    BEGIN
-        SELECT "TiempoCorte" INTO v_TiempoCorte
-        FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+    SELECT "TiempoCorte" INTO v_TiempoCorte
+    FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
 
-        IF _NuevaFecha = CURRENT_DATE
-           AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
-        THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'No es posible reprogramar a las ' ||
-                        to_char(_NuevaHoraInicio,'HH24:MI:SS') ||
-                        ' horas, debe reprogramar con ' || v_TiempoCorte::TEXT ||
-                        ' horas de anticipación a la hora de inicio del servicio.';
-            RETURN;
-        END IF;
+    IF _NuevaFecha = CURRENT_DATE
+       AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
+    THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'No es posible reprogramar a las ' ||
+                    to_char(_NuevaHoraInicio,'HH24:MI:SS') ||
+                    ' horas, debe reprogramar con ' || v_TiempoCorte::TEXT ||
+                    ' horas de anticipación a la hora de inicio del servicio.';
+        RETURN;
+    END IF;
 
-        IF _Rol <> 'ADMINISTRADOR' THEN
-            SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
-            INTO   v_HorasExcepcion
-            FROM (
-                SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
-                FROM   generate_series(0,
-                           EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
-                       ) AS s(n)
-            ) g
-            WHERE EXISTS (
-                SELECT 1 FROM "Excepcion" e
-                WHERE  e."Fecha"  = _NuevaFecha AND e."Estado" = 'ACTIVO'
-                  AND  g.hora_dt >= _NuevaFecha + e."TiempoInicio"
-                  AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
-                                         THEN _NuevaFecha + e."TiempoFinal" + INTERVAL '1 day'
-                                         ELSE _NuevaFecha + e."TiempoFinal" END
-            );
-
-            IF v_HorasExcepcion IS NOT NULL THEN
-                ROLLBACK;
-                _Exitoso        := 0;
-                _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
-                _HorasConflicto := v_HorasExcepcion;
-                RETURN;
-            END IF;
-        END IF;
-
-        SELECT COUNT(*)::INT INTO v_GruasDisponibles
-        FROM   "Grua"
-        WHERE  "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA'
-          AND  "Capacidad" >= v_CantidadCarga;
-
-        WITH
-        "Horas" AS (
-            SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS "HoraDT"
+    IF _Rol <> 'ADMINISTRADOR' THEN
+        SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
+        INTO   v_HorasExcepcion
+        FROM (
+            SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
             FROM   generate_series(0,
                        EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
                    ) AS s(n)
-        ),
-        "SupplyPorNivel" AS (
-            SELECT "Capacidad" AS "Lvl", COUNT(*)::INT AS "Supply"
-            FROM   "Grua" WHERE "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA'
-            GROUP BY "Capacidad"
-        ),
-        "HoraDemanda" AS (
-            SELECT h."HoraDT", sp."Lvl", sp."Supply",
-                   COALESCE(r."Cnt",0) + COALESCE(t."Cnt",0) AS "Demand"
-            FROM "Horas" h CROSS JOIN "SupplyPorNivel" sp
-            LEFT JOIN LATERAL (
-                SELECT COUNT(*)::INT AS "Cnt" FROM "Reserva" rv
-                WHERE  rv."FechaServicio"   = _NuevaFecha
-                  AND  rv."EstadoOperacion" <> 'CANCELADO'
-                  AND  rv."Id"             <> _IdReserva
-                  AND  rv."CantidadCarga"   = sp."Lvl"
-                  AND  h."HoraDT" >= rv."FechaServicio" + rv."HoraInicio"
-                  AND  h."HoraDT" <  CASE WHEN rv."HoraFin" <= rv."HoraInicio"
-                                          THEN rv."FechaServicio" + rv."HoraFin" + INTERVAL '1 day'
-                                          ELSE rv."FechaServicio" + rv."HoraFin" END
-                FOR UPDATE
-            ) r ON TRUE
-            LEFT JOIN LATERAL (
-                SELECT COUNT(*)::INT AS "Cnt" FROM "TimerReserva" tr
-                WHERE  tr."FechaServicio" = _NuevaFecha
-                  AND  tr."FechaCreacion" + (tr."TimerExpiracion" || ' minutes')::INTERVAL > NOW()
-                  AND  tr."CantidadCarga" = sp."Lvl"
-                  AND  h."HoraDT" >= tr."FechaServicio" + tr."HoraInicio"
-                  AND  h."HoraDT" <  CASE WHEN tr."HoraFin" <= tr."HoraInicio"
-                                          THEN tr."FechaServicio" + tr."HoraFin" + INTERVAL '1 day'
-                                          ELSE tr."FechaServicio" + tr."HoraFin" END
-                FOR UPDATE
-            ) t ON TRUE
-        ),
-        "Sufijos" AS (
-            SELECT "HoraDT",
-                SUM("Demand") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufD",
-                SUM("Supply") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufG"
-            FROM "HoraDemanda" WHERE "Lvl" < v_CantidadCarga
-        ),
-        "Overflow" AS (
-            SELECT "HoraDT", GREATEST(0, MAX("SufD" - "SufG")) AS "Overflow"
-            FROM   "Sufijos" GROUP BY "HoraDT"
-        ),
-        "DemandaDirecta" AS (
-            SELECT "HoraDT", SUM("Demand") AS "DemandaK"
-            FROM   "HoraDemanda" WHERE "Lvl" >= v_CantidadCarga GROUP BY "HoraDT"
-        ),
-        "OcupacionPorHora" AS (
-            SELECT h."HoraDT",
-                   COALESCE(dd."DemandaK",0) + COALESCE(ov."Overflow",0) AS "OcupacionEfectiva"
-            FROM "Horas" h
-            LEFT JOIN "DemandaDirecta" dd ON dd."HoraDT" = h."HoraDT"
-            LEFT JOIN "Overflow"       ov ON ov."HoraDT" = h."HoraDT"
-        )
-        SELECT COALESCE(MAX("OcupacionEfectiva"),0),
-               string_agg(CASE WHEN "OcupacionEfectiva" >= v_GruasDisponibles
-                               THEN to_char("HoraDT"::TIME,'HH24:MI') END, ', ')
-        INTO   v_MaxOcupacion, _HorasConflicto
-        FROM   "OcupacionPorHora";
+        ) g
+        WHERE EXISTS (
+            SELECT 1 FROM "Excepcion" e
+            WHERE  e."Fecha"  = _NuevaFecha AND e."Estado" = 'ACTIVO'
+              AND  g.hora_dt >= _NuevaFecha + e."TiempoInicio"
+              AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
+                                     THEN _NuevaFecha + e."TiempoFinal" + INTERVAL '1 day'
+                                     ELSE _NuevaFecha + e."TiempoFinal" END
+        );
 
-        IF v_MaxOcupacion >= v_GruasDisponibles THEN
+        IF v_HorasExcepcion IS NOT NULL THEN
             ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'El nuevo horario no tiene disponibilidad para la carga solicitada.';
+            _Exitoso        := 0;
+            _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
+            _HorasConflicto := v_HorasExcepcion;
             RETURN;
         END IF;
+    END IF;
 
-        UPDATE "Reserva"
-        SET    "FechaServicio"      = _NuevaFecha,
-               "HoraInicio"         = _NuevaHoraInicio,
-               "HoraFin"            = v_NuevaHoraFin,
-               "NroBloques"         = _NuevoNroBloques,
-               "IdGrua"             = NULL,
-               "IdOperador"         = NULL,
-               "EstadoOperacion"    = 'RESERVADO',
-               "FechaActualizacion" = NOW(),
-               "ActualizadoPor"     = _ActualizadoPor
-        WHERE  "Id" = _IdReserva;
+    SELECT COUNT(*)::INT INTO v_GruasDisponibles
+    FROM   "Grua"
+    WHERE  "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA'
+      AND  "Grua"."Capacidad" >= v_CantidadCarga;
 
-        COMMIT;
-        _Exitoso        := 1;
-        _Mensaje        := 'Reserva reprogramada correctamente.';
-        _HorasConflicto := NULL;
+    WITH
+    "Horas" AS (
+        SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS "HoraDT"
+        FROM   generate_series(0,
+                   EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
+               ) AS s(n)
+    ),
+    "SupplyPorNivel" AS (
+        SELECT "Capacidad" AS "Lvl", COUNT(*)::INT AS "Supply"
+        FROM   "Grua" WHERE "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA'
+        GROUP BY "Capacidad"
+    ),
+    "HoraDemanda" AS (
+        SELECT h."HoraDT", sp."Lvl", sp."Supply",
+               COALESCE(r."Cnt",0) + COALESCE(t."Cnt",0) AS "Demand"
+        FROM "Horas" h CROSS JOIN "SupplyPorNivel" sp
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*)::INT AS "Cnt" FROM "Reserva" rv
+            WHERE  rv."FechaServicio"   = _NuevaFecha
+              AND  rv."EstadoOperacion" <> 'CANCELADO'
+              AND  rv."Id"             <> _IdReserva
+              AND  rv."CantidadCarga"   = sp."Lvl"
+              AND  h."HoraDT" >= rv."FechaServicio" + rv."HoraInicio"
+              AND  h."HoraDT" <  CASE WHEN rv."HoraFin" <= rv."HoraInicio"
+                                      THEN rv."FechaServicio" + rv."HoraFin" + INTERVAL '1 day'
+                                      ELSE rv."FechaServicio" + rv."HoraFin" END
+        ) r ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*)::INT AS "Cnt" FROM "TimerReserva" tr
+            WHERE  tr."FechaServicio" = _NuevaFecha
+              AND  tr."FechaCreacion" + (tr."TimerExpiracion" || ' minutes')::INTERVAL > NOW()
+              AND  tr."CantidadCarga" = sp."Lvl"
+              AND  h."HoraDT" >= tr."FechaServicio" + tr."HoraInicio"
+              AND  h."HoraDT" <  CASE WHEN tr."HoraFin" <= tr."HoraInicio"
+                                      THEN tr."FechaServicio" + tr."HoraFin" + INTERVAL '1 day'
+                                      ELSE tr."FechaServicio" + tr."HoraFin" END
+        ) t ON TRUE
+    ),
+    "Sufijos" AS (
+        SELECT "HoraDT",
+            SUM("Demand") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufD",
+            SUM("Supply") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufG"
+        FROM "HoraDemanda" WHERE "Lvl" < v_CantidadCarga
+    ),
+    "Overflow" AS (
+        SELECT "HoraDT", GREATEST(0, MAX("SufD" - "SufG")) AS "Overflow"
+        FROM   "Sufijos" GROUP BY "HoraDT"
+    ),
+    "DemandaDirecta" AS (
+        SELECT "HoraDT", SUM("Demand") AS "DemandaK"
+        FROM   "HoraDemanda" WHERE "Lvl" >= v_CantidadCarga GROUP BY "HoraDT"
+    ),
+    "OcupacionPorHora" AS (
+        SELECT h."HoraDT",
+               COALESCE(dd."DemandaK",0) + COALESCE(ov."Overflow",0) AS "OcupacionEfectiva"
+        FROM "Horas" h
+        LEFT JOIN "DemandaDirecta" dd ON dd."HoraDT" = h."HoraDT"
+        LEFT JOIN "Overflow"       ov ON ov."HoraDT" = h."HoraDT"
+    )
+    SELECT COALESCE(MAX("OcupacionEfectiva"),0),
+           string_agg(CASE WHEN "OcupacionEfectiva" >= v_GruasDisponibles
+                           THEN to_char("HoraDT"::TIME,'HH24:MI') END, ', ')
+    INTO   v_MaxOcupacion, _HorasConflicto
+    FROM   "OcupacionPorHora";
 
-    EXCEPTION WHEN OTHERS THEN
+    IF v_MaxOcupacion >= v_GruasDisponibles THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := SQLERRM;
-    END;
+        _Mensaje := 'El nuevo horario no tiene disponibilidad para la carga solicitada.';
+        RETURN;
+    END IF;
+
+    UPDATE "Reserva"
+    SET    "FechaServicio"      = _NuevaFecha,
+           "HoraInicio"         = _NuevaHoraInicio,
+           "HoraFin"            = v_NuevaHoraFin,
+           "NroBloques"         = _NuevoNroBloques,
+           "IdGrua"             = NULL,
+           "IdOperador"         = NULL,
+           "EstadoOperacion"    = 'RESERVADO',
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdReserva;
+
+    COMMIT;
+    _Exitoso        := 1;
+    _Mensaje        := 'Reserva reprogramada correctamente.';
+    _HorasConflicto := NULL;
+
 END;
 $$;
-
 -- ── sp_ValidarHorario ────────────────────────────────────────
 CREATE OR REPLACE PROCEDURE sp_ValidarHorario(
     _FechaServicio        DATE,
@@ -889,158 +867,149 @@ BEGIN
     DELETE FROM "TimerReserva"
     WHERE "FechaCreacion" + ("TimerExpiracion" || ' minutes')::INTERVAL <= NOW();
 
-    BEGIN
-        SELECT "TiempoCorte" INTO v_TiempoCorte
-        FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+    SELECT "TiempoCorte" INTO v_TiempoCorte
+    FROM   "ParametroOperativo" po WHERE po."Estado" = 'ACTIVO';
 
-        IF _FechaServicio = CURRENT_DATE
-           AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
-        THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'No es posible reservar a las ' ||
-                        to_char(_HoraInicio,'HH24:MI:SS') ||
-                        ' horas, debe reservar con ' || v_TiempoCorte::TEXT ||
-                        ' horas de anticipación a la hora de inicio del servicio';
-            RETURN;
-        END IF;
+    IF _FechaServicio = CURRENT_DATE
+       AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
+    THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'No es posible reservar a las ' ||
+                    to_char(_HoraInicio,'HH24:MI:SS') ||
+                    ' horas, debe reservar con ' || v_TiempoCorte::TEXT ||
+                    ' horas de anticipación a la hora de inicio del servicio';
+        RETURN;
+    END IF;
 
-        IF _Rol <> 'ADMINISTRADOR' THEN
-            SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
-            INTO   v_HorasExcepcion
-            FROM (
-                SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
-                FROM   generate_series(0,
-                           EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
-                       ) AS s(n)
-            ) g
-            WHERE EXISTS (
-                SELECT 1 FROM "Excepcion" e
-                WHERE  e."Fecha"  = _FechaServicio AND e."Estado" = 'ACTIVO'
-                  AND  g.hora_dt >= _FechaServicio + e."TiempoInicio"
-                  AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
-                                         THEN _FechaServicio + e."TiempoFinal" + INTERVAL '1 day'
-                                         ELSE _FechaServicio + e."TiempoFinal" END
-            );
-
-            IF v_HorasExcepcion IS NOT NULL THEN
-                ROLLBACK;
-                _Exitoso        := 0;
-                _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
-                _HorasConflicto := v_HorasExcepcion;
-                RETURN;
-            END IF;
-        END IF;
-
-        SELECT COUNT(*)::INT INTO v_GruasDisponibles
-        FROM   "Grua"
-        WHERE  "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA'
-          AND  "Capacidad" >= _CantidadCarga;
-
-        WITH
-        "Horas" AS (
-            SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS "HoraDT"
+    IF _Rol <> 'ADMINISTRADOR' THEN
+        SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
+        INTO   v_HorasExcepcion
+        FROM (
+            SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
             FROM   generate_series(0,
                        EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
                    ) AS s(n)
-        ),
-        "SupplyPorNivel" AS (
-            SELECT "Capacidad" AS "Lvl", COUNT(*)::INT AS "Supply"
-            FROM   "Grua" WHERE "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA'
-            GROUP BY "Capacidad"
-        ),
-        "HoraDemanda" AS (
-            SELECT h."HoraDT", sp."Lvl", sp."Supply",
-                   COALESCE(r."Cnt",0) + COALESCE(t."Cnt",0) AS "Demand"
-            FROM "Horas" h CROSS JOIN "SupplyPorNivel" sp
-            LEFT JOIN LATERAL (
-                SELECT COUNT(*)::INT AS "Cnt" FROM "Reserva" rv
-                WHERE  rv."FechaServicio"   = _FechaServicio
-                  AND  rv."EstadoOperacion" <> 'CANCELADO'
-                  AND  rv."CantidadCarga"   = sp."Lvl"
-                  AND  h."HoraDT" >= rv."FechaServicio" + rv."HoraInicio"
-                  AND  h."HoraDT" <  CASE WHEN rv."HoraFin" <= rv."HoraInicio"
-                                          THEN rv."FechaServicio" + rv."HoraFin" + INTERVAL '1 day'
-                                          ELSE rv."FechaServicio" + rv."HoraFin" END
-                FOR UPDATE
-            ) r ON TRUE
-            LEFT JOIN LATERAL (
-                SELECT COUNT(*)::INT AS "Cnt" FROM "TimerReserva" tr
-                WHERE  tr."FechaServicio" = _FechaServicio
-                  AND  tr."FechaCreacion" + (tr."TimerExpiracion" || ' minutes')::INTERVAL > NOW()
-                  AND  tr."CantidadCarga" = sp."Lvl"
-                  AND  h."HoraDT" >= tr."FechaServicio" + tr."HoraInicio"
-                  AND  h."HoraDT" <  CASE WHEN tr."HoraFin" <= tr."HoraInicio"
-                                          THEN tr."FechaServicio" + tr."HoraFin" + INTERVAL '1 day'
-                                          ELSE tr."FechaServicio" + tr."HoraFin" END
-                FOR UPDATE
-            ) t ON TRUE
-        ),
-        "Sufijos" AS (
-            SELECT "HoraDT",
-                SUM("Demand") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufD",
-                SUM("Supply") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufG"
-            FROM "HoraDemanda" WHERE "Lvl" < _CantidadCarga
-        ),
-        "Overflow" AS (
-            SELECT "HoraDT", GREATEST(0, MAX("SufD" - "SufG")) AS "Overflow"
-            FROM   "Sufijos" GROUP BY "HoraDT"
-        ),
-        "DemandaDirecta" AS (
-            SELECT "HoraDT", SUM("Demand") AS "DemandaK"
-            FROM   "HoraDemanda" WHERE "Lvl" >= _CantidadCarga GROUP BY "HoraDT"
-        ),
-        "OcupacionPorHora" AS (
-            SELECT h."HoraDT",
-                   COALESCE(dd."DemandaK",0) + COALESCE(ov."Overflow",0) AS "OcupacionEfectiva"
-            FROM "Horas" h
-            LEFT JOIN "DemandaDirecta" dd ON dd."HoraDT" = h."HoraDT"
-            LEFT JOIN "Overflow"       ov ON ov."HoraDT" = h."HoraDT"
-        )
-        SELECT COALESCE(MAX("OcupacionEfectiva"),0),
-               string_agg(CASE WHEN "OcupacionEfectiva" >= v_GruasDisponibles
-                               THEN to_char("HoraDT"::TIME,'HH24:MI') END, ', ')
-        INTO   v_MaxOcupacion, _HorasConflicto
-        FROM   "OcupacionPorHora";
+        ) g
+        WHERE EXISTS (
+            SELECT 1 FROM "Excepcion" e
+            WHERE  e."Fecha"  = _FechaServicio AND e."Estado" = 'ACTIVO'
+              AND  g.hora_dt >= _FechaServicio + e."TiempoInicio"
+              AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
+                                     THEN _FechaServicio + e."TiempoFinal" + INTERVAL '1 day'
+                                     ELSE _FechaServicio + e."TiempoFinal" END
+        );
 
-        IF v_MaxOcupacion >= v_GruasDisponibles THEN
+        IF v_HorasExcepcion IS NOT NULL THEN
             ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'El horario seleccionado ya no tiene disponibilidad.';
+            _Exitoso        := 0;
+            _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
+            _HorasConflicto := v_HorasExcepcion;
             RETURN;
         END IF;
+    END IF;
 
-        INSERT INTO "TimerReserva" (
-            "CantidadCarga","IdCliente","DireccionOrigen","CoordLatOrigen","CoordLonOrigen",
-            "DireccionDestino","CoordLatDestino","CoordLonDestino","DistanciaKm",
-            "TiempoEstimado","TiempoManiobra","TiempoRetorno","NroBloques",
-            "CostoKm","CostoBase","EstadoOperacion","Estado","EstadoAdministrativo",
-            "HoraInicio","HoraFin","FechaServicio","IdOperador",
-            "FechaCreacion","FechaActualizacion","CreadoPor","ActualizadoPor",
-            "TimerExpiracion","TipoHorario"
-        ) VALUES (
-            _CantidadCarga,_IdCliente,_DireccionOrigen,_CoordLatOrigen,_CoordLonOrigen,
-            _DireccionDestino,_CoordLatDestino,_CoordLonDestino,_DistanciaKm,
-            _TiempoEstimado,_TiempoManiobra,_TiempoRetorno,_NroBloques,
-            _CostoKm,_CostoBase,_EstadoOperacion,_Estado,_EstadoAdministrativo,
-            _HoraInicio,_HoraFin,_FechaServicio,_IdOperador,
-            _FechaCreacion,NULL,_CreadoPor,NULL,
-            _TimerExpiracion,_TipoHorario
-        )
-        RETURNING "Id" INTO _Id;
+    SELECT COUNT(*)::INT INTO v_GruasDisponibles
+    FROM   "Grua"
+    WHERE  "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA'
+      AND  "Grua"."Capacidad" >= _CantidadCarga;
 
-        COMMIT;
-        _Exitoso := 1;
-        _Mensaje := 'Horario bloqueado temporalmente.';
+    WITH
+    "Horas" AS (
+        SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS "HoraDT"
+        FROM   generate_series(0,
+                   EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
+               ) AS s(n)
+    ),
+    "SupplyPorNivel" AS (
+        SELECT "Capacidad" AS "Lvl", COUNT(*)::INT AS "Supply"
+        FROM   "Grua" WHERE "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA'
+        GROUP BY "Capacidad"
+    ),
+    "HoraDemanda" AS (
+        SELECT h."HoraDT", sp."Lvl", sp."Supply",
+               COALESCE(r."Cnt",0) + COALESCE(t."Cnt",0) AS "Demand"
+        FROM "Horas" h CROSS JOIN "SupplyPorNivel" sp
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*)::INT AS "Cnt" FROM "Reserva" rv
+            WHERE  rv."FechaServicio"   = _FechaServicio
+              AND  rv."EstadoOperacion" <> 'CANCELADO'
+              AND  rv."CantidadCarga"   = sp."Lvl"
+              AND  h."HoraDT" >= rv."FechaServicio" + rv."HoraInicio"
+              AND  h."HoraDT" <  CASE WHEN rv."HoraFin" <= rv."HoraInicio"
+                                      THEN rv."FechaServicio" + rv."HoraFin" + INTERVAL '1 day'
+                                      ELSE rv."FechaServicio" + rv."HoraFin" END
+        ) r ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT COUNT(*)::INT AS "Cnt" FROM "TimerReserva" tr
+            WHERE  tr."FechaServicio" = _FechaServicio
+              AND  tr."FechaCreacion" + (tr."TimerExpiracion" || ' minutes')::INTERVAL > NOW()
+              AND  tr."CantidadCarga" = sp."Lvl"
+              AND  h."HoraDT" >= tr."FechaServicio" + tr."HoraInicio"
+              AND  h."HoraDT" <  CASE WHEN tr."HoraFin" <= tr."HoraInicio"
+                                      THEN tr."FechaServicio" + tr."HoraFin" + INTERVAL '1 day'
+                                      ELSE tr."FechaServicio" + tr."HoraFin" END
+        ) t ON TRUE
+    ),
+    "Sufijos" AS (
+        SELECT "HoraDT",
+            SUM("Demand") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufD",
+            SUM("Supply") OVER (PARTITION BY "HoraDT" ORDER BY "Lvl" DESC ROWS UNBOUNDED PRECEDING) AS "SufG"
+        FROM "HoraDemanda" WHERE "Lvl" < _CantidadCarga
+    ),
+    "Overflow" AS (
+        SELECT "HoraDT", GREATEST(0, MAX("SufD" - "SufG")) AS "Overflow"
+        FROM   "Sufijos" GROUP BY "HoraDT"
+    ),
+    "DemandaDirecta" AS (
+        SELECT "HoraDT", SUM("Demand") AS "DemandaK"
+        FROM   "HoraDemanda" WHERE "Lvl" >= _CantidadCarga GROUP BY "HoraDT"
+    ),
+    "OcupacionPorHora" AS (
+        SELECT h."HoraDT",
+               COALESCE(dd."DemandaK",0) + COALESCE(ov."Overflow",0) AS "OcupacionEfectiva"
+        FROM "Horas" h
+        LEFT JOIN "DemandaDirecta" dd ON dd."HoraDT" = h."HoraDT"
+        LEFT JOIN "Overflow"       ov ON ov."HoraDT" = h."HoraDT"
+    )
+    SELECT COALESCE(MAX("OcupacionEfectiva"),0),
+           string_agg(CASE WHEN "OcupacionEfectiva" >= v_GruasDisponibles
+                           THEN to_char("HoraDT"::TIME,'HH24:MI') END, ', ')
+    INTO   v_MaxOcupacion, _HorasConflicto
+    FROM   "OcupacionPorHora";
 
-    EXCEPTION WHEN OTHERS THEN
+    IF v_MaxOcupacion >= v_GruasDisponibles THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := SQLERRM;
-    END;
+        _Mensaje := 'El horario seleccionado ya no tiene disponibilidad.';
+        RETURN;
+    END IF;
+
+    INSERT INTO "TimerReserva" (
+        "CantidadCarga","IdCliente","DireccionOrigen","CoordLatOrigen","CoordLonOrigen",
+        "DireccionDestino","CoordLatDestino","CoordLonDestino","DistanciaKm",
+        "TiempoEstimado","TiempoManiobra","TiempoRetorno","NroBloques",
+        "CostoKm","CostoBase","EstadoOperacion","Estado","EstadoAdministrativo",
+        "HoraInicio","HoraFin","FechaServicio","IdOperador",
+        "FechaCreacion","FechaActualizacion","CreadoPor","ActualizadoPor",
+        "TimerExpiracion","TipoHorario"
+    ) VALUES (
+        _CantidadCarga,_IdCliente,_DireccionOrigen,_CoordLatOrigen,_CoordLonOrigen,
+        _DireccionDestino,_CoordLatDestino,_CoordLonDestino,_DistanciaKm,
+        _TiempoEstimado,_TiempoManiobra,_TiempoRetorno,_NroBloques,
+        _CostoKm,_CostoBase,_EstadoOperacion,_Estado,_EstadoAdministrativo,
+        _HoraInicio,_HoraFin,_FechaServicio,_IdOperador,
+        _FechaCreacion,NULL,_CreadoPor,NULL,
+        _TimerExpiracion,_TipoHorario
+    )
+    RETURNING "Id" INTO _Id;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'Horario bloqueado temporalmente.';
+
 END;
 $$;
-
 -- ── sp_CreateReserva ─────────────────────────────────────────
 CREATE OR REPLACE PROCEDURE sp_CreateReserva(
     _IdTimerReserva INT,
@@ -1063,114 +1032,107 @@ DECLARE
     v_IdReserva      INT;
     v_CreadoPor      INT;
 BEGIN
-    BEGIN
-        IF NOT EXISTS (
-            SELECT 1 FROM "TimerReserva"
-            WHERE  "Id" = _IdTimerReserva
-              AND  "FechaCreacion" + ("TimerExpiracion" || ' minutes')::INTERVAL > NOW()
-        ) THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'El tiempo de reserva ha expirado. Seleccione el horario nuevamente.';
-            RETURN;
-        END IF;
-
-        SELECT tr."FechaServicio", tr."HoraInicio", tr."HoraFin"
-        INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
-        FROM   "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva;
-
-        v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
-        v_SlotFinDT    := CASE WHEN v_HoraFin <= v_HoraInicio
-                               THEN v_FechaServicio + v_HoraFin + INTERVAL '1 day'
-                               ELSE v_FechaServicio + v_HoraFin END;
-
-        IF _Rol <> 'ADMINISTRADOR' THEN
-            SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
-            INTO   v_HorasExcepcion
-            FROM (
-                SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
-                FROM   generate_series(0,
-                           EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
-                       ) AS s(n)
-            ) g
-            WHERE EXISTS (
-                SELECT 1 FROM "Excepcion" e
-                WHERE  e."Fecha"  = v_FechaServicio AND e."Estado" = 'ACTIVO'
-                  AND  g.hora_dt >= v_FechaServicio + e."TiempoInicio"
-                  AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
-                                         THEN v_FechaServicio + e."TiempoFinal" + INTERVAL '1 day'
-                                         ELSE v_FechaServicio + e."TiempoFinal" END
-            );
-
-            IF v_HorasExcepcion IS NOT NULL THEN
-                ROLLBACK;
-                _Exitoso        := 0;
-                _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
-                _HorasConflicto := v_HorasExcepcion;
-                RETURN;
-            END IF;
-        END IF;
-
-        SELECT "TiempoCorte" INTO v_TiempoCorte
-        FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
-
-        IF v_FechaServicio = CURRENT_DATE
-           AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
-        THEN
-            ROLLBACK;
-            _Exitoso := 0;
-            _Mensaje := 'No es posible guardar la reserva a las ' ||
-                        to_char(v_HoraInicio,'HH24:MI:SS') ||
-                        ' horas, debe reservar con ' || v_TiempoCorte::TEXT ||
-                        ' horas de anticipación a la hora de inicio del servicio';
-            RETURN;
-        END IF;
-
-        INSERT INTO "Reserva" (
-            "CantidadCarga","IdCliente","DireccionOrigen","CoordLatOrigen","CoordLonOrigen",
-            "DireccionDestino","CoordLatDestino","CoordLonDestino","DistanciaKm",
-            "TiempoEstimado","TiempoManiobra","TiempoRetorno","NroBloques",
-            "CostoKm","CostoBase","EstadoOperacion","Estado","EstadoAdministrativo",
-            "HoraInicio","HoraFin","FechaServicio","IdOperador",
-            "FechaCreacion","FechaActualizacion","CreadoPor","ActualizadoPor","TipoHorario"
-        )
-        SELECT
-            tr."CantidadCarga",tr."IdCliente",tr."DireccionOrigen",tr."CoordLatOrigen",tr."CoordLonOrigen",
-            tr."DireccionDestino",tr."CoordLatDestino",tr."CoordLonDestino",tr."DistanciaKm",
-            tr."TiempoEstimado",tr."TiempoManiobra",tr."TiempoRetorno",tr."NroBloques",
-            tr."CostoKm",tr."CostoBase",tr."EstadoOperacion",tr."Estado",tr."EstadoAdministrativo",
-            tr."HoraInicio",tr."HoraFin",tr."FechaServicio",tr."IdOperador",
-            NOW(),NULL,tr."CreadoPor",NULL,tr."TipoHorario"
-        FROM "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva
-        RETURNING "Id" INTO v_IdReserva;
-
-        SELECT tr."CreadoPor" INTO v_CreadoPor
-        FROM   "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva;
-
-        INSERT INTO "Vehiculo" (
-            "Tipo","Placa","Modelo","Observacion",
-            "IdReserva","FechaCreacion","FechaActualizacion",
-            "CreadoPor","ActualizadoPor","Estado"
-        )
-        SELECT v."Tipo",v."Placa",v."Descripcion",v."Observacion",
-               v_IdReserva,NOW(),NULL,v_CreadoPor,NULL,'ACTIVO'
-        FROM   UNNEST(_Vehiculos) AS v;
-
-        DELETE FROM "TimerReserva" WHERE "Id" = _IdTimerReserva;
-
-        COMMIT;
-        _Exitoso := 1;
-        _Mensaje := 'Reserva creada exitosamente.';
-        _Id      := v_IdReserva;
-
-    EXCEPTION WHEN OTHERS THEN
+    IF NOT EXISTS (
+        SELECT 1 FROM "TimerReserva"
+        WHERE  "Id" = _IdTimerReserva
+          AND  "FechaCreacion" + ("TimerExpiracion" || ' minutes')::INTERVAL > NOW()
+    ) THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := SQLERRM;
-    END;
+        _Mensaje := 'El tiempo de reserva ha expirado. Seleccione el horario nuevamente.';
+        RETURN;
+    END IF;
+
+    SELECT tr."FechaServicio", tr."HoraInicio", tr."HoraFin"
+    INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
+    FROM   "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva;
+
+    v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
+    v_SlotFinDT    := CASE WHEN v_HoraFin <= v_HoraInicio
+                           THEN v_FechaServicio + v_HoraFin + INTERVAL '1 day'
+                           ELSE v_FechaServicio + v_HoraFin END;
+
+    IF _Rol <> 'ADMINISTRADOR' THEN
+        SELECT string_agg(to_char(g.hora_dt::TIME,'HH24:MI'), ', ')
+        INTO   v_HorasExcepcion
+        FROM (
+            SELECT v_SlotInicioDT + (s.n || ' hours')::INTERVAL AS hora_dt
+            FROM   generate_series(0,
+                       EXTRACT(EPOCH FROM (v_SlotFinDT - v_SlotInicioDT))::INT / 3600 - 1
+                   ) AS s(n)
+        ) g
+        WHERE EXISTS (
+            SELECT 1 FROM "Excepcion" e
+            WHERE  e."Fecha"  = v_FechaServicio AND e."Estado" = 'ACTIVO'
+              AND  g.hora_dt >= v_FechaServicio + e."TiempoInicio"
+              AND  g.hora_dt <  CASE WHEN e."TiempoFinal" <= e."TiempoInicio"
+                                     THEN v_FechaServicio + e."TiempoFinal" + INTERVAL '1 day'
+                                     ELSE v_FechaServicio + e."TiempoFinal" END
+        );
+
+        IF v_HorasExcepcion IS NOT NULL THEN
+            ROLLBACK;
+            _Exitoso        := 0;
+            _Mensaje        := 'El horario seleccionado no está disponible por una excepción operativa.';
+            _HorasConflicto := v_HorasExcepcion;
+            RETURN;
+        END IF;
+    END IF;
+
+    SELECT "TiempoCorte" INTO v_TiempoCorte
+    FROM   "ParametroOperativo" po WHERE po."Estado" = 'ACTIVO';
+
+    IF v_FechaServicio = CURRENT_DATE
+       AND v_SlotInicioDT - (v_TiempoCorte || ' hours')::INTERVAL <= NOW()
+    THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'No es posible guardar la reserva a las ' ||
+                    to_char(v_HoraInicio,'HH24:MI:SS') ||
+                    ' horas, debe reservar con ' || v_TiempoCorte::TEXT ||
+                    ' horas de anticipación a la hora de inicio del servicio';
+        RETURN;
+    END IF;
+
+    INSERT INTO "Reserva" (
+        "CantidadCarga","IdCliente","DireccionOrigen","CoordLatOrigen","CoordLonOrigen",
+        "DireccionDestino","CoordLatDestino","CoordLonDestino","DistanciaKm",
+        "TiempoEstimado","TiempoManiobra","TiempoRetorno","NroBloques",
+        "CostoKm","CostoBase","EstadoOperacion","Estado","EstadoAdministrativo",
+        "HoraInicio","HoraFin","FechaServicio","IdOperador",
+        "FechaCreacion","FechaActualizacion","CreadoPor","ActualizadoPor","TipoHorario"
+    )
+    SELECT
+        tr."CantidadCarga",tr."IdCliente",tr."DireccionOrigen",tr."CoordLatOrigen",tr."CoordLonOrigen",
+        tr."DireccionDestino",tr."CoordLatDestino",tr."CoordLonDestino",tr."DistanciaKm",
+        tr."TiempoEstimado",tr."TiempoManiobra",tr."TiempoRetorno",tr."NroBloques",
+        tr."CostoKm",tr."CostoBase",tr."EstadoOperacion",tr."Estado",tr."EstadoAdministrativo",
+        tr."HoraInicio",tr."HoraFin",tr."FechaServicio",tr."IdOperador",
+        NOW(),NULL,tr."CreadoPor",NULL,tr."TipoHorario"
+    FROM "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva
+    RETURNING "Id" INTO v_IdReserva;
+
+    SELECT tr."CreadoPor" INTO v_CreadoPor
+    FROM   "TimerReserva" tr WHERE tr."Id" = _IdTimerReserva;
+
+    INSERT INTO "Vehiculo" (
+        "Tipo","Placa","Modelo","Observacion",
+        "IdReserva","FechaCreacion","FechaActualizacion",
+        "CreadoPor","ActualizadoPor","Estado"
+    )
+    SELECT v."Tipo",v."Placa",v."Descripcion",v."Observacion",
+           v_IdReserva,NOW(),NULL,v_CreadoPor,NULL,'ACTIVO'
+    FROM   UNNEST(_Vehiculos) AS v;
+
+    DELETE FROM "TimerReserva" WHERE "Id" = _IdTimerReserva;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'Reserva creada exitosamente.';
+    _Id      := v_IdReserva;
+
 END;
 $$;
-
 
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
@@ -1392,7 +1354,7 @@ BEGIN
     v_NroDia := (EXTRACT(DOW FROM _FechaSeleccionada)::INT + 1)::SMALLINT;
 
     SELECT "TiempoCorte" INTO v_TiempoCorte
-    FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+    FROM   "ParametroOperativo" po WHERE po."Estado" = 'ACTIVO';
 
     SELECT ch."HoraInicio",ch."HoraFinal"
     INTO   v_HoraInicio,v_HoraFinal
@@ -1409,7 +1371,7 @@ BEGIN
 
     SELECT COUNT(*)::INT INTO v_GruasCapacidad
     FROM   "Grua"
-    WHERE  "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA' AND "Capacidad" >= _Capacidad;
+    WHERE  "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA' AND "Grua"."Capacidad" >= _Capacidad;
 
     RETURN QUERY
     WITH
@@ -1521,7 +1483,7 @@ BEGIN
     v_NroDia := (EXTRACT(DOW FROM _FechaSeleccionada)::INT + 1)::SMALLINT;
 
     SELECT "TiempoCorte" INTO v_TiempoCorte
-    FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
+    FROM   "ParametroOperativo" po WHERE po."Estado" = 'ACTIVO';
 
     SELECT ch."HoraInicio",ch."HoraFinal"
     INTO   v_HoraInicio,v_HoraFinal
@@ -1538,7 +1500,7 @@ BEGIN
 
     SELECT COUNT(*)::INT INTO v_GruasCapacidad
     FROM   "Grua"
-    WHERE  "Estado" = 'ACTIVO' AND "EstadoOperacion" = 'OPERATIVA' AND "Capacidad" >= _Capacidad;
+    WHERE  "Grua"."Estado" = 'ACTIVO' AND "Grua"."EstadoOperacion" = 'OPERATIVA' AND "Grua"."Capacidad" >= _Capacidad;
 
     RETURN QUERY
     WITH
