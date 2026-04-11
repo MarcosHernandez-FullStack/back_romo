@@ -1285,3 +1285,28 @@ System.ArgumentException: Cannot write DateTime with Kind=Unspecified to Postgre
 [2026-04-11 17:36:54 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.0853 ms
 [2026-04-11 17:36:54 INF] HTTP POST /api/reservas/validar-horario responded 200 in 26.4571 ms
 [2026-04-11 17:43:26 INF] Application is shutting down...
+[2026-04-11 17:55:54 INF] Now listening on: http://localhost:5016
+[2026-04-11 17:55:54 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 17:55:54 INF] Hosting environment: Development
+[2026-04-11 17:55:54 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 17:56:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 41.6511 ms
+[2026-04-11 17:56:10 INF] HTTP OPTIONS /api/clientes responded 204 in 41.6490 ms
+[2026-04-11 17:56:11 INF] HTTP GET /api/reservas/horarios responded 200 in 1021.8014 ms
+[2026-04-11 17:56:11 INF] HTTP GET /api/clientes responded 200 in 1016.3468 ms
+[2026-04-11 17:56:18 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2301 ms
+[2026-04-11 17:56:18 INF] HTTP GET /api/reservas/horarios responded 200 in 66.9722 ms
+[2026-04-11 17:56:19 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1754 ms
+[2026-04-11 17:56:19 INF] HTTP GET /api/reservas/horarios responded 200 in 31.3684 ms
+[2026-04-11 17:56:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1397 ms
+[2026-04-11 17:56:20 INF] HTTP GET /api/reservas/horarios responded 200 in 6.9402 ms
+[2026-04-11 17:56:21 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1454 ms
+[2026-04-11 17:56:21 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 245.5609 ms
+[2026-04-11 17:56:24 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1330 ms
+[2026-04-11 17:56:24 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 57.0307 ms
+[2026-04-11 17:56:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2048 ms
+[2026-04-11 17:56:38 INF] HTTP GET /api/reservas/horarios responded 200 in 8.5283 ms
+[2026-04-11 17:56:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4208 ms
+[2026-04-11 17:56:41 INF] HTTP GET /api/reservas/horarios responded 200 in 43.9165 ms
+[2026-04-11 17:58:29 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1915 ms
+[2026-04-11 17:58:29 INF] HTTP POST /api/reservas/validar-horario responded 200 in 263.4748 ms
+[2026-04-11 17:58:42 INF] Application is shutting down...
