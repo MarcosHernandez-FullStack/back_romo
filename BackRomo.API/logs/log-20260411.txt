@@ -178,3 +178,1110 @@ POSITION: 6
 [2026-04-11 14:32:30 INF] Login exitoso para usuario 803 (ADMINISTRADOR), token expira "2026-04-12T03:32:30.6970681Z"
 [2026-04-11 14:32:31 INF] HTTP POST /api/auth/login responded 200 in 1906.5309 ms
 [2026-04-11 14:34:28 INF] Application is shutting down...
+[2026-04-11 16:27:21 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:27:21 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:27:21 INF] Hosting environment: Development
+[2026-04-11 16:27:21 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:32:04 INF] Application is shutting down...
+[2026-04-11 16:32:14 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:32:14 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:32:14 INF] Hosting environment: Development
+[2026-04-11 16:32:14 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:33:25 INF] HTTP OPTIONS /api/auth/login responded 204 in 75.7226 ms
+[2026-04-11 16:33:25 INF] Intento de login para identificador nosj.xvxx@gmail.com
+[2026-04-11 16:33:27 INF] Login exitoso para usuario 803 (ADMINISTRADOR), token expira "2026-04-12T05:33:27.5013643Z"
+[2026-04-11 16:33:28 INF] HTTP POST /api/auth/login responded 200 in 2449.5385 ms
+[2026-04-11 16:33:30 INF] HTTP OPTIONS /api/clientes responded 204 in 3.5291 ms
+[2026-04-11 16:33:30 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2669 ms
+[2026-04-11 16:33:31 ERR] Error no controlado en GET /api/clientes
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ClienteRepository.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ClienteRepository.cs:line 22
+   at BackRomo.Application.Services.ClienteService.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Application\Services\ClienteService.cs:line 16
+   at BackRomo.API.Controllers.ClientesController.ListarClientes(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.API\Controllers\ClientesController.cs:line 22
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:33:31 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:33:31 ERR] HTTP GET /api/clientes responded 500 in 710.5550 ms
+[2026-04-11 16:33:31 ERR] HTTP GET /api/reservas/horarios responded 500 in 789.9848 ms
+[2026-04-11 16:33:32 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1736 ms
+[2026-04-11 16:33:32 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:33:32 ERR] HTTP GET /api/reservas/horarios responded 500 in 383.4045 ms
+[2026-04-11 16:33:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3109 ms
+[2026-04-11 16:33:35 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:33:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2769 ms
+[2026-04-11 16:33:35 ERR] HTTP GET /api/reservas/horarios responded 500 in 311.3205 ms
+[2026-04-11 16:33:35 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:33:35 ERR] HTTP GET /api/reservas/horarios responded 500 in 205.6934 ms
+[2026-04-11 16:34:35 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.4332 ms
+[2026-04-11 16:34:35 ERR] Error no controlado en GET /api/configuracion/parametro-operativo
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_parametrooperativo()»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryRowAsync[T](IDbConnection cnn, Row row, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 489
+   at BackRomo.Infrastructure.Repositories.ConfiguracionRepository.ObtenerParametroOperativoAsync() in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ConfiguracionRepository.cs:line 32
+   at BackRomo.Application.Services.ConfiguracionService.ObtenerParametroOperativoAsync() in C:\dev\back_romo\BackRomo.Application\Services\ConfiguracionService.cs:line 19
+   at BackRomo.API.Controllers.ConfiguracionController.ObtenerParametroOperativo() in C:\dev\back_romo\BackRomo.API\Controllers\ConfiguracionController.cs:line 31
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_parametrooperativo()»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:34:36 ERR] HTTP GET /api/configuracion/parametro-operativo responded 500 in 726.4157 ms
+[2026-04-11 16:36:35 INF] Application is shutting down...
+[2026-04-11 16:36:41 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:36:41 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:36:41 INF] Hosting environment: Development
+[2026-04-11 16:36:41 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:36:49 INF] HTTP OPTIONS /api/operaciones responded 204 in 46.8341 ms
+[2026-04-11 16:36:49 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 46.8488 ms
+[2026-04-11 16:36:50 INF] HTTP OPTIONS /api/clientes responded 204 in 0.1871 ms
+[2026-04-11 16:36:50 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3273 ms
+[2026-04-11 16:36:50 ERR] Error no controlado en GET /api/clientes
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ClienteRepository.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ClienteRepository.cs:line 22
+   at BackRomo.Application.Services.ClienteService.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Application\Services\ClienteService.cs:line 16
+   at BackRomo.API.Controllers.ClientesController.ListarClientes(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.API\Controllers\ClientesController.cs:line 22
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:36:50 ERR] Error no controlado en GET /api/operaciones
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listreservas(EstadoOperacion => text, Id => integer, FechaServicio => unknown)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.OperacionRepository.ListarReservasAsync(String estadoOperacion, Nullable`1 id, Nullable`1 fechaServicio) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\OperacionRepository.cs:line 23
+   at BackRomo.Application.Services.OperacionService.ListarReservasAsync(String estadoOperacion, Nullable`1 id, Nullable`1 fechaServicio) in C:\dev\back_romo\BackRomo.Application\Services\OperacionService.cs:line 25
+   at BackRomo.API.Controllers.OperacionesController.ListarReservas(String estadoOperacion, Nullable`1 id, Nullable`1 fechaServicio) in C:\dev\back_romo\BackRomo.API\Controllers\OperacionesController.cs:line 25
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listreservas(EstadoOperacion => text, Id => integer, FechaServicio => unknown)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:36:50 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:36:50 ERR] HTTP GET /api/clientes responded 500 in 331.6189 ms
+[2026-04-11 16:36:50 ERR] HTTP GET /api/operaciones responded 500 in 1016.9017 ms
+[2026-04-11 16:36:50 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 1026.7678 ms
+[2026-04-11 16:36:50 ERR] HTTP GET /api/reservas/horarios responded 500 in 274.4338 ms
+[2026-04-11 16:36:53 INF] Application is shutting down...
+[2026-04-11 16:36:59 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:36:59 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:36:59 INF] Hosting environment: Development
+[2026-04-11 16:36:59 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:37:06 INF] HTTP OPTIONS /api/clientes responded 204 in 70.9000 ms
+[2026-04-11 16:37:06 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 70.0922 ms
+[2026-04-11 16:37:07 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:37:07 ERR] Error no controlado en GET /api/clientes
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ClienteRepository.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ClienteRepository.cs:line 22
+   at BackRomo.Application.Services.ClienteService.ListarClientesAsync(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.Application\Services\ClienteService.cs:line 16
+   at BackRomo.API.Controllers.ClientesController.ListarClientes(String estado, Nullable`1 id) in C:\dev\back_romo\BackRomo.API\Controllers\ClientesController.cs:line 22
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listclientes(Estado => text, Id => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:37:07 ERR] HTTP GET /api/clientes responded 500 in 1294.9601 ms
+[2026-04-11 16:37:07 ERR] HTTP GET /api/reservas/horarios responded 500 in 1201.1606 ms
+[2026-04-11 16:38:38 INF] Application is shutting down...
+[2026-04-11 16:38:45 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:38:45 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:38:45 INF] Hosting environment: Development
+[2026-04-11 16:38:45 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:39:35 INF] HTTP OPTIONS /api/clientes responded 204 in 82.6419 ms
+[2026-04-11 16:39:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 82.6362 ms
+[2026-04-11 16:39:38 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:39:38 INF] HTTP GET /api/clientes responded 200 in 2424.9973 ms
+[2026-04-11 16:39:38 ERR] HTTP GET /api/reservas/horarios responded 500 in 2385.6401 ms
+[2026-04-11 16:40:30 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.7292 ms
+[2026-04-11 16:40:30 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:40:31 ERR] HTTP GET /api/reservas/horarios responded 500 in 348.9660 ms
+[2026-04-11 16:40:32 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2953 ms
+[2026-04-11 16:40:32 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:40:32 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2063 ms
+[2026-04-11 16:40:32 ERR] HTTP GET /api/reservas/horarios responded 500 in 276.5384 ms
+[2026-04-11 16:40:32 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:40:32 ERR] HTTP GET /api/reservas/horarios responded 500 in 182.3489 ms
+[2026-04-11 16:40:34 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2267 ms
+[2026-04-11 16:40:34 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 188.1362 ms
+[2026-04-11 16:40:36 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.3268 ms
+[2026-04-11 16:40:37 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 84.3893 ms
+[2026-04-11 16:40:55 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3436 ms
+[2026-04-11 16:40:55 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42883: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+
+POSITION: 15
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe la función fn_listhorariosdisponibles(timestamp without time zone, text, smallint)
+    Hint: Ninguna función coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 15
+    File: parse_func.c
+    Line: 636
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:40:56 ERR] HTTP GET /api/reservas/horarios responded 500 in 261.5086 ms
+[2026-04-11 16:44:09 INF] Application is shutting down...
+[2026-04-11 16:44:27 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:44:27 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:44:27 INF] Hosting environment: Development
+[2026-04-11 16:44:27 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:46:11 INF] Application is shutting down...
+[2026-04-11 16:46:20 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:46:20 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:46:20 INF] Hosting environment: Development
+[2026-04-11 16:46:20 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:46:42 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 97.3957 ms
+[2026-04-11 16:46:42 INF] HTTP OPTIONS /api/clientes responded 204 in 98.9583 ms
+[2026-04-11 16:46:43 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4259 ms
+[2026-04-11 16:46:44 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42702: la referencia a la columna «Estado» es ambigua
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.<ReadMessage>g__ReadMessageSequential|49_0(NpgsqlConnector connector, Boolean async)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42702
+    MessageText: la referencia a la columna «Estado» es ambigua
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    InternalPosition: 80
+    InternalQuery: SELECT "TiempoCorte"                         FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO'
+    Where: función PL/pgSQL fn_listhorariosdisponibles(date,character varying,smallint) en la línea 13 en sentencia SQL
+    File: pl_comp.c
+    Line: 1046
+    Routine: plpgsql_post_column_ref
+[2026-04-11 16:46:44 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42702: la referencia a la columna «Estado» es ambigua
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.<ReadMessage>g__ReadMessageSequential|49_0(NpgsqlConnector connector, Boolean async)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42702
+    MessageText: la referencia a la columna «Estado» es ambigua
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    InternalPosition: 80
+    InternalQuery: SELECT "TiempoCorte"                         FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO'
+    Where: función PL/pgSQL fn_listhorariosdisponibles(date,character varying,smallint) en la línea 13 en sentencia SQL
+    File: pl_comp.c
+    Line: 1046
+    Routine: plpgsql_post_column_ref
+[2026-04-11 16:46:45 INF] HTTP GET /api/clientes responded 200 in 2309.4129 ms
+[2026-04-11 16:46:45 ERR] HTTP GET /api/reservas/horarios responded 500 in 1918.2403 ms
+[2026-04-11 16:46:45 ERR] HTTP GET /api/reservas/horarios responded 500 in 2858.9151 ms
+[2026-04-11 16:46:45 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4178 ms
+[2026-04-11 16:46:46 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42702: la referencia a la columna «Estado» es ambigua
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.<ReadMessage>g__ReadMessageSequential|49_0(NpgsqlConnector connector, Boolean async)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42702
+    MessageText: la referencia a la columna «Estado» es ambigua
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    InternalPosition: 80
+    InternalQuery: SELECT "TiempoCorte"                         FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO'
+    Where: función PL/pgSQL fn_listhorariosdisponibles(date,character varying,smallint) en la línea 13 en sentencia SQL
+    File: pl_comp.c
+    Line: 1046
+    Routine: plpgsql_post_column_ref
+[2026-04-11 16:46:46 ERR] HTTP GET /api/reservas/horarios responded 500 in 426.7593 ms
+[2026-04-11 16:46:47 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.7751 ms
+[2026-04-11 16:46:47 ERR] Error no controlado en GET /api/reservas/horarios
+Npgsql.PostgresException (0x80004005): 42702: la referencia a la columna «Estado» es ambigua
+
+DETAIL: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.<ReadMessage>g__ReadMessageSequential|49_0(NpgsqlConnector connector, Boolean async)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 38
+   at BackRomo.Application.Services.ReservaService.ListarHorariosAsync(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 18
+   at BackRomo.API.Controllers.ReservasController.ListarHorarios(DateOnly fecha, String rol, Int16 capacidad) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 21
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42702
+    MessageText: la referencia a la columna «Estado» es ambigua
+    Detail: Detail redacted as it may contain sensitive data. Specify 'Include Error Detail' in the connection string to include this information.
+    InternalPosition: 80
+    InternalQuery: SELECT "TiempoCorte"                         FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO'
+    Where: función PL/pgSQL fn_listhorariosdisponibles(date,character varying,smallint) en la línea 13 en sentencia SQL
+    File: pl_comp.c
+    Line: 1046
+    Routine: plpgsql_post_column_ref
+[2026-04-11 16:46:48 ERR] HTTP GET /api/reservas/horarios responded 500 in 335.9779 ms
+[2026-04-11 16:46:49 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 7.5369 ms
+[2026-04-11 16:46:49 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 185.8253 ms
+[2026-04-11 16:46:51 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2092 ms
+[2026-04-11 16:46:51 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 129.3331 ms
+[2026-04-11 16:53:42 INF] Application is shutting down...
+[2026-04-11 16:53:49 INF] Now listening on: http://localhost:5016
+[2026-04-11 16:53:49 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 16:53:49 INF] Hosting environment: Development
+[2026-04-11 16:53:49 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 16:53:57 INF] HTTP OPTIONS /api/clientes responded 204 in 100.8110 ms
+[2026-04-11 16:53:57 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 102.9392 ms
+[2026-04-11 16:53:58 INF] HTTP GET /api/reservas/horarios responded 200 in 810.1934 ms
+[2026-04-11 16:53:58 INF] HTTP GET /api/clientes responded 200 in 813.8018 ms
+[2026-04-11 16:54:01 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3782 ms
+[2026-04-11 16:54:02 INF] HTTP GET /api/reservas/horarios responded 200 in 88.0568 ms
+[2026-04-11 16:54:03 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1975 ms
+[2026-04-11 16:54:03 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2942 ms
+[2026-04-11 16:54:04 INF] HTTP GET /api/reservas/horarios responded 200 in 165.6384 ms
+[2026-04-11 16:54:04 INF] HTTP GET /api/reservas/horarios responded 200 in 15.0130 ms
+[2026-04-11 16:54:05 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 3.5686 ms
+[2026-04-11 16:54:06 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 189.0546 ms
+[2026-04-11 16:54:11 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.3552 ms
+[2026-04-11 16:54:12 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 22.0664 ms
+[2026-04-11 16:54:14 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2785 ms
+[2026-04-11 16:54:14 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 93.7900 ms
+[2026-04-11 16:54:27 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2332 ms
+[2026-04-11 16:54:28 INF] HTTP GET /api/reservas/horarios responded 200 in 39.1050 ms
+[2026-04-11 16:54:34 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2069 ms
+[2026-04-11 16:54:35 INF] HTTP GET /api/reservas/horarios responded 200 in 18.1665 ms
+[2026-04-11 16:56:39 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1429 ms
+[2026-04-11 16:56:40 ERR] Error no controlado en POST /api/reservas/validar-horario
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_validarhorario(timestamp without time zone, interval, interval, smallint, integer, unknown, integer, text, text, text, text, text, text, numeric, integer, integer, integer, integer, numeric, numeric, smallint, text, text, text, timestamp without time zone, text, text, integer, text, text, integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, Object param) in /_/Dapper/SqlMapper.Async.cs:line 662
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ValidarHorarioAsync(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 154
+   at BackRomo.Application.Services.ReservaService.ValidarHorarioAsync(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 26
+   at BackRomo.API.Controllers.ReservasController.ValidarHorario(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 43
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_validarhorario(timestamp without time zone, interval, interval, smallint, integer, unknown, integer, text, text, text, text, text, text, numeric, integer, integer, integer, integer, numeric, numeric, smallint, text, text, text, timestamp without time zone, text, text, integer, text, text, integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-11 16:56:40 ERR] HTTP POST /api/reservas/validar-horario responded 500 in 971.2326 ms
+[2026-04-11 17:00:49 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2492 ms
+[2026-04-11 17:00:49 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1638 ms
+[2026-04-11 17:00:49 INF] HTTP GET /api/clientes responded 200 in 152.8407 ms
+[2026-04-11 17:00:49 INF] HTTP GET /api/reservas/horarios responded 200 in 39.9268 ms
+[2026-04-11 17:00:52 INF] Application is shutting down...
+[2026-04-11 17:01:03 INF] Now listening on: http://localhost:5016
+[2026-04-11 17:01:03 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 17:01:03 INF] Hosting environment: Development
+[2026-04-11 17:01:03 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 17:01:15 INF] HTTP OPTIONS /api/clientes responded 204 in 82.6981 ms
+[2026-04-11 17:01:15 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 82.4356 ms
+[2026-04-11 17:01:16 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1580 ms
+[2026-04-11 17:01:18 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4688 ms
+[2026-04-11 17:01:18 INF] HTTP GET /api/reservas/horarios responded 200 in 2147.4332 ms
+[2026-04-11 17:01:18 INF] HTTP GET /api/reservas/horarios responded 200 in 1632.7312 ms
+[2026-04-11 17:01:18 INF] HTTP GET /api/reservas/horarios responded 200 in 97.0233 ms
+[2026-04-11 17:01:18 INF] HTTP GET /api/clientes responded 200 in 2638.5221 ms
+[2026-04-11 17:01:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.6401 ms
+[2026-04-11 17:01:20 INF] HTTP GET /api/reservas/horarios responded 200 in 57.1740 ms
+[2026-04-11 17:01:21 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.3529 ms
+[2026-04-11 17:01:21 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 165.7646 ms
+[2026-04-11 17:01:23 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.3373 ms
+[2026-04-11 17:01:24 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 131.6429 ms
+[2026-04-11 17:01:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2343 ms
+[2026-04-11 17:01:35 INF] HTTP GET /api/reservas/horarios responded 200 in 19.8643 ms
+[2026-04-11 17:01:39 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.5673 ms
+[2026-04-11 17:01:39 INF] HTTP GET /api/reservas/horarios responded 200 in 59.3295 ms
+[2026-04-11 17:01:47 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.4663 ms
+[2026-04-11 17:01:48 ERR] Error no controlado en POST /api/reservas/validar-horario
+System.ArgumentException: Cannot write DateTime with Kind=Unspecified to PostgreSQL type 'timestamp with time zone', only UTC is supported. Note that it's not possible to mix DateTimes with different Kinds in an array, range, or multirange. (Parameter 'value')
+   at Npgsql.Internal.Converters.DateTimeConverterResolver`1.Get(DateTime value, Nullable`1 expectedPgTypeId, Boolean validateOnly)
+   at Npgsql.Internal.Converters.DateTimeConverterResolver.<>c.<CreateResolver>b__0_0(DateTimeConverterResolver`1 resolver, DateTime value, Nullable`1 expectedPgTypeId)
+   at Npgsql.Internal.Converters.DateTimeConverterResolver`1.Get(T value, Nullable`1 expectedPgTypeId)
+   at Npgsql.Internal.PgConverterResolver`1.GetAsObjectInternal(PgTypeInfo typeInfo, Object value, Nullable`1 expectedPgTypeId)
+   at Npgsql.Internal.PgResolverTypeInfo.GetResolutionAsObject(Object value, Nullable`1 expectedPgTypeId)
+   at Npgsql.Internal.PgTypeInfo.GetObjectResolution(Object value)
+   at Npgsql.NpgsqlParameter.ResolveConverter(PgTypeInfo typeInfo)
+   at Npgsql.NpgsqlParameter.ResolveTypeInfo(PgSerializerOptions options)
+   at Npgsql.NpgsqlParameterCollection.ProcessParameters(PgSerializerOptions options, Boolean validateValues, CommandType commandType)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, Object param) in /_/Dapper/SqlMapper.Async.cs:line 662
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ValidarHorarioAsync(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 154
+   at BackRomo.Application.Services.ReservaService.ValidarHorarioAsync(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 26
+   at BackRomo.API.Controllers.ReservasController.ValidarHorario(CrearReservaDto dto) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 43
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+[2026-04-11 17:01:48 ERR] HTTP POST /api/reservas/validar-horario responded 500 in 508.6632 ms
+[2026-04-11 17:04:27 INF] Application is shutting down...
+[2026-04-11 17:04:37 INF] Now listening on: http://localhost:5016
+[2026-04-11 17:04:37 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 17:04:37 INF] Hosting environment: Development
+[2026-04-11 17:04:37 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 17:05:32 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 130.1199 ms
+[2026-04-11 17:05:32 INF] HTTP OPTIONS /api/clientes responded 204 in 129.0050 ms
+[2026-04-11 17:05:33 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.5300 ms
+[2026-04-11 17:05:34 INF] HTTP GET /api/reservas/horarios responded 200 in 1821.0253 ms
+[2026-04-11 17:05:34 INF] HTTP GET /api/reservas/horarios responded 200 in 369.0569 ms
+[2026-04-11 17:05:34 INF] HTTP GET /api/clientes responded 200 in 1743.8506 ms
+[2026-04-11 17:05:36 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3893 ms
+[2026-04-11 17:05:37 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 12.8795 ms
+[2026-04-11 17:05:37 INF] HTTP GET /api/reservas/horarios responded 200 in 115.7005 ms
+[2026-04-11 17:05:37 INF] HTTP GET /api/reservas/horarios responded 200 in 27.6775 ms
+[2026-04-11 17:05:38 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.5059 ms
+[2026-04-11 17:05:39 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 200.7983 ms
+[2026-04-11 17:05:40 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.5231 ms
+[2026-04-11 17:05:40 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 88.6483 ms
+[2026-04-11 17:05:58 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3670 ms
+[2026-04-11 17:05:58 INF] HTTP GET /api/reservas/horarios responded 200 in 37.0996 ms
+[2026-04-11 17:06:01 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 2.2329 ms
+[2026-04-11 17:06:01 INF] HTTP GET /api/reservas/horarios responded 200 in 24.2702 ms
+[2026-04-11 17:06:05 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1407 ms
+[2026-04-11 17:06:06 INF] HTTP POST /api/reservas/validar-horario responded 409 in 668.4006 ms
+[2026-04-11 17:10:37 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2334 ms
+[2026-04-11 17:10:37 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1455 ms
+[2026-04-11 17:10:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1639 ms
+[2026-04-11 17:10:38 INF] HTTP GET /api/clientes responded 200 in 490.7621 ms
+[2026-04-11 17:10:39 INF] HTTP GET /api/reservas/horarios responded 200 in 39.7926 ms
+[2026-04-11 17:10:39 INF] HTTP GET /api/reservas/horarios responded 200 in 124.2108 ms
+[2026-04-11 17:10:42 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4356 ms
+[2026-04-11 17:10:42 INF] HTTP GET /api/reservas/horarios responded 200 in 43.3166 ms
+[2026-04-11 17:10:42 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1979 ms
+[2026-04-11 17:10:43 INF] HTTP GET /api/reservas/horarios responded 200 in 23.0649 ms
+[2026-04-11 17:10:43 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1766 ms
+[2026-04-11 17:10:45 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 47.6424 ms
+[2026-04-11 17:10:47 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1189 ms
+[2026-04-11 17:10:47 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 11.7611 ms
+[2026-04-11 17:10:58 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.7342 ms
+[2026-04-11 17:10:58 INF] HTTP GET /api/reservas/horarios responded 200 in 18.1492 ms
+[2026-04-11 17:11:01 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2711 ms
+[2026-04-11 17:11:01 INF] HTTP GET /api/reservas/horarios responded 200 in 11.8645 ms
+[2026-04-11 17:11:28 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1219 ms
+[2026-04-11 17:11:28 INF] HTTP POST /api/reservas/validar-horario responded 409 in 71.6813 ms
+[2026-04-11 17:16:50 INF] HTTP OPTIONS /api/clientes responded 204 in 0.0711 ms
+[2026-04-11 17:16:50 INF] HTTP GET /api/clientes responded 200 in 43.3840 ms
+[2026-04-11 17:16:50 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0528 ms
+[2026-04-11 17:16:50 INF] HTTP GET /api/reservas/horarios responded 200 in 10.9163 ms
+[2026-04-11 17:26:02 INF] HTTP OPTIONS /api/clientes responded 204 in 0.1581 ms
+[2026-04-11 17:26:02 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1043 ms
+[2026-04-11 17:26:03 INF] HTTP GET /api/clientes responded 200 in 133.4650 ms
+[2026-04-11 17:26:03 INF] HTTP GET /api/reservas/horarios responded 200 in 45.2893 ms
+[2026-04-11 17:26:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0824 ms
+[2026-04-11 17:26:10 INF] HTTP GET /api/reservas/horarios responded 200 in 12.7952 ms
+[2026-04-11 17:26:29 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0880 ms
+[2026-04-11 17:26:29 INF] HTTP GET /api/reservas/horarios responded 200 in 9.3759 ms
+[2026-04-11 17:26:29 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1226 ms
+[2026-04-11 17:26:29 INF] HTTP GET /api/reservas/horarios responded 200 in 10.5712 ms
+[2026-04-11 17:26:31 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.0962 ms
+[2026-04-11 17:26:31 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 5.5982 ms
+[2026-04-11 17:26:33 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.0718 ms
+[2026-04-11 17:26:33 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 10.0062 ms
+[2026-04-11 17:26:48 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1724 ms
+[2026-04-11 17:26:48 INF] HTTP GET /api/reservas/horarios responded 200 in 20.6915 ms
+[2026-04-11 17:26:55 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1291 ms
+[2026-04-11 17:26:55 INF] HTTP GET /api/reservas/horarios responded 200 in 17.2812 ms
+[2026-04-11 17:27:02 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3843 ms
+[2026-04-11 17:27:02 INF] HTTP POST /api/reservas/validar-horario responded 409 in 32.6406 ms
+[2026-04-11 17:27:23 INF] Application is shutting down...
+[2026-04-11 17:27:30 INF] Now listening on: http://localhost:5016
+[2026-04-11 17:27:30 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-11 17:27:30 INF] Hosting environment: Development
+[2026-04-11 17:27:30 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-11 17:27:37 INF] HTTP OPTIONS /api/clientes responded 204 in 39.7418 ms
+[2026-04-11 17:27:37 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 39.7529 ms
+[2026-04-11 17:27:38 INF] HTTP GET /api/reservas/horarios responded 200 in 865.0084 ms
+[2026-04-11 17:27:38 INF] HTTP GET /api/clientes responded 200 in 984.1846 ms
+[2026-04-11 17:27:39 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4471 ms
+[2026-04-11 17:27:39 INF] HTTP GET /api/reservas/horarios responded 200 in 37.3903 ms
+[2026-04-11 17:27:40 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2664 ms
+[2026-04-11 17:27:40 INF] HTTP GET /api/reservas/horarios responded 200 in 54.5169 ms
+[2026-04-11 17:27:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2131 ms
+[2026-04-11 17:27:41 INF] HTTP GET /api/reservas/horarios responded 200 in 14.9369 ms
+[2026-04-11 17:27:42 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2330 ms
+[2026-04-11 17:27:43 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 176.0858 ms
+[2026-04-11 17:27:44 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.4159 ms
+[2026-04-11 17:27:44 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 57.0220 ms
+[2026-04-11 17:27:55 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2835 ms
+[2026-04-11 17:27:55 INF] HTTP GET /api/reservas/horarios responded 200 in 14.5768 ms
+[2026-04-11 17:27:59 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3785 ms
+[2026-04-11 17:27:59 INF] HTTP GET /api/reservas/horarios responded 200 in 12.7145 ms
+[2026-04-11 17:28:03 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3345 ms
+[2026-04-11 17:28:04 INF] HTTP POST /api/reservas/validar-horario responded 409 in 346.6028 ms
+[2026-04-11 17:36:17 INF] HTTP OPTIONS /api/clientes responded 204 in 0.5924 ms
+[2026-04-11 17:36:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2603 ms
+[2026-04-11 17:36:17 INF] HTTP GET /api/clientes responded 200 in 174.3061 ms
+[2026-04-11 17:36:17 INF] HTTP GET /api/reservas/horarios responded 200 in 41.9407 ms
+[2026-04-11 17:36:19 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2171 ms
+[2026-04-11 17:36:19 INF] HTTP GET /api/reservas/horarios responded 200 in 15.2817 ms
+[2026-04-11 17:36:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.9343 ms
+[2026-04-11 17:36:20 INF] HTTP GET /api/reservas/horarios responded 200 in 9.7132 ms
+[2026-04-11 17:36:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1556 ms
+[2026-04-11 17:36:20 INF] HTTP GET /api/reservas/horarios responded 200 in 9.9254 ms
+[2026-04-11 17:36:22 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1489 ms
+[2026-04-11 17:36:22 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 6.6239 ms
+[2026-04-11 17:36:24 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1588 ms
+[2026-04-11 17:36:24 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 7.8261 ms
+[2026-04-11 17:36:34 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3000 ms
+[2026-04-11 17:36:34 INF] HTTP GET /api/reservas/horarios responded 200 in 24.8816 ms
+[2026-04-11 17:36:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0792 ms
+[2026-04-11 17:36:38 INF] HTTP GET /api/reservas/horarios responded 200 in 8.9613 ms
+[2026-04-11 17:36:54 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.0853 ms
+[2026-04-11 17:36:54 INF] HTTP POST /api/reservas/validar-horario responded 200 in 26.4571 ms
+[2026-04-11 17:43:26 INF] Application is shutting down...

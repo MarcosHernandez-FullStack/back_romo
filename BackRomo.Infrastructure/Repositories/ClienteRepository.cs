@@ -15,7 +15,9 @@ public class ClienteRepository : IClienteRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id)
+    /*
+    //Con sql server
+     public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id)
     {
         using var conn = _db.CreateConnection();
 
@@ -23,6 +25,17 @@ public class ClienteRepository : IClienteRepository
             "sp_ListClientes",
             new { Estado = estado, Id = id },
             commandType: CommandType.StoredProcedure
+        );
+    } */
+
+    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id)
+    {
+        using var conn = _db.CreateConnection();
+
+        return await conn.QueryAsync<ClienteDto>(
+            "SELECT * FROM fn_ListClientes(@Estado, @Id)",
+            new { Estado = estado, Id = id },
+            commandType: CommandType.Text
         );
     }
 }

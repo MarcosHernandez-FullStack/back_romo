@@ -31,8 +31,8 @@ public class AuthRepository : IAuthRepository
 
         // PostgreSQL — function (RETURNS TABLE)
         var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
-            "SELECT * FROM fn_LoginUsuario(@_Identificador, @_Contrasena)",
-            new { _Identificador = identificador, _Contrasena = hashContrasena }
+            "SELECT * FROM fn_LoginUsuario(@Identificador, @Contrasena)",
+            new { Identificador = identificador, Contrasena = hashContrasena }
         );
 
         if (result is null || result.Exitoso == 0)

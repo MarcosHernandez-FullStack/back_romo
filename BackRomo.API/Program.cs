@@ -90,6 +90,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+//Configuración zona horaria Npgsql
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
