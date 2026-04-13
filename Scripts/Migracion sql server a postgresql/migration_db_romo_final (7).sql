@@ -485,6 +485,7 @@ DECLARE
     v_NombresOp     VARCHAR(100);
     v_ApellidosOp   VARCHAR(100);
 BEGIN
+
     SELECT r."FechaServicio", r."HoraInicio", r."HoraFin"
     INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
     FROM   "Reserva" r
@@ -586,6 +587,7 @@ DECLARE
     v_SlotInicioDT  TIMESTAMP;
     v_TiempoCorte   INT;
 BEGIN
+
     SELECT r."FechaServicio", r."HoraInicio"
     INTO   v_FechaServicio, v_HoraInicio
     FROM   "Reserva" r
@@ -656,6 +658,7 @@ DECLARE
     v_GruasDisponibles INT;
     v_MaxOcupacion     INT;
 BEGIN
+
     v_NuevaHoraFin := _NuevaHoraInicio + (_NuevoNroBloques || ' hours')::INTERVAL;
     v_SlotInicioDT := _NuevaFecha + _NuevaHoraInicio;
     v_SlotFinDT    := _NuevaFecha + v_NuevaHoraFin;
@@ -859,6 +862,7 @@ DECLARE
     v_GruasDisponibles INT;
     v_MaxOcupacion     INT;
 BEGIN
+
     v_SlotInicioDT := _FechaServicio + _HoraInicio;
     v_SlotFinDT    := CASE WHEN _HoraFin <= _HoraInicio
                            THEN _FechaServicio + _HoraFin + INTERVAL '1 day'
@@ -1032,6 +1036,7 @@ DECLARE
     v_IdReserva      INT;
     v_CreadoPor      INT;
 BEGIN
+
     IF NOT EXISTS (
         SELECT 1 FROM "TimerReserva"
         WHERE  "Id" = _IdTimerReserva
@@ -1351,6 +1356,7 @@ DECLARE
     v_TiempoCorte    INT;
     v_GruasCapacidad INT;
 BEGIN
+
     v_NroDia := (EXTRACT(DOW FROM _FechaSeleccionada)::INT + 1)::SMALLINT;
 
     SELECT "TiempoCorte" INTO v_TiempoCorte
@@ -1480,6 +1486,7 @@ DECLARE
     v_TiempoCorte    INT;
     v_GruasCapacidad INT;
 BEGIN
+
     v_NroDia := (EXTRACT(DOW FROM _FechaSeleccionada)::INT + 1)::SMALLINT;
 
     SELECT "TiempoCorte" INTO v_TiempoCorte
@@ -2934,3 +2941,14 @@ INSERT INTO "Vehiculo" ("Id", "Tipo", "Marca", "Modelo", "Placa", "Observacion",
 SELECT setval(pg_get_serial_sequence('"Vehiculo"', 'Id'), MAX("Id")) FROM "Vehiculo";
 
 COMMIT;
+
+-- ============================================================
+-- Zona horaria de la base de datos (tomada de ParametroOperativo)
+-- ============================================================
+DO $$
+DECLARE v_zona TEXT;
+BEGIN
+    SELECT "ZonaHoraria" INTO v_zona FROM "ParametroOperativo" LIMIT 1;
+    EXECUTE format('ALTER DATABASE db_romo SET timezone = %L', v_zona);
+END;
+$$;
