@@ -3,6 +3,8 @@ using BackRomo.Application.DTOs.Reserva;
 using BackRomo.Application.Interfaces;
 using BackRomo.Infrastructure.Data;
 using Dapper;
+using Npgsql;
+using NpgsqlTypes;
 
 namespace BackRomo.Infrastructure.Repositories;
 
@@ -51,6 +53,8 @@ public class ReservaRepository : IReservaRepository
             .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
     }
 
+    /*
+    //Con sql server
     public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva)
     {
         using var conn = _db.CreateConnection();
@@ -59,6 +63,26 @@ public class ReservaRepository : IReservaRepository
             "sp_ListHorariosReprogramacion",
             new { FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue), Rol = rol, Capacidad = capacidad, IdReserva = idReserva },
             commandType: CommandType.StoredProcedure
+        );
+
+        return results
+            .Where(r => r.Hora.HasValue)
+            .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
+    } */
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva)
+    {
+        using var conn = _db.CreateConnection();
+
+        var results = await conn.QueryAsync<SpHorarioResult>(
+            "SELECT * FROM fn_ListHorariosReprogramacion(@FechaSeleccionada::date, @Rol, @Capacidad, @IdReserva)",
+            new
+            {
+                FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue),
+                Rol               = rol,
+                Capacidad         = capacidad,
+                IdReserva         = idReserva
+            },
+            commandType: CommandType.Text
         );
 
         return results
@@ -175,6 +199,8 @@ public class ReservaRepository : IReservaRepository
         }
     }
 
+    /*
+    //Con sql server
     public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
     {
         using var conn = _db.CreateConnection();
@@ -200,6 +226,63 @@ public class ReservaRepository : IReservaRepository
         );
 
         return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al crear la reserva." };
+    } */
+    public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
+    {
+        using var conn = (NpgsqlConnection)_db.CreateConnection();
+        await conn.OpenAsync();
+
+        try
+        {
+            var pExitoso        = new NpgsqlParameter("_Exitoso",        NpgsqlDbType.Integer) { Value = 0,            Direction = ParameterDirection.InputOutput };
+            var pMensaje        = new NpgsqlParameter("_Mensaje",        NpgsqlDbType.Text)    { Value = "",           Direction = ParameterDirection.InputOutput };
+            var pHorasConflicto = new NpgsqlParameter("_HorasConflicto", NpgsqlDbType.Text)    { Value = DBNull.Value, Direction = ParameterDirection.InputOutput };
+            var pId             = new NpgsqlParameter("_Id",             NpgsqlDbType.Integer) { Value = DBNull.Value, Direction = ParameterDirection.InputOutput };
+
+            using var cmd = new NpgsqlCommand("", conn);
+            cmd.Parameters.AddWithValue("_IdTimerReserva", dto.IdTimerReserva);
+            cmd.Parameters.AddWithValue("_Rol", dto.Rol);
+            cmd.Parameters.Add(pExitoso);
+            cmd.Parameters.Add(pMensaje);
+            cmd.Parameters.Add(pHorasConflicto);
+            cmd.Parameters.Add(pId);
+
+            string vehiculosExpr;
+            if (dto.Vehiculos.Count == 0)
+            {
+                vehiculosExpr = "ARRAY[]::tipo_vehiculo_detalle[]";
+            }
+            else
+            {
+                var rows = new List<string>();
+                for (int i = 0; i < dto.Vehiculos.Count; i++)
+                {
+                    var v = dto.Vehiculos[i];
+                    cmd.Parameters.AddWithValue($"_v_tipo_{i}",  (object?)v.Tipo        ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue($"_v_placa_{i}", (object?)v.Placa       ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue($"_v_desc_{i}",  (object?)v.Descripcion ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue($"_v_obs_{i}",   (object?)v.Observacion ?? DBNull.Value);
+                    rows.Add($"ROW(@_v_tipo_{i}, @_v_placa_{i}, @_v_desc_{i}, @_v_obs_{i})::tipo_vehiculo_detalle");
+                }
+                vehiculosExpr = $"ARRAY[{string.Join(", ", rows)}]";
+            }
+
+            cmd.CommandText = $"CALL sp_CreateReserva(@_IdTimerReserva, {vehiculosExpr}, @_Rol, @_Exitoso, @_Mensaje, @_HorasConflicto, @_Id)";
+
+            await cmd.ExecuteNonQueryAsync();
+
+            return new ValidarHorarioResultDto
+            {
+                Exitoso        = (int)pExitoso.Value!,
+                Mensaje        = (string)pMensaje.Value!,
+                HorasConflicto = pHorasConflicto.Value == DBNull.Value ? null : (string)pHorasConflicto.Value,
+                Id             = pId.Value == DBNull.Value ? null : (int?)pId.Value
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ValidarHorarioResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
     }
 
     public async Task EliminarTimerAsync(int idTimer)

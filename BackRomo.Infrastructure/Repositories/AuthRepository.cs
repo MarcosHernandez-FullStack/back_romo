@@ -15,21 +15,42 @@ public class AuthRepository : IAuthRepository
     {
         _db = db;
     }
-
+   /*  //Con sql server
     public async Task<Usuario?> LoginAsync(string identificador, string contrasena)
     {
         var hashContrasena = HashMd5ComoGuid(contrasena);
 
         using var conn = _db.CreateConnection();
+        var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
+         "sp_LoginUsuario",
+         new { Identificador = identificador, Contrasena = hashContrasena },
+         commandType: System.Data.CommandType.StoredProcedure
+        );
 
-        // SQL Server — stored procedure
-        // var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
-        //     "sp_LoginUsuario",
-        //     new { Identificador = identificador, Contrasena = hashContrasena },
-        //     commandType: System.Data.CommandType.StoredProcedure
-        // );
+        if (result is null || result.Exitoso == 0)
+            return null;
 
-        // PostgreSQL — function (RETURNS TABLE)
+        return new Usuario
+        {
+            Id         = result.Id,
+            Alias      = result.Alias,
+            Nombres    = result.Nombres,
+            Apellidos  = result.Apellidos,
+            Correo     = result.Correo,
+            Telefono   = result.Telefono,
+            Rol        = result.Rol,
+            IdCliente  = result.IdCliente,
+            TarifaKm   = result.TarifaKmCliente,
+            TarifaBase = result.TarifaBaseCliente,
+            Empresa    = result.EmpresaCliente
+        };
+    } */
+    
+    public async Task<Usuario?> LoginAsync(string identificador, string contrasena)
+    {
+        var hashContrasena = HashMd5ComoGuid(contrasena);
+
+        using var conn = _db.CreateConnection();
         var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
             "SELECT * FROM fn_LoginUsuario(@Identificador, @Contrasena)",
             new { Identificador = identificador, Contrasena = hashContrasena }

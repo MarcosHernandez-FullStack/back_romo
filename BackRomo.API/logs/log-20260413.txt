@@ -1,0 +1,468 @@
+[2026-04-13 08:39:08 INF] Now listening on: http://localhost:5016
+[2026-04-13 08:39:08 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 08:39:08 INF] Hosting environment: Development
+[2026-04-13 08:39:08 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 08:39:44 INF] HTTP OPTIONS /api/auth/login responded 204 in 76.5820 ms
+[2026-04-13 08:39:44 INF] Intento de login para identificador nosj.xvxx@gmail.com
+[2026-04-13 08:39:47 INF] Login exitoso para usuario 803 (ADMINISTRADOR), token expira "2026-04-13T21:39:47.1295554Z"
+[2026-04-13 08:39:47 INF] HTTP POST /api/auth/login responded 200 in 2908.1529 ms
+[2026-04-13 08:39:55 INF] HTTP OPTIONS /api/clientes responded 204 in 3.0659 ms
+[2026-04-13 08:39:55 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2072 ms
+[2026-04-13 08:39:56 INF] HTTP GET /api/clientes responded 200 in 272.2392 ms
+[2026-04-13 08:39:56 INF] HTTP GET /api/reservas/horarios responded 200 in 338.6308 ms
+[2026-04-13 08:39:57 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2076 ms
+[2026-04-13 08:39:57 INF] HTTP GET /api/reservas/horarios responded 200 in 53.7747 ms
+[2026-04-13 08:39:59 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1335 ms
+[2026-04-13 08:39:59 INF] HTTP GET /api/reservas/horarios responded 200 in 14.6945 ms
+[2026-04-13 08:39:59 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4676 ms
+[2026-04-13 08:39:59 INF] HTTP GET /api/reservas/horarios responded 200 in 7.1922 ms
+[2026-04-13 08:40:02 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.4038 ms
+[2026-04-13 08:40:02 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 66.6770 ms
+[2026-04-13 08:40:03 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2744 ms
+[2026-04-13 08:40:03 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 40.7015 ms
+[2026-04-13 08:40:19 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.6327 ms
+[2026-04-13 08:40:19 INF] HTTP GET /api/reservas/horarios responded 200 in 8.2661 ms
+[2026-04-13 08:40:25 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3704 ms
+[2026-04-13 08:40:25 INF] HTTP GET /api/reservas/horarios responded 200 in 137.9601 ms
+[2026-04-13 08:41:28 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2358 ms
+[2026-04-13 08:41:29 INF] HTTP POST /api/reservas/validar-horario responded 200 in 511.3432 ms
+[2026-04-13 08:42:20 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.2792 ms
+[2026-04-13 08:42:20 INF] HTTP POST /api/reservas/crear-reserva responded 409 in 178.7023 ms
+[2026-04-13 08:43:34 INF] HTTP OPTIONS /api/clientes responded 204 in 0.7360 ms
+[2026-04-13 08:43:34 INF] HTTP GET /api/clientes responded 200 in 13.2183 ms
+[2026-04-13 08:43:34 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3365 ms
+[2026-04-13 08:43:34 INF] HTTP GET /api/reservas/horarios responded 200 in 27.8219 ms
+[2026-04-13 08:43:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1600 ms
+[2026-04-13 08:43:35 INF] HTTP GET /api/reservas/horarios responded 200 in 10.5500 ms
+[2026-04-13 08:43:37 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1626 ms
+[2026-04-13 08:43:37 INF] HTTP GET /api/reservas/horarios responded 200 in 9.2985 ms
+[2026-04-13 08:43:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1721 ms
+[2026-04-13 08:43:38 INF] HTTP GET /api/reservas/horarios responded 200 in 6.6189 ms
+[2026-04-13 08:43:39 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1867 ms
+[2026-04-13 08:43:39 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 5.4015 ms
+[2026-04-13 08:43:41 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.0771 ms
+[2026-04-13 08:43:41 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 2.9140 ms
+[2026-04-13 08:44:05 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1126 ms
+[2026-04-13 08:44:05 INF] HTTP GET /api/reservas/horarios responded 200 in 9.1230 ms
+[2026-04-13 08:44:08 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2197 ms
+[2026-04-13 08:44:08 INF] HTTP GET /api/reservas/horarios responded 200 in 10.9481 ms
+[2026-04-13 08:44:12 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0669 ms
+[2026-04-13 08:44:12 INF] HTTP GET /api/reservas/horarios responded 200 in 17.7782 ms
+[2026-04-13 08:44:20 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3243 ms
+[2026-04-13 08:44:20 INF] HTTP POST /api/reservas/validar-horario responded 200 in 15.0650 ms
+[2026-04-13 08:48:04 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.1385 ms
+[2026-04-13 08:48:04 INF] HTTP POST /api/reservas/crear-reserva responded 409 in 117.9761 ms
+[2026-04-13 08:48:12 INF] Application is shutting down...
+[2026-04-13 08:48:20 INF] Now listening on: http://localhost:5016
+[2026-04-13 08:48:20 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 08:48:20 INF] Hosting environment: Development
+[2026-04-13 08:48:20 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 08:48:29 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 49.1869 ms
+[2026-04-13 08:48:30 INF] HTTP POST /api/reservas/crear-reserva responded 409 in 883.3283 ms
+[2026-04-13 08:48:36 INF] HTTP OPTIONS /api/clientes responded 204 in 3.5346 ms
+[2026-04-13 08:48:36 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2742 ms
+[2026-04-13 08:48:36 INF] HTTP GET /api/reservas/horarios responded 200 in 285.1428 ms
+[2026-04-13 08:48:36 INF] HTTP GET /api/clientes responded 200 in 410.4055 ms
+[2026-04-13 08:48:39 INF] Application is shutting down...
+[2026-04-13 08:48:45 INF] Now listening on: http://localhost:5016
+[2026-04-13 08:48:45 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 08:48:45 INF] Hosting environment: Development
+[2026-04-13 08:48:45 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 08:50:01 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 57.8016 ms
+[2026-04-13 08:50:02 INF] HTTP GET /api/reservas/horarios responded 200 in 883.3911 ms
+[2026-04-13 08:50:03 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 2.4266 ms
+[2026-04-13 08:50:03 INF] HTTP GET /api/reservas/horarios responded 200 in 30.2275 ms
+[2026-04-13 08:50:04 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2527 ms
+[2026-04-13 08:50:04 INF] HTTP GET /api/reservas/horarios responded 200 in 24.3354 ms
+[2026-04-13 08:50:04 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1578 ms
+[2026-04-13 08:50:05 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 138.0839 ms
+[2026-04-13 08:50:08 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1890 ms
+[2026-04-13 08:50:08 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 31.1995 ms
+[2026-04-13 08:50:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2033 ms
+[2026-04-13 08:50:20 INF] HTTP GET /api/reservas/horarios responded 200 in 6.9850 ms
+[2026-04-13 08:50:23 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.5115 ms
+[2026-04-13 08:50:23 INF] HTTP GET /api/reservas/horarios responded 200 in 14.7818 ms
+[2026-04-13 08:50:28 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2071 ms
+[2026-04-13 08:50:29 INF] HTTP POST /api/reservas/validar-horario responded 200 in 488.3094 ms
+[2026-04-13 08:52:31 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.4099 ms
+[2026-04-13 08:52:31 INF] HTTP POST /api/reservas/crear-reserva responded 409 in 92.4372 ms
+[2026-04-13 08:59:07 INF] Application is shutting down...
+[2026-04-13 08:59:19 INF] Now listening on: http://localhost:5016
+[2026-04-13 08:59:19 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 08:59:19 INF] Hosting environment: Development
+[2026-04-13 08:59:19 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 08:59:38 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 46.4368 ms
+[2026-04-13 08:59:38 INF] HTTP OPTIONS /api/clientes responded 204 in 46.2660 ms
+[2026-04-13 08:59:39 INF] HTTP GET /api/reservas/horarios responded 200 in 1056.1246 ms
+[2026-04-13 08:59:39 INF] HTTP GET /api/clientes responded 200 in 1064.0073 ms
+[2026-04-13 09:00:00 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2866 ms
+[2026-04-13 09:00:00 INF] HTTP GET /api/reservas/horarios responded 200 in 53.8830 ms
+[2026-04-13 09:00:02 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4106 ms
+[2026-04-13 09:00:02 INF] HTTP GET /api/reservas/horarios responded 200 in 19.2911 ms
+[2026-04-13 09:00:03 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2087 ms
+[2026-04-13 09:00:03 INF] HTTP GET /api/reservas/horarios responded 200 in 7.4832 ms
+[2026-04-13 09:00:06 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1718 ms
+[2026-04-13 09:00:06 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 71.2475 ms
+[2026-04-13 09:00:10 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1892 ms
+[2026-04-13 09:00:10 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 43.3965 ms
+[2026-04-13 09:01:02 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4196 ms
+[2026-04-13 09:01:02 INF] HTTP GET /api/reservas/horarios responded 200 in 8.4596 ms
+[2026-04-13 09:01:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1958 ms
+[2026-04-13 09:01:10 INF] HTTP GET /api/reservas/horarios responded 200 in 6.8508 ms
+[2026-04-13 09:02:58 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3224 ms
+[2026-04-13 09:02:59 INF] HTTP POST /api/reservas/validar-horario responded 200 in 366.3850 ms
+[2026-04-13 09:05:38 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.2027 ms
+[2026-04-13 09:05:38 INF] HTTP POST /api/reservas/crear-reserva responded 200 in 180.7073 ms
+[2026-04-13 09:05:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1485 ms
+[2026-04-13 09:05:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1157 ms
+[2026-04-13 09:05:41 INF] HTTP GET /api/reservas/horarios responded 200 in 24.1187 ms
+[2026-04-13 09:05:41 INF] HTTP GET /api/reservas/horarios responded 200 in 9.3825 ms
+[2026-04-13 09:17:05 INF] Application is shutting down...
+[2026-04-13 09:17:21 INF] Now listening on: http://localhost:5016
+[2026-04-13 09:17:21 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 09:17:21 INF] Hosting environment: Development
+[2026-04-13 09:17:21 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 09:19:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 49.3669 ms
+[2026-04-13 09:19:17 INF] HTTP OPTIONS /api/clientes responded 204 in 49.3569 ms
+[2026-04-13 09:19:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3250 ms
+[2026-04-13 09:19:18 INF] HTTP GET /api/reservas/horarios responded 200 in 893.5267 ms
+[2026-04-13 09:19:18 INF] HTTP GET /api/reservas/horarios responded 200 in 1070.7812 ms
+[2026-04-13 09:19:18 INF] HTTP GET /api/clientes responded 200 in 1077.3331 ms
+[2026-04-13 09:19:21 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.5208 ms
+[2026-04-13 09:19:21 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2273 ms
+[2026-04-13 09:19:21 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 94.7390 ms
+[2026-04-13 09:19:21 INF] HTTP GET /api/operaciones responded 200 in 211.8731 ms
+[2026-04-13 09:19:24 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.5259 ms
+[2026-04-13 09:19:24 INF] HTTP GET /api/operaciones responded 200 in 30.0558 ms
+[2026-04-13 09:19:39 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.3963 ms
+[2026-04-13 09:19:39 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 163.3645 ms
+[2026-04-13 09:19:53 INF] HTTP OPTIONS /api/operaciones responded 204 in 1.1050 ms
+[2026-04-13 09:19:53 INF] HTTP GET /api/operaciones responded 200 in 16.1527 ms
+[2026-04-13 09:20:00 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.4444 ms
+[2026-04-13 09:20:01 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 1229.9575 ms
+[2026-04-13 09:20:16 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2313 ms
+[2026-04-13 09:20:16 INF] HTTP GET /api/operaciones responded 200 in 9.8874 ms
+[2026-04-13 09:20:18 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1602 ms
+[2026-04-13 09:20:18 INF] HTTP GET /api/operaciones responded 200 in 9.9570 ms
+[2026-04-13 09:20:29 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2554 ms
+[2026-04-13 09:20:29 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 25.3257 ms
+[2026-04-13 09:20:36 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 0.3553 ms
+[2026-04-13 09:20:36 INF] HTTP PATCH /api/operaciones/asignar responded 204 in 187.5350 ms
+[2026-04-13 09:20:37 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.3193 ms
+[2026-04-13 09:20:37 INF] HTTP GET /api/operaciones responded 200 in 6.2050 ms
+[2026-04-13 09:20:39 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1951 ms
+[2026-04-13 09:20:39 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 9.6936 ms
+[2026-04-13 09:20:44 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2760 ms
+[2026-04-13 09:20:44 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 170.3316 ms
+[2026-04-13 09:21:05 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1498 ms
+[2026-04-13 09:21:06 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 141.7203 ms
+[2026-04-13 09:21:24 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.0876 ms
+[2026-04-13 09:21:24 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 392.8511 ms
+[2026-04-13 09:21:56 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2452 ms
+[2026-04-13 09:21:56 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 10.4178 ms
+[2026-04-13 09:24:18 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.4152 ms
+[2026-04-13 09:24:18 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.4082 ms
+[2026-04-13 09:24:18 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 84.1111 ms
+[2026-04-13 09:24:18 INF] HTTP GET /api/operaciones responded 200 in 139.8788 ms
+[2026-04-13 09:24:21 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1512 ms
+[2026-04-13 09:24:21 INF] HTTP GET /api/operaciones responded 200 in 29.4083 ms
+[2026-04-13 09:24:22 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.0891 ms
+[2026-04-13 09:24:23 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 374.0602 ms
+[2026-04-13 09:25:34 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1433 ms
+[2026-04-13 09:25:34 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 9.4908 ms
+[2026-04-13 09:33:35 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.6404 ms
+[2026-04-13 09:33:35 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.0818 ms
+[2026-04-13 09:33:36 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 125.8758 ms
+[2026-04-13 09:33:36 INF] HTTP GET /api/operaciones responded 200 in 214.4355 ms
+[2026-04-13 09:36:30 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1103 ms
+[2026-04-13 09:36:30 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1217 ms
+[2026-04-13 09:36:30 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 5.8901 ms
+[2026-04-13 09:36:30 INF] HTTP GET /api/operaciones responded 200 in 24.3949 ms
+[2026-04-13 09:37:10 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1340 ms
+[2026-04-13 09:37:10 INF] HTTP GET /api/operaciones responded 200 in 4.9735 ms
+[2026-04-13 09:39:43 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1053 ms
+[2026-04-13 09:39:43 INF] HTTP GET /api/operaciones responded 200 in 5.3617 ms
+[2026-04-13 09:39:46 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1476 ms
+[2026-04-13 09:39:46 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 687.8677 ms
+[2026-04-13 09:39:54 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2570 ms
+[2026-04-13 09:39:54 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 9.8786 ms
+[2026-04-13 09:39:58 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0715 ms
+[2026-04-13 09:39:58 INF] HTTP GET /api/operaciones responded 200 in 7.1685 ms
+[2026-04-13 09:40:02 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1489 ms
+[2026-04-13 09:40:02 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 15.4990 ms
+[2026-04-13 09:40:45 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 0.2159 ms
+[2026-04-13 09:40:45 INF] HTTP PATCH /api/operaciones/asignar responded 204 in 29.4916 ms
+[2026-04-13 09:40:47 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0522 ms
+[2026-04-13 09:40:47 INF] HTTP GET /api/operaciones responded 200 in 5.0985 ms
+[2026-04-13 09:40:49 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.1246 ms
+[2026-04-13 09:40:49 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 13.9528 ms
+[2026-04-13 09:40:53 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.0535 ms
+[2026-04-13 09:40:53 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 443.9213 ms
+[2026-04-13 09:41:09 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1456 ms
+[2026-04-13 09:41:10 ERR] Error no controlado en GET /api/reservas/horarios-reprogramacion
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 60
+   at BackRomo.Application.Services.ReservaService.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 21
+   at BackRomo.API.Controllers.ReservasController.ListarHorariosReprogramacion(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-13 09:41:10 ERR] HTTP GET /api/reservas/horarios-reprogramacion responded 500 in 213.5569 ms
+[2026-04-13 09:41:30 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.0552 ms
+[2026-04-13 09:41:30 ERR] Error no controlado en GET /api/reservas/horarios-reprogramacion
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 60
+   at BackRomo.Application.Services.ReservaService.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 21
+   at BackRomo.API.Controllers.ReservasController.ListarHorariosReprogramacion(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-13 09:41:30 ERR] HTTP GET /api/reservas/horarios-reprogramacion responded 500 in 211.0127 ms
+[2026-04-13 09:41:36 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.0465 ms
+[2026-04-13 09:41:36 ERR] Error no controlado en GET /api/reservas/horarios-reprogramacion
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 60
+   at BackRomo.Application.Services.ReservaService.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 21
+   at BackRomo.API.Controllers.ReservasController.ListarHorariosReprogramacion(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-13 09:41:36 ERR] HTTP GET /api/reservas/horarios-reprogramacion responded 500 in 41.6576 ms
+[2026-04-13 09:41:50 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0709 ms
+[2026-04-13 09:41:50 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.0707 ms
+[2026-04-13 09:41:50 INF] HTTP GET /api/operaciones responded 200 in 79.0978 ms
+[2026-04-13 09:41:50 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 158.1136 ms
+[2026-04-13 09:41:55 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0628 ms
+[2026-04-13 09:41:55 INF] HTTP GET /api/operaciones responded 200 in 5.0276 ms
+[2026-04-13 09:44:21 INF] HTTP OPTIONS /api/operaciones/cancelar responded 204 in 0.0661 ms
+[2026-04-13 09:44:22 INF] HTTP PATCH /api/operaciones/cancelar responded 204 in 50.2827 ms
+[2026-04-13 09:44:28 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0854 ms
+[2026-04-13 09:44:28 INF] HTTP GET /api/operaciones responded 200 in 5.3387 ms
+[2026-04-13 09:46:29 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1287 ms
+[2026-04-13 09:46:29 ERR] Error no controlado en GET /api/reservas/horarios-reprogramacion
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 60
+   at BackRomo.Application.Services.ReservaService.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 21
+   at BackRomo.API.Controllers.ReservasController.ListarHorariosReprogramacion(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-13 09:46:29 ERR] HTTP GET /api/reservas/horarios-reprogramacion responded 500 in 47.3336 ms
+[2026-04-13 09:46:35 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0567 ms
+[2026-04-13 09:46:35 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.0856 ms
+[2026-04-13 09:46:35 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 108.6223 ms
+[2026-04-13 09:46:35 INF] HTTP GET /api/operaciones responded 200 in 149.7679 ms
+[2026-04-13 09:46:42 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2437 ms
+[2026-04-13 09:46:42 INF] HTTP GET /api/operaciones responded 200 in 17.1578 ms
+[2026-04-13 09:46:44 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.0685 ms
+[2026-04-13 09:46:44 ERR] Error no controlado en GET /api/reservas/horarios-reprogramacion
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteDbDataReaderAsync(CommandBehavior behavior, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.QueryAsync[T](IDbConnection cnn, Type effectiveType, CommandDefinition command) in /_/Dapper/SqlMapper.Async.cs:line 434
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 60
+   at BackRomo.Application.Services.ReservaService.ListarHorariosReprogramacionAsync(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 21
+   at BackRomo.API.Controllers.ReservasController.ListarHorariosReprogramacion(DateOnly fecha, String rol, Int16 capacidad, Int32 idReserva) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 32
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_listhorariosreprogramacion(FechaSeleccionada => timestamp without time zone, Rol => text, Capacidad => smallint, IdReserva => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-13 09:46:44 ERR] HTTP GET /api/reservas/horarios-reprogramacion responded 500 in 108.2080 ms
+[2026-04-13 09:48:15 INF] Application is shutting down...
+[2026-04-13 09:48:28 INF] Now listening on: http://localhost:5016
+[2026-04-13 09:48:28 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-13 09:48:28 INF] Hosting environment: Development
+[2026-04-13 09:48:28 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-13 09:53:39 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 50.3929 ms
+[2026-04-13 09:53:39 INF] HTTP OPTIONS /api/operaciones responded 204 in 50.3444 ms
+[2026-04-13 09:53:40 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 1049.1031 ms
+[2026-04-13 09:53:40 INF] HTTP GET /api/operaciones responded 200 in 1067.1249 ms
+[2026-04-13 09:53:42 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.3315 ms
+[2026-04-13 09:53:42 INF] HTTP GET /api/operaciones responded 200 in 74.7871 ms
+[2026-04-13 09:53:44 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1813 ms
+[2026-04-13 09:53:44 INF] HTTP GET /api/operaciones responded 200 in 11.9006 ms
+[2026-04-13 09:53:46 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1874 ms
+[2026-04-13 09:53:46 INF] HTTP GET /api/operaciones responded 200 in 6.3868 ms
+[2026-04-13 09:53:47 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.4657 ms
+[2026-04-13 09:53:47 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 115.2444 ms
+[2026-04-13 09:53:59 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1377 ms
+[2026-04-13 09:53:59 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 34.2314 ms
+[2026-04-13 09:54:11 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2078 ms
+[2026-04-13 09:54:11 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2078 ms
+[2026-04-13 09:54:11 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 5.5766 ms
+[2026-04-13 09:54:11 INF] HTTP GET /api/operaciones responded 200 in 50.3716 ms
+[2026-04-13 09:54:17 INF] HTTP OPTIONS /api/clientes responded 204 in 0.7317 ms
+[2026-04-13 09:54:17 INF] HTTP GET /api/clientes responded 200 in 82.0347 ms
+[2026-04-13 09:54:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3807 ms
+[2026-04-13 09:54:17 INF] HTTP GET /api/reservas/horarios responded 200 in 86.6769 ms
+[2026-04-13 09:54:18 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2054 ms
+[2026-04-13 09:54:18 INF] HTTP GET /api/reservas/horarios responded 200 in 10.9138 ms
+[2026-04-13 09:54:28 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.3646 ms
+[2026-04-13 09:54:28 INF] HTTP GET /api/operaciones responded 200 in 11.0531 ms
+[2026-04-13 09:54:32 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.9469 ms
+[2026-04-13 09:54:32 INF] HTTP GET /api/operaciones responded 200 in 5.2242 ms
+[2026-04-13 09:54:39 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.2526 ms
+[2026-04-13 09:54:39 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 8.4806 ms
+[2026-04-13 09:55:04 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.1998 ms
+[2026-04-13 09:55:05 INF] HTTP PATCH /api/operaciones/reprogramar responded 204 in 473.0450 ms
+[2026-04-13 09:55:06 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1187 ms
+[2026-04-13 09:55:06 INF] HTTP GET /api/operaciones responded 200 in 4.4703 ms
+[2026-04-13 09:55:09 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.2010 ms
+[2026-04-13 09:55:10 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 1426.5345 ms
+[2026-04-13 09:55:13 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.1211 ms
+[2026-04-13 09:55:13 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 10.1145 ms
+[2026-04-13 09:55:40 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.2564 ms
+[2026-04-13 09:55:40 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 13.7455 ms
+[2026-04-13 09:55:55 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.1697 ms
+[2026-04-13 09:55:55 INF] HTTP PATCH /api/operaciones/reprogramar responded 204 in 19.2873 ms
+[2026-04-13 09:55:57 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0878 ms
+[2026-04-13 09:55:57 INF] HTTP GET /api/operaciones responded 200 in 5.6477 ms
+[2026-04-13 09:55:59 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0569 ms
+[2026-04-13 09:55:59 INF] HTTP GET /api/operaciones responded 200 in 7.5594 ms
+[2026-04-13 10:12:29 INF] Application is shutting down...

@@ -16,6 +16,8 @@ public class OperacionRepository : IOperacionRepository
         _db = db;
     }
 
+    /*
+    //Con sql server
     public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio)
     {
         using var conn = _db.CreateConnection();
@@ -25,8 +27,20 @@ public class OperacionRepository : IOperacionRepository
             new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio },
             commandType: CommandType.StoredProcedure
         );
+    } */
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio)
+    {
+        using var conn = _db.CreateConnection();
+
+        return await conn.QueryAsync<ReservaDto>(
+            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date)",
+            new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio },
+            commandType: CommandType.Text
+        );
     }
 
+    /*
+    //Con sql server
     public async Task CancelarReservaAsync(CancelarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
@@ -36,8 +50,26 @@ public class OperacionRepository : IOperacionRepository
             new { dto.Id, dto.MotivoCancelacion, dto.ActualizadoPor },
             commandType: CommandType.StoredProcedure
         );
+    } */
+    public async Task CancelarReservaAsync(CancelarServicioDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        var p = new DynamicParameters();
+        p.Add("_Id",                dto.Id,                DbType.Int32);
+        p.Add("_MotivoCancelacion", dto.MotivoCancelacion, DbType.String);
+        p.Add("_ActualizadoPor",    dto.ActualizadoPor,    DbType.Int32);
+        p.Add("_Exitoso", value: 0,   dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+        p.Add("_Mensaje",  value: "",  dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+        await conn.ExecuteAsync(
+            "CALL sp_CancelarReserva(@_Id, @_MotivoCancelacion, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+            p, commandType: CommandType.Text
+        );
     }
 
+    /*
+    //Con sql server
     public async Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva)
     {
         using var conn  = _db.CreateConnection();
@@ -51,8 +83,28 @@ public class OperacionRepository : IOperacionRepository
         var operadores = await multi.ReadAsync<OperadorCandidatoDto>();
 
         return (gruas, operadores);
+    } */
+    public async Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva)
+    {
+        using var conn = _db.CreateConnection();
+
+        var gruas = await conn.QueryAsync<GruaCandidatoDto>(
+            "SELECT * FROM fn_SugerirAsignacion_Gruas(@IdReserva)",
+            new { IdReserva = idReserva },
+            commandType: CommandType.Text
+        );
+
+        var operadores = await conn.QueryAsync<OperadorCandidatoDto>(
+            "SELECT * FROM fn_SugerirAsignacion_Operadores(@IdReserva)",
+            new { IdReserva = idReserva },
+            commandType: CommandType.Text
+        );
+
+        return (gruas, operadores);
     }
 
+    /*
+    //Con sql server
     public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
@@ -62,8 +114,33 @@ public class OperacionRepository : IOperacionRepository
             new { dto.IdReserva, dto.IdGrua, dto.IdOperador, dto.ActualizadoPor },
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al asignar el servicio." };
+    } */
+    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        var p = new DynamicParameters();
+        p.Add("_IdReserva",      dto.IdReserva,      DbType.Int32);
+        p.Add("_IdGrua",         dto.IdGrua,         DbType.Int32);
+        p.Add("_IdOperador",     dto.IdOperador,     DbType.Int32);
+        p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+        p.Add("_Exitoso", value: 0,   dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+        p.Add("_Mensaje",  value: "",  dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+        await conn.ExecuteAsync(
+            "CALL sp_AsignarServicio(@_IdReserva, @_IdGrua, @_IdOperador, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+            p, commandType: CommandType.Text
+        );
+
+        return new OperacionResultDto
+        {
+            Exitoso = p.Get<int>("_Exitoso"),
+            Mensaje = p.Get<string>("_Mensaje")
+        };
     }
 
+    /*
+    //Con sql server
     public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
@@ -83,14 +160,60 @@ public class OperacionRepository : IOperacionRepository
             },
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al reprogramar la reserva." };
+    } */
+    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
+    {
+        using var conn = _db.CreateConnection();
+
+        var horaInicio = TimeSpan.Parse(dto.NuevaHoraInicio);
+
+        var p = new DynamicParameters();
+        p.Add("_IdReserva",       dto.IdReserva,       DbType.Int32);
+        p.Add("_NuevaFecha",      dto.NuevaFecha.Date, DbType.Date);
+        p.Add("_NuevaHoraInicio", horaInicio,          DbType.Time);
+        p.Add("_NuevoNroBloques", dto.NuevoNroBloques, DbType.Int32);
+        p.Add("_ActualizadoPor",  dto.ActualizadoPor,  DbType.Int32);
+        p.Add("_Rol",             dto.Rol,             DbType.String);
+        p.Add("_Exitoso",        value: 0,    dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+        p.Add("_Mensaje",        value: "",   dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+        p.Add("_HorasConflicto", value: null, dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+        await conn.ExecuteAsync(
+            @"CALL sp_ReprogramarReserva(
+                @_IdReserva, @_NuevaFecha::date, @_NuevaHoraInicio::time,
+                @_NuevoNroBloques, @_ActualizadoPor, @_Rol,
+                @_Exitoso, @_Mensaje, @_HorasConflicto)",
+            p, commandType: CommandType.Text
+        );
+
+        return new OperacionResultDto
+        {
+            Exitoso        = p.Get<int>("_Exitoso"),
+            Mensaje        = p.Get<string>("_Mensaje"),
+            HorasConflicto = p.Get<string?>("_HorasConflicto")
+        };
     }
 
+    /*
+    //Con sql server
     public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva)
     {
         using var conn = _db.CreateConnection();
 
         var result = await conn.QueryFirstOrDefaultAsync<OrigenReserva>(
             "SELECT CoordLatOrigen, CoordLonOrigen FROM Reserva WHERE Id = @Id",
+            new { Id = idReserva }
+        );
+
+        if (result is null) return null;
+        return (result.CoordLatOrigen, result.CoordLonOrigen);
+    } */
+    public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva)
+    {
+        using var conn = _db.CreateConnection();
+
+        var result = await conn.QueryFirstOrDefaultAsync<OrigenReserva>(
+            @"SELECT ""CoordLatOrigen"", ""CoordLonOrigen"" FROM ""Reserva"" WHERE ""Id"" = @Id",
             new { Id = idReserva }
         );
 
