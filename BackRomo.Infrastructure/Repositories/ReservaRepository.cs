@@ -285,6 +285,7 @@ public class ReservaRepository : IReservaRepository
         }
     }
 
+    /* //Con sql server
     public async Task EliminarTimerAsync(int idTimer)
     {
         using var conn = _db.CreateConnection();
@@ -293,7 +294,35 @@ public class ReservaRepository : IReservaRepository
             new { Id = idTimer },
             commandType: CommandType.StoredProcedure
         );
+    } */
+    public async Task<ValidarHorarioResultDto> EliminarTimerAsync(int idTimer)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id",      idTimer, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(
+                "CALL sp_DeleteTimerReserva(@_Id::integer, @_Exitoso, @_Mensaje)",
+                p,
+                commandType: CommandType.Text
+            );
+
+            return new ValidarHorarioResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ValidarHorarioResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
     }
+
 
     private class SpHorarioResult
     {

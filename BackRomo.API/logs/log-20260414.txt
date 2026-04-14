@@ -1,0 +1,210 @@
+[2026-04-14 09:40:56 INF] Now listening on: http://localhost:5016
+[2026-04-14 09:40:56 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 09:40:56 INF] Hosting environment: Development
+[2026-04-14 09:40:56 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 09:57:35 INF] Application is shutting down...
+[2026-04-14 09:57:42 INF] Now listening on: http://localhost:5016
+[2026-04-14 09:57:42 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 09:57:42 INF] Hosting environment: Development
+[2026-04-14 09:57:42 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 09:58:13 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 37.1972 ms
+[2026-04-14 09:58:13 INF] HTTP OPTIONS /api/clientes responded 204 in 37.1343 ms
+[2026-04-14 09:58:14 INF] HTTP GET /api/reservas/horarios responded 200 in 1109.0655 ms
+[2026-04-14 09:58:14 INF] HTTP GET /api/clientes responded 200 in 1111.7082 ms
+[2026-04-14 09:58:29 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2593 ms
+[2026-04-14 09:58:29 INF] HTTP GET /api/clientes responded 200 in 40.8529 ms
+[2026-04-14 09:58:29 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0928 ms
+[2026-04-14 09:58:29 INF] HTTP GET /api/reservas/horarios responded 200 in 7.3816 ms
+[2026-04-14 09:58:36 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2069 ms
+[2026-04-14 09:58:37 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1931 ms
+[2026-04-14 09:58:37 INF] HTTP GET /api/clientes responded 200 in 36.6904 ms
+[2026-04-14 09:58:37 INF] HTTP GET /api/reservas/horarios responded 200 in 30.4176 ms
+[2026-04-14 09:58:44 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1757 ms
+[2026-04-14 09:58:44 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 114.6445 ms
+[2026-04-14 09:58:47 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2849 ms
+[2026-04-14 09:58:47 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 41.0962 ms
+[2026-04-14 09:59:01 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 1.0249 ms
+[2026-04-14 09:59:01 INF] HTTP GET /api/reservas/horarios responded 200 in 43.4541 ms
+[2026-04-14 09:59:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.6189 ms
+[2026-04-14 09:59:10 INF] HTTP GET /api/reservas/horarios responded 200 in 31.9280 ms
+[2026-04-14 09:59:53 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.6319 ms
+[2026-04-14 09:59:54 INF] HTTP POST /api/reservas/validar-horario responded 200 in 497.8405 ms
+[2026-04-14 10:00:19 INF] HTTP OPTIONS /api/reservas/timer/7 responded 204 in 0.1637 ms
+[2026-04-14 10:00:19 ERR] Error no controlado en DELETE /api/reservas/timer/7
+Npgsql.PostgresException (0x80004005): 42883: no existe el procedimiento «sp_deletetimerreserva(Id => integer)»
+
+POSITION: 6
+   at Npgsql.Internal.NpgsqlConnector.ReadMessageLong(Boolean async, DataRowLoadingMode dataRowLoadingMode, Boolean readingNotifications, Boolean isReadingPrependedMessage)
+   at System.Runtime.CompilerServices.PoolingAsyncValueTaskMethodBuilder`1.StateMachineBox`1.System.Threading.Tasks.Sources.IValueTaskSource<TResult>.GetResult(Int16 token)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlDataReader.NextResult(Boolean async, Boolean isConsuming, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteReader(Boolean async, CommandBehavior behavior, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlCommand.ExecuteNonQuery(Boolean async, CancellationToken cancellationToken)
+   at Dapper.SqlMapper.ExecuteImplAsync(IDbConnection cnn, CommandDefinition command, Object param) in /_/Dapper/SqlMapper.Async.cs:line 662
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.EliminarTimerAsync(Int32 idTimer) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 291
+   at BackRomo.Application.Services.ReservaService.EliminarTimerAsync(Int32 idTimer) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 33
+   at BackRomo.API.Controllers.ReservasController.EliminarTimer(Int32 id) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 65
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+  Exception data:
+    Severity: ERROR
+    SqlState: 42883
+    MessageText: no existe el procedimiento «sp_deletetimerreserva(Id => integer)»
+    Hint: Ningún procedimiento coincide en el nombre y tipos de argumentos. Puede ser necesario agregar conversión explícita de tipos.
+    Position: 6
+    File: parse_func.c
+    Line: 627
+    Routine: ParseFuncOrColumn
+[2026-04-14 10:00:19 ERR] HTTP DELETE /api/reservas/timer/7 responded 500 in 255.5909 ms
+[2026-04-14 10:05:53 INF] Application is shutting down...
+[2026-04-14 10:06:09 INF] Now listening on: http://localhost:5016
+[2026-04-14 10:06:09 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 10:06:10 INF] Hosting environment: Development
+[2026-04-14 10:06:10 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 10:06:31 INF] HTTP OPTIONS /api/clientes responded 204 in 49.0419 ms
+[2026-04-14 10:06:31 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 49.0390 ms
+[2026-04-14 10:06:32 INF] HTTP GET /api/reservas/horarios responded 200 in 1013.4364 ms
+[2026-04-14 10:06:32 INF] HTTP GET /api/clientes responded 200 in 1105.2307 ms
+[2026-04-14 10:06:55 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.2846 ms
+[2026-04-14 10:06:56 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 133.9861 ms
+[2026-04-14 10:06:57 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.3772 ms
+[2026-04-14 10:06:57 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 43.9133 ms
+[2026-04-14 10:07:25 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.9374 ms
+[2026-04-14 10:07:26 INF] HTTP GET /api/reservas/horarios responded 200 in 40.7561 ms
+[2026-04-14 10:07:32 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1729 ms
+[2026-04-14 10:07:32 INF] HTTP GET /api/reservas/horarios responded 200 in 42.6180 ms
+[2026-04-14 10:07:47 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3094 ms
+[2026-04-14 10:07:47 INF] HTTP POST /api/reservas/validar-horario responded 200 in 408.1906 ms
+[2026-04-14 10:07:56 INF] HTTP OPTIONS /api/clientes responded 204 in 0.4054 ms
+[2026-04-14 10:07:56 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.9894 ms
+[2026-04-14 10:07:56 INF] HTTP GET /api/clientes responded 200 in 17.6928 ms
+[2026-04-14 10:07:56 INF] HTTP GET /api/reservas/horarios responded 200 in 7.0021 ms
+[2026-04-14 10:07:57 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1894 ms
+[2026-04-14 10:07:57 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 17.0307 ms
+[2026-04-14 10:07:58 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1681 ms
+[2026-04-14 10:07:58 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 6.4828 ms
+[2026-04-14 10:08:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2523 ms
+[2026-04-14 10:08:10 INF] HTTP GET /api/reservas/horarios responded 200 in 11.6212 ms
+[2026-04-14 10:08:16 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.7963 ms
+[2026-04-14 10:08:16 INF] HTTP GET /api/reservas/horarios responded 200 in 32.5937 ms
+[2026-04-14 10:08:27 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2969 ms
+[2026-04-14 10:08:27 INF] HTTP POST /api/reservas/validar-horario responded 200 in 35.3314 ms
+[2026-04-14 10:10:32 INF] Application is shutting down...
+[2026-04-14 10:10:38 INF] Now listening on: http://localhost:5016
+[2026-04-14 10:10:38 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 10:10:38 INF] Hosting environment: Development
+[2026-04-14 10:10:38 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 10:23:40 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 18.9728 ms
+[2026-04-14 10:23:40 INF] HTTP OPTIONS /api/clientes responded 204 in 18.8892 ms
+[2026-04-14 10:23:41 INF] HTTP GET /api/reservas/horarios responded 200 in 606.1425 ms
+[2026-04-14 10:23:41 INF] HTTP GET /api/clientes responded 200 in 612.2642 ms
+[2026-04-14 10:23:54 INF] Application is shutting down...
+[2026-04-14 10:24:03 INF] Now listening on: http://localhost:5016
+[2026-04-14 10:24:03 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 10:24:03 INF] Hosting environment: Development
+[2026-04-14 10:24:03 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 10:24:07 INF] HTTP OPTIONS /api/clientes responded 204 in 58.0626 ms
+[2026-04-14 10:24:07 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 59.1528 ms
+[2026-04-14 10:24:09 INF] HTTP GET /api/reservas/horarios responded 200 in 1023.3077 ms
+[2026-04-14 10:24:09 INF] HTTP GET /api/clientes responded 200 in 1411.9572 ms
+[2026-04-14 10:24:11 INF] HTTP GET /api/clientes responded 200 in 19.1090 ms
+[2026-04-14 10:24:12 INF] HTTP GET /api/reservas/horarios responded 200 in 50.7191 ms
+[2026-04-14 10:24:15 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.3115 ms
+[2026-04-14 10:24:15 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 101.7927 ms
+[2026-04-14 10:24:17 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1905 ms
+[2026-04-14 10:24:17 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 43.0133 ms
+[2026-04-14 10:24:27 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3631 ms
+[2026-04-14 10:24:27 INF] HTTP GET /api/reservas/horarios responded 200 in 48.9625 ms
+[2026-04-14 10:24:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4361 ms
+[2026-04-14 10:24:35 INF] HTTP GET /api/reservas/horarios responded 200 in 19.4911 ms
+[2026-04-14 10:24:44 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2894 ms
+[2026-04-14 10:24:44 INF] HTTP POST /api/reservas/validar-horario responded 200 in 370.1213 ms
+[2026-04-14 10:26:30 INF] HTTP OPTIONS /api/reservas/timer/10 responded 204 in 0.2591 ms
+[2026-04-14 10:26:30 INF] HTTP DELETE /api/reservas/timer/10 responded 204 in 60.6691 ms
+[2026-04-14 10:27:24 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3998 ms
+[2026-04-14 10:27:24 INF] HTTP POST /api/reservas/validar-horario responded 200 in 38.7291 ms
+[2026-04-14 10:27:39 INF] HTTP OPTIONS /api/reservas/timer/11 responded 204 in 0.1714 ms
+[2026-04-14 10:27:39 ERR] Error no controlado en DELETE /api/reservas/timer/11
+System.Exception: Error al eliminar el timer: No se encontró el timer con Id 11.
+ ---> System.Exception: No se encontró el timer con Id 11.
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.EliminarTimerAsync(Int32 idTimer) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 318
+   --- End of inner exception stack trace ---
+   at BackRomo.Infrastructure.Repositories.ReservaRepository.EliminarTimerAsync(Int32 idTimer) in C:\dev\back_romo\BackRomo.Infrastructure\Repositories\ReservaRepository.cs:line 322
+   at BackRomo.Application.Services.ReservaService.EliminarTimerAsync(Int32 idTimer) in C:\dev\back_romo\BackRomo.Application\Services\ReservaService.cs:line 33
+   at BackRomo.API.Controllers.ReservasController.EliminarTimer(Int32 id) in C:\dev\back_romo\BackRomo.API\Controllers\ReservasController.cs:line 65
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at BackRomo.API.Middlewares.ErrorHandlingMiddleware.InvokeAsync(HttpContext context) in C:\dev\back_romo\BackRomo.API\Middlewares\ErrorHandlingMiddleware.cs:line 18
+[2026-04-14 10:27:39 ERR] HTTP DELETE /api/reservas/timer/11 responded 500 in 152.0599 ms
+[2026-04-14 10:33:09 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2483 ms
+[2026-04-14 10:33:09 INF] HTTP GET /api/clientes responded 200 in 92.3778 ms
+[2026-04-14 10:33:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.3704 ms
+[2026-04-14 10:33:10 INF] HTTP GET /api/reservas/horarios responded 200 in 39.3885 ms
+[2026-04-14 10:35:45 INF] Application is shutting down...
+[2026-04-14 10:35:58 INF] Now listening on: http://localhost:5016
+[2026-04-14 10:35:58 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 10:35:58 INF] Hosting environment: Development
+[2026-04-14 10:35:58 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 10:36:10 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 44.2703 ms
+[2026-04-14 10:36:10 INF] HTTP OPTIONS /api/clientes responded 204 in 43.5229 ms
+[2026-04-14 10:36:11 INF] HTTP GET /api/reservas/horarios responded 200 in 1161.4992 ms
+[2026-04-14 10:36:11 INF] HTTP GET /api/clientes responded 200 in 1154.4752 ms
+[2026-04-14 10:36:18 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.9491 ms
+[2026-04-14 10:36:18 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 129.9849 ms
+[2026-04-14 10:36:20 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.2656 ms
+[2026-04-14 10:36:20 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 28.0032 ms
+[2026-04-14 10:36:35 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2191 ms
+[2026-04-14 10:36:36 INF] HTTP GET /api/reservas/horarios responded 200 in 55.0252 ms
+[2026-04-14 10:36:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1472 ms
+[2026-04-14 10:36:41 INF] HTTP GET /api/reservas/horarios responded 200 in 18.7386 ms
+[2026-04-14 10:36:47 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2368 ms
+[2026-04-14 10:36:47 INF] HTTP POST /api/reservas/validar-horario responded 200 in 375.6193 ms
+[2026-04-14 10:37:04 INF] HTTP OPTIONS /api/reservas/timer/12 responded 204 in 0.2723 ms
+[2026-04-14 10:37:04 INF] HTTP DELETE /api/reservas/timer/12 responded 204 in 71.7754 ms
+[2026-04-14 10:37:20 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.3418 ms
+[2026-04-14 10:37:20 INF] HTTP POST /api/reservas/validar-horario responded 200 in 21.1874 ms
+[2026-04-14 10:37:31 INF] HTTP OPTIONS /api/reservas/timer/13 responded 204 in 0.2158 ms
+[2026-04-14 10:37:31 INF] HTTP DELETE /api/reservas/timer/13 responded 409 in 7.3387 ms
+[2026-04-14 10:38:57 INF] HTTP OPTIONS /api/clientes responded 204 in 0.2972 ms
+[2026-04-14 10:38:57 INF] HTTP GET /api/clientes responded 200 in 7.7686 ms
+[2026-04-14 10:38:57 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1889 ms
+[2026-04-14 10:38:57 INF] HTTP GET /api/reservas/horarios responded 200 in 7.3093 ms
+[2026-04-14 10:38:59 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.4022 ms
+[2026-04-14 10:38:59 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 9.1479 ms
+[2026-04-14 10:39:01 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1181 ms
+[2026-04-14 10:39:01 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 6.3984 ms
+[2026-04-14 10:39:36 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2772 ms
+[2026-04-14 10:39:36 INF] HTTP GET /api/reservas/horarios responded 200 in 17.4829 ms
+[2026-04-14 10:39:48 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2435 ms
+[2026-04-14 10:39:48 INF] HTTP GET /api/reservas/horarios responded 200 in 10.2551 ms
+[2026-04-14 10:39:54 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.2507 ms
+[2026-04-14 10:39:55 INF] HTTP POST /api/reservas/validar-horario responded 200 in 31.3915 ms
+[2026-04-14 10:41:39 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.2156 ms
+[2026-04-14 10:41:39 INF] HTTP POST /api/reservas/crear-reserva responded 200 in 233.3642 ms
+[2026-04-14 10:41:42 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0830 ms
+[2026-04-14 10:41:42 INF] HTTP GET /api/reservas/horarios responded 200 in 26.9479 ms
+[2026-04-14 10:42:28 INF] Application is shutting down...

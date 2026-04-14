@@ -8,5 +8,5 @@ public interface IReservaRepository
     Task<IEnumerable<HorarioDto>>  ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva);
     Task<ValidarHorarioResultDto>            ValidarHorarioAsync(CrearReservaDto dto);
     Task<ValidarHorarioResultDto>            CrearReservaAsync(ConfirmarReservaDto dto);
-    Task                                     EliminarTimerAsync(int idTimer);
+    Task<ValidarHorarioResultDto>            EliminarTimerAsync(int idTimer);
 }

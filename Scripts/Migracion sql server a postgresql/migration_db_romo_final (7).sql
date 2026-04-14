@@ -458,10 +458,26 @@ CREATE INDEX "IX_TimerReserva_Fecha_Carga"
 -- ────────────────────────────────────────────────────────────
 
 -- ── sp_DeleteTimerReserva ────────────────────────────────────
-CREATE OR REPLACE PROCEDURE sp_DeleteTimerReserva(_Id INT)
+CREATE OR REPLACE PROCEDURE sp_DeleteTimerReserva(
+    _Id        INT,
+    INOUT _Exitoso INT     DEFAULT 0,
+    INOUT _Mensaje TEXT    DEFAULT ''
+)
 LANGUAGE plpgsql AS $$
 BEGIN
     DELETE FROM "TimerReserva" WHERE "Id" = _Id;
+
+    IF FOUND THEN
+        _Exitoso := 1;
+        _Mensaje := 'Timer eliminado correctamente.';
+    ELSE
+        _Exitoso := 0;
+        _Mensaje := 'No se encontró el timer con Id ' || _Id || '.';
+    END IF;
+
+EXCEPTION WHEN OTHERS THEN
+    _Exitoso := 0;
+    _Mensaje := SQLERRM;
 END;
 $$;
 
@@ -912,6 +928,9 @@ BEGIN
             RETURN;
         END IF;
     END IF;
+
+    LOCK TABLE "TimerReserva" IN SHARE ROW EXCLUSIVE MODE;
+    LOCK TABLE "Reserva"      IN SHARE ROW EXCLUSIVE MODE;
 
     SELECT COUNT(*)::INT INTO v_GruasDisponibles
     FROM   "Grua"
