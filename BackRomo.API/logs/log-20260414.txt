@@ -687,3 +687,117 @@ System.Exception: Error al eliminar el timer: No se encontró el timer con Id 11
 [2026-04-14 14:24:15 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0695 ms
 [2026-04-14 14:24:16 INF] HTTP GET /api/operaciones responded 200 in 13.0042 ms
 [2026-04-14 14:24:34 INF] Application is shutting down...
+[2026-04-14 16:15:32 INF] Now listening on: http://localhost:5016
+[2026-04-14 16:15:32 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 16:15:32 INF] Hosting environment: Development
+[2026-04-14 16:15:32 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 16:15:44 INF] HTTP OPTIONS /api/operaciones responded 204 in 54.7285 ms
+[2026-04-14 16:15:44 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 54.7357 ms
+[2026-04-14 16:15:45 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 1080.8502 ms
+[2026-04-14 16:15:45 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 23.4003 ms
+[2026-04-14 16:15:45 INF] HTTP GET /api/operaciones responded 200 in 1119.6647 ms
+[2026-04-14 16:15:45 INF] HTTP GET /api/operaciones responded 200 in 51.9828 ms
+[2026-04-14 16:15:48 INF] HTTP OPTIONS /api/clientes responded 204 in 0.4833 ms
+[2026-04-14 16:15:48 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.4250 ms
+[2026-04-14 16:15:48 INF] HTTP GET /api/clientes responded 200 in 126.7668 ms
+[2026-04-14 16:15:48 INF] HTTP GET /api/reservas/horarios responded 200 in 205.9967 ms
+[2026-04-14 16:15:51 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.3709 ms
+[2026-04-14 16:15:51 INF] HTTP GET /api/operaciones responded 200 in 40.2904 ms
+[2026-04-14 16:15:54 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.4998 ms
+[2026-04-14 16:15:54 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 8.0817 ms
+[2026-04-14 16:16:01 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.3427 ms
+[2026-04-14 16:16:01 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 32.9216 ms
+[2026-04-14 16:16:13 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2769 ms
+[2026-04-14 16:16:13 INF] HTTP GET /api/reservas/horarios responded 200 in 15.5593 ms
+[2026-04-14 16:16:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.5051 ms
+[2026-04-14 16:16:17 INF] HTTP GET /api/reservas/horarios responded 200 in 81.8243 ms
+[2026-04-14 16:16:22 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0986 ms
+[2026-04-14 16:16:22 INF] HTTP GET /api/reservas/horarios responded 200 in 9.0407 ms
+[2026-04-14 16:19:50 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.5677 ms
+[2026-04-14 16:19:50 INF] HTTP GET /api/operaciones responded 200 in 10.0780 ms
+[2026-04-14 16:20:07 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1457 ms
+[2026-04-14 16:20:08 INF] HTTP POST /api/reservas/validar-horario responded 200 in 464.2296 ms
+[2026-04-14 16:20:16 INF] HTTP OPTIONS /api/reservas/timer/23 responded 204 in 0.2961 ms
+[2026-04-14 16:20:16 INF] HTTP DELETE /api/reservas/timer/23 responded 204 in 52.7516 ms
+[2026-04-14 16:20:17 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1517 ms
+[2026-04-14 16:20:17 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.1316 ms
+[2026-04-14 16:20:17 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 3.4016 ms
+[2026-04-14 16:20:17 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 5.0939 ms
+[2026-04-14 16:20:20 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.7502 ms
+[2026-04-14 16:20:20 INF] HTTP GET /api/reservas/horarios responded 200 in 9.4947 ms
+[2026-04-14 16:20:20 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 2.8810 ms
+[2026-04-14 16:20:20 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 1.9164 ms
+[2026-04-14 16:20:22 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2236 ms
+[2026-04-14 16:20:22 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1564 ms
+[2026-04-14 16:20:22 INF] HTTP GET /api/reservas/horarios responded 200 in 9.3147 ms
+[2026-04-14 16:20:22 INF] HTTP GET /api/reservas/horarios responded 200 in 10.4466 ms
+[2026-04-14 16:20:25 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1404 ms
+[2026-04-14 16:20:25 INF] HTTP GET /api/reservas/horarios responded 200 in 9.7814 ms
+[2026-04-14 16:20:28 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.1023 ms
+[2026-04-14 16:20:28 INF] HTTP POST /api/reservas/validar-horario responded 200 in 60.0928 ms
+[2026-04-14 16:20:40 INF] HTTP OPTIONS /api/reservas/crear-reserva responded 204 in 0.2031 ms
+[2026-04-14 16:20:40 INF] HTTP POST /api/reservas/crear-reserva responded 200 in 116.3883 ms
+[2026-04-14 16:20:43 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2256 ms
+[2026-04-14 16:20:43 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0944 ms
+[2026-04-14 16:20:43 INF] HTTP GET /api/reservas/horarios responded 200 in 21.0551 ms
+[2026-04-14 16:20:43 INF] HTTP GET /api/reservas/horarios responded 200 in 12.6779 ms
+[2026-04-14 16:20:48 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1392 ms
+[2026-04-14 16:20:48 INF] HTTP GET /api/operaciones responded 200 in 145.3483 ms
+[2026-04-14 16:20:53 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1492 ms
+[2026-04-14 16:20:53 INF] HTTP GET /api/reservas/horarios responded 200 in 48.1199 ms
+[2026-04-14 16:20:56 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1221 ms
+[2026-04-14 16:20:56 INF] HTTP GET /api/reservas/horarios responded 200 in 7.5104 ms
+[2026-04-14 16:20:58 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 0.1291 ms
+[2026-04-14 16:20:58 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 2.5093 ms
+[2026-04-14 16:20:59 INF] HTTP OPTIONS /api/configuracion/tarifario-global responded 204 in 0.0817 ms
+[2026-04-14 16:20:59 INF] HTTP GET /api/configuracion/tarifario-global responded 200 in 5.8761 ms
+[2026-04-14 16:21:11 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1539 ms
+[2026-04-14 16:21:11 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0937 ms
+[2026-04-14 16:21:11 INF] HTTP GET /api/reservas/horarios responded 200 in 7.5312 ms
+[2026-04-14 16:21:11 INF] HTTP GET /api/reservas/horarios responded 200 in 11.6418 ms
+[2026-04-14 16:21:17 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.0813 ms
+[2026-04-14 16:21:17 INF] HTTP GET /api/reservas/horarios responded 200 in 16.8184 ms
+[2026-04-14 16:21:21 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.2092 ms
+[2026-04-14 16:21:21 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 58.1684 ms
+[2026-04-14 16:21:26 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.2409 ms
+[2026-04-14 16:21:26 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 7.7419 ms
+[2026-04-14 16:21:28 INF] HTTP OPTIONS /api/reservas/horarios-reprogramacion responded 204 in 0.0931 ms
+[2026-04-14 16:21:28 INF] HTTP GET /api/reservas/horarios-reprogramacion responded 200 in 22.8727 ms
+[2026-04-14 16:21:36 INF] HTTP OPTIONS /api/reservas/validar-horario responded 204 in 0.0577 ms
+[2026-04-14 16:21:36 INF] HTTP POST /api/reservas/validar-horario responded 200 in 48.0671 ms
+[2026-04-14 16:21:41 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.1102 ms
+[2026-04-14 16:21:41 INF] HTTP PATCH /api/operaciones/reprogramar responded 409 in 89.1343 ms
+[2026-04-14 16:22:09 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.0814 ms
+[2026-04-14 16:22:09 INF] HTTP PATCH /api/operaciones/reprogramar responded 409 in 10.8246 ms
+[2026-04-14 16:23:03 INF] HTTP OPTIONS /api/operaciones/reprogramar responded 204 in 0.1078 ms
+[2026-04-14 16:23:03 INF] HTTP PATCH /api/operaciones/reprogramar responded 200 in 14.7177 ms
+[2026-04-14 16:23:10 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0615 ms
+[2026-04-14 16:23:10 INF] HTTP GET /api/operaciones responded 200 in 4.0095 ms
+[2026-04-14 16:23:17 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.0515 ms
+[2026-04-14 16:23:17 INF] HTTP GET /api/operaciones responded 200 in 3.5255 ms
+[2026-04-14 16:23:21 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.1659 ms
+[2026-04-14 16:23:21 INF] HTTP GET /api/operaciones responded 200 in 7.4609 ms
+[2026-04-14 16:24:42 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.0611 ms
+[2026-04-14 16:24:42 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 101.1589 ms
+[2026-04-14 16:27:15 INF] HTTP OPTIONS /api/operaciones/asignar responded 204 in 0.3041 ms
+[2026-04-14 16:27:15 INF] HTTP PATCH /api/operaciones/asignar responded 200 in 112.8566 ms
+[2026-04-14 16:27:17 INF] HTTP OPTIONS /api/operaciones responded 204 in 0.2272 ms
+[2026-04-14 16:27:17 INF] HTTP GET /api/operaciones responded 200 in 6.6284 ms
+[2026-04-14 16:28:01 INF] HTTP OPTIONS /api/operaciones/sugerencias responded 204 in 0.0548 ms
+[2026-04-14 16:28:01 INF] HTTP GET /api/operaciones/sugerencias responded 200 in 19.1746 ms
+[2026-04-14 16:41:02 INF] Application is shutting down...
+[2026-04-14 16:41:18 INF] Now listening on: http://localhost:5016
+[2026-04-14 16:41:18 INF] Application started. Press Ctrl+C to shut down.
+[2026-04-14 16:41:18 INF] Hosting environment: Development
+[2026-04-14 16:41:18 INF] Content root path: C:\dev\back_romo\BackRomo.API
+[2026-04-14 16:41:36 INF] HTTP OPTIONS /api/configuracion/parametro-operativo responded 204 in 111.0403 ms
+[2026-04-14 16:41:36 INF] HTTP OPTIONS /api/operaciones responded 204 in 111.2431 ms
+[2026-04-14 16:41:38 INF] HTTP GET /api/configuracion/parametro-operativo responded 200 in 1344.1942 ms
+[2026-04-14 16:41:38 INF] HTTP GET /api/operaciones responded 200 in 1441.0685 ms
+[2026-04-14 16:41:40 INF] HTTP OPTIONS /api/clientes responded 204 in 0.3144 ms
+[2026-04-14 16:41:40 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.2189 ms
+[2026-04-14 16:41:40 INF] HTTP GET /api/clientes responded 200 in 137.6632 ms
+[2026-04-14 16:41:40 INF] HTTP GET /api/reservas/horarios responded 200 in 196.1357 ms
+[2026-04-14 16:41:41 INF] HTTP OPTIONS /api/reservas/horarios responded 204 in 0.1701 ms
+[2026-04-14 16:41:41 INF] HTTP GET /api/reservas/horarios responded 200 in 35.4847 ms
+[2026-04-14 16:41:50 INF] Application is shutting down...
