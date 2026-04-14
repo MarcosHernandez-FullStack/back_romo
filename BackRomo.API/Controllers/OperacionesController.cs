@@ -71,4 +71,20 @@ public class OperacionesController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("capacidades-gruas")]
+    public async Task<IActionResult> ListarCapacidadesGruas()
+    {
+        var data = await _operacionService.ListarCapacidadesGruasAsync();
+        return Ok(data);
+    }
+
+    [HttpGet("disponibilidad-gruas")]
+    public async Task<IActionResult> ObtenerDisponibilidadGruas(
+        [FromQuery] DateOnly fechaServicio,
+        [FromQuery] short?   capacidad)
+    {
+        var data = await _operacionService.ObtenerDisponibilidadGruasAsync(fechaServicio, capacidad);
+        return Ok(data);
+    }
 }

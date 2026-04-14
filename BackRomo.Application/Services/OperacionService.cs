@@ -33,6 +33,12 @@ public class OperacionService
     public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
         => await _operacionRepository.ReprogramarReservaAsync(dto);
 
+    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync()
+        => await _operacionRepository.ListarCapacidadesGruasAsync();
+
+    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad)
+        => await _operacionRepository.ObtenerDisponibilidadGruasAsync(fechaServicio, capacidad);
+
     public async Task<SugerenciasDto> SugerirAsignacionAsync(int idReserva)
     {
         var parametro = await _configuracionRepository.ObtenerParametroOperativoAsync()

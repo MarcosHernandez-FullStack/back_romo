@@ -11,4 +11,6 @@ public interface IOperacionRepository
     Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva);
     Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto);
     Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto);
+    Task<IEnumerable<short>> ListarCapacidadesGruasAsync();
+    Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad);
 }

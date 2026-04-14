@@ -245,6 +245,25 @@ public class OperacionRepository : IOperacionRepository
         return (result.CoordLatOrigen, result.CoordLonOrigen);
     }
 
+    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync()
+    {
+        using var conn = _db.CreateConnection();
+        return await conn.QueryAsync<short>(
+            "SELECT * FROM fn_ListCapacidadesGruas()",
+            commandType: CommandType.Text
+        );
+    }
+
+    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad)
+    {
+        using var conn = _db.CreateConnection();
+        return await conn.QueryAsync<DisponibilidadGruaDto>(
+            "SELECT * FROM fn_DisponibilidadGruas(@FechaServicio::date, @Capacidad::smallint)",
+            new { FechaServicio = fechaServicio.ToDateTime(TimeOnly.MinValue), Capacidad = (object?)capacidad ?? DBNull.Value },
+            commandType: CommandType.Text
+        );
+    }
+
     private class OrigenReserva
     {
         public string CoordLatOrigen { get; set; } = string.Empty;

@@ -2968,6 +2968,110 @@ SELECT setval(pg_get_serial_sequence('"Vehiculo"', 'Id'), MAX("Id")) FROM "Vehic
 
 COMMIT;
 
+-- ── fn_ListCapacidadesGruas ──────────────────────────────────
+CREATE OR REPLACE FUNCTION fn_ListCapacidadesGruas()
+RETURNS TABLE("Capacidad" SMALLINT)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT DISTINCT g."Capacidad"
+    FROM   "Grua" g
+    WHERE  g."Estado"          = 'ACTIVO'
+      AND  g."EstadoOperacion" = 'OPERATIVA'
+    ORDER BY 1;
+END;
+$$;
+
+-- ── fn_DisponibilidadGruas ───────────────────────────────────
+CREATE OR REPLACE FUNCTION fn_DisponibilidadGruas(
+    _FechaServicio DATE,
+    _Capacidad     SMALLINT DEFAULT NULL
+)
+RETURNS TABLE(
+    "Hora"                    TIME,
+    "Capacidad"               SMALLINT,
+    "CantidadReservas"        INT,
+    "CantidadGruas"           INT,
+    "CantidadGruasDisponible" INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    WITH
+    "Bloques" AS (
+        SELECT make_time(n, 0, 0) AS "Bloque"
+        FROM   generate_series(8, 23) AS s(n)
+    ),
+    "Capacidades" AS (
+        SELECT DISTINCT g."Capacidad"
+        FROM   "Grua" g
+        WHERE  g."Estado"          = 'ACTIVO'
+          AND  g."EstadoOperacion" = 'OPERATIVA'
+          AND  (_Capacidad IS NULL OR g."Capacidad" = _Capacidad)
+    ),
+    "GruasPorCapacidad" AS (
+        SELECT
+            c."Capacidad",
+            (
+                SELECT COUNT(*)::INT
+                FROM   "Grua" g
+                WHERE  g."Estado"          = 'ACTIVO'
+                  AND  g."EstadoOperacion" = 'OPERATIVA'
+                  AND  g."Capacidad"       >= c."Capacidad"
+            ) AS "TotalGruas"
+        FROM "Capacidades" c
+    ),
+    "ReservasActivas" AS (
+        SELECT r."HoraInicio", r."HoraFin", r."CantidadCarga"
+        FROM   "Reserva" r
+        WHERE  r."FechaServicio"   = _FechaServicio
+          AND  r."Estado"          = 'ACTIVO'
+          AND  r."EstadoOperacion" != 'CANCELADO'
+          AND  (_Capacidad IS NULL OR r."CantidadCarga" = _Capacidad)
+        UNION ALL
+        SELECT t."HoraInicio", t."HoraFin", t."CantidadCarga"
+        FROM   "TimerReserva" t
+        WHERE  t."FechaServicio"   = _FechaServicio
+          AND  t."Estado"          = 'ACTIVO'
+          AND  t."EstadoOperacion" != 'CANCELADO'
+          AND  (_Capacidad IS NULL OR t."CantidadCarga" = _Capacidad)
+    ),
+    "Base" AS (
+        SELECT b."Bloque", c."Capacidad"
+        FROM   "Bloques"     b
+        CROSS JOIN "Capacidades" c
+    ),
+    "Ocupacion" AS (
+        SELECT
+            bs."Bloque",
+            bs."Capacidad",
+            COUNT(r."CantidadCarga")::INT AS "CantidadReservas"
+        FROM "Base" bs
+        LEFT JOIN "ReservasActivas" r
+               ON r."CantidadCarga" = bs."Capacidad"
+              AND (
+                    CASE
+                        WHEN r."HoraFin" > r."HoraInicio"
+                            THEN bs."Bloque" >= r."HoraInicio"
+                             AND bs."Bloque" <  r."HoraFin"
+                        ELSE bs."Bloque" >= r."HoraInicio"
+                          OR bs."Bloque" <  r."HoraFin"
+                    END
+                  )
+        GROUP BY bs."Bloque", bs."Capacidad"
+    )
+    SELECT
+        o."Bloque"                                              AS "Hora",
+        o."Capacidad",
+        o."CantidadReservas",
+        g."TotalGruas"                                         AS "CantidadGruas",
+        GREATEST(g."TotalGruas" - o."CantidadReservas", 0)    AS "CantidadGruasDisponible"
+    FROM "Ocupacion"         o
+    JOIN "GruasPorCapacidad" g ON g."Capacidad" = o."Capacidad"
+    ORDER BY o."Bloque", o."Capacidad";
+END;
+$$;
+
 -- ============================================================
 -- Zona horaria de la base de datos (tomada de ParametroOperativo)
 -- ============================================================
