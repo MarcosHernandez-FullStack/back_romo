@@ -51,21 +51,33 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task CancelarReservaAsync(CancelarServicioDto dto)
+    public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id",                dto.Id,                DbType.Int32);
+            p.Add("_MotivoCancelacion", dto.MotivoCancelacion, DbType.String);
+            p.Add("_ActualizadoPor",    dto.ActualizadoPor,    DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-        var p = new DynamicParameters();
-        p.Add("_Id",                dto.Id,                DbType.Int32);
-        p.Add("_MotivoCancelacion", dto.MotivoCancelacion, DbType.String);
-        p.Add("_ActualizadoPor",    dto.ActualizadoPor,    DbType.Int32);
-        p.Add("_Exitoso", value: 0,   dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
-        p.Add("_Mensaje",  value: "",  dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+            await conn.ExecuteAsync(
+                "CALL sp_CancelarReserva(@_Id, @_MotivoCancelacion, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text
+            );
 
-        await conn.ExecuteAsync(
-            "CALL sp_CancelarReserva(@_Id, @_MotivoCancelacion, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-            p, commandType: CommandType.Text
-        );
+            return new OperacionResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
     }
 
     /*
@@ -118,25 +130,31 @@ public class OperacionRepository : IOperacionRepository
     public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
-
-        var p = new DynamicParameters();
-        p.Add("_IdReserva",      dto.IdReserva,      DbType.Int32);
-        p.Add("_IdGrua",         dto.IdGrua,         DbType.Int32);
-        p.Add("_IdOperador",     dto.IdOperador,     DbType.Int32);
-        p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
-        p.Add("_Exitoso", value: 0,   dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
-        p.Add("_Mensaje",  value: "",  dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
-
-        await conn.ExecuteAsync(
-            "CALL sp_AsignarServicio(@_IdReserva, @_IdGrua, @_IdOperador, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-            p, commandType: CommandType.Text
-        );
-
-        return new OperacionResultDto
+        try
         {
-            Exitoso = p.Get<int>("_Exitoso"),
-            Mensaje = p.Get<string>("_Mensaje")
-        };
+            var p = new DynamicParameters();
+            p.Add("_IdReserva",      dto.IdReserva,      DbType.Int32);
+            p.Add("_IdGrua",         dto.IdGrua,         DbType.Int32);
+            p.Add("_IdOperador",     dto.IdOperador,     DbType.Int32);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(
+                "CALL sp_AsignarServicio(@_IdReserva, @_IdGrua, @_IdOperador, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text
+            );
+
+            return new OperacionResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
     }
 
     /*
@@ -164,34 +182,40 @@ public class OperacionRepository : IOperacionRepository
     public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
-
-        var horaInicio = TimeSpan.Parse(dto.NuevaHoraInicio);
-
-        var p = new DynamicParameters();
-        p.Add("_IdReserva",       dto.IdReserva,       DbType.Int32);
-        p.Add("_NuevaFecha",      dto.NuevaFecha.Date, DbType.Date);
-        p.Add("_NuevaHoraInicio", horaInicio,          DbType.Time);
-        p.Add("_NuevoNroBloques", dto.NuevoNroBloques, DbType.Int32);
-        p.Add("_ActualizadoPor",  dto.ActualizadoPor,  DbType.Int32);
-        p.Add("_Rol",             dto.Rol,             DbType.String);
-        p.Add("_Exitoso",        value: 0,    dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
-        p.Add("_Mensaje",        value: "",   dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
-        p.Add("_HorasConflicto", value: null, dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
-
-        await conn.ExecuteAsync(
-            @"CALL sp_ReprogramarReserva(
-                @_IdReserva, @_NuevaFecha::date, @_NuevaHoraInicio::time,
-                @_NuevoNroBloques, @_ActualizadoPor, @_Rol,
-                @_Exitoso, @_Mensaje, @_HorasConflicto)",
-            p, commandType: CommandType.Text
-        );
-
-        return new OperacionResultDto
+        try
         {
-            Exitoso        = p.Get<int>("_Exitoso"),
-            Mensaje        = p.Get<string>("_Mensaje"),
-            HorasConflicto = p.Get<string?>("_HorasConflicto")
-        };
+            var horaInicio = TimeSpan.Parse(dto.NuevaHoraInicio);
+
+            var p = new DynamicParameters();
+            p.Add("_IdReserva",       dto.IdReserva,       DbType.Int32);
+            p.Add("_NuevaFecha",      dto.NuevaFecha.Date, DbType.Date);
+            p.Add("_NuevaHoraInicio", horaInicio,          DbType.Time);
+            p.Add("_NuevoNroBloques", dto.NuevoNroBloques, DbType.Int32);
+            p.Add("_ActualizadoPor",  dto.ActualizadoPor,  DbType.Int32);
+            p.Add("_Rol",             dto.Rol,             DbType.String);
+            p.Add("_Exitoso",        value: 0,    dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje",        value: "",   dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+            p.Add("_HorasConflicto", value: null, dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(
+                @"CALL sp_ReprogramarReserva(
+                    @_IdReserva, @_NuevaFecha::date, @_NuevaHoraInicio::time,
+                    @_NuevoNroBloques, @_ActualizadoPor, @_Rol,
+                    @_Exitoso, @_Mensaje, @_HorasConflicto)",
+                p, commandType: CommandType.Text
+            );
+
+            return new OperacionResultDto
+            {
+                Exitoso        = p.Get<int>("_Exitoso"),
+                Mensaje        = p.Get<string>("_Mensaje"),
+                HorasConflicto = p.Get<string?>("_HorasConflicto")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
     }
 
     /*

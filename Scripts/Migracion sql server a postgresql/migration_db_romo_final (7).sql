@@ -502,11 +502,12 @@ DECLARE
     v_ApellidosOp   VARCHAR(100);
 BEGIN
 
+    LOCK TABLE "Reserva" IN SHARE ROW EXCLUSIVE MODE;
+
     SELECT r."FechaServicio", r."HoraInicio", r."HoraFin"
     INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
     FROM   "Reserva" r
-    WHERE  r."Id" = _IdReserva
-    FOR UPDATE;
+    WHERE  r."Id" = _IdReserva;
 
     v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
 
@@ -674,6 +675,9 @@ DECLARE
     v_GruasDisponibles INT;
     v_MaxOcupacion     INT;
 BEGIN
+
+    LOCK TABLE "TimerReserva" IN SHARE ROW EXCLUSIVE MODE;
+    LOCK TABLE "Reserva"      IN SHARE ROW EXCLUSIVE MODE;
 
     v_NuevaHoraFin := _NuevaHoraInicio + (_NuevoNroBloques || ' hours')::INTERVAL;
     v_SlotInicioDT := _NuevaFecha + _NuevaHoraInicio;
@@ -1055,6 +1059,9 @@ DECLARE
     v_IdReserva      INT;
     v_CreadoPor      INT;
 BEGIN
+
+    LOCK TABLE "TimerReserva" IN SHARE ROW EXCLUSIVE MODE;
+    LOCK TABLE "Reserva"      IN SHARE ROW EXCLUSIVE MODE;
 
     IF NOT EXISTS (
         SELECT 1 FROM "TimerReserva"

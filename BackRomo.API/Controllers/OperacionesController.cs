@@ -30,8 +30,12 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> CancelarReserva([FromBody] CancelarServicioDto dto)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        await _operacionService.CancelarReservaAsync(dto);
-        return NoContent();
+        var result = await _operacionService.CancelarReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result);
+
+        return Ok(result);
     }
 
     [HttpGet("sugerencias")]
@@ -51,7 +55,7 @@ public class OperacionesController : ControllerBase
         if (result.Exitoso == 0)
             return Conflict(result);
 
-        return NoContent();
+        return Ok(result);
     }
 
     [HttpPatch("reprogramar")]
@@ -65,6 +69,6 @@ public class OperacionesController : ControllerBase
         if (result.Exitoso == 0)
             return Conflict(result);
 
-        return NoContent();
+        return Ok(result);
     }
 }
