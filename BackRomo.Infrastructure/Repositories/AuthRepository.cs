@@ -71,7 +71,8 @@ public class AuthRepository : IAuthRepository
             IdCliente  = result.IdCliente,
             TarifaKm   = result.TarifaKmCliente,
             TarifaBase = result.TarifaBaseCliente,
-            Empresa    = result.EmpresaCliente
+            Empresa    = result.EmpresaCliente,
+            IdOperador = result.IdOperador
         };
     }
 
@@ -96,5 +97,6 @@ public class AuthRepository : IAuthRepository
         public decimal? TarifaKmCliente  { get; set; }
         public decimal? TarifaBaseCliente { get; set; }
         public string?  EmpresaCliente    { get; set; }
+        public int?     IdOperador        { get; set; }
     }
 }

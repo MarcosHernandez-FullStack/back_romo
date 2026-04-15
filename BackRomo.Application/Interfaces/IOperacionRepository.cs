@@ -5,7 +5,7 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IOperacionRepository
 {
-    Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio);
+    Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador);
     Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto);
     Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva);
     Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva);

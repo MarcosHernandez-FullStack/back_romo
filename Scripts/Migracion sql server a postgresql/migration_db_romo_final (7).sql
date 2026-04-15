@@ -1206,12 +1206,17 @@ $$;
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion VARCHAR(20),
     _Id              INT,
-    _FechaServicio   DATE
+    _FechaServicio   DATE,
+    _IdOperador      INT
 )
 RETURNS TABLE(
     "Id"               INT,
     "DireccionOrigen"  TEXT,
+    "CoordLatOrigen"   VARCHAR(20),
+    "CoordLonOrigen"   VARCHAR(20),
     "DireccionDestino" TEXT,
+    "CoordLatDestino"  VARCHAR(20),
+    "CoordLonDestino"  VARCHAR(20),
     "CantidadCarga"    SMALLINT,
     "FechaServicio"    DATE,
     "HoraInicio"       TIME,
@@ -1223,35 +1228,63 @@ RETURNS TABLE(
     "TiempoRetorno"    INT,
     "Estado"           VARCHAR(10),
     "EstadoOperacion"  VARCHAR(50),
+    "NombreCliente"    TEXT,
     "GruaAsignada"     TEXT,
-    "OperadorAsignado" TEXT
+    "OperadorAsignado" TEXT,
+    "PlacaVehiculo"    TEXT,
+    "MarcaVehiculo"    TEXT,
+    "ModeloVehiculo"   TEXT,
+    "NotasAdicionales" TEXT
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT r."Id",r."DireccionOrigen",r."DireccionDestino",r."CantidadCarga",
+    SELECT r."Id",
+           r."DireccionOrigen",
+           r."CoordLatOrigen",
+           r."CoordLonOrigen",
+           r."DireccionDestino",
+           r."CoordLatDestino",
+           r."CoordLonDestino",
+           r."CantidadCarga",
            r."FechaServicio",r."HoraInicio",r."HoraFin",r."NroBloques",
            r."DistanciaKm",r."TiempoEstimado",r."TiempoManiobra",r."TiempoRetorno",
            r."Estado",r."EstadoOperacion",
+           (u_c."Nombres" || ' ' || u_c."Apellidos")::TEXT,
            CASE WHEN g."Id" IS NOT NULL
                 THEN g."Placa" || ' - ' || g."Marca" || ' ' || g."Modelo"
                 ELSE NULL END::TEXT,
            CASE WHEN o."Id" IS NOT NULL
                 THEN u."Nombres" || ' ' || u."Apellidos"
-                ELSE NULL END::TEXT
+                ELSE NULL END::TEXT,
+           v."Placa"::TEXT,
+           v."Marca"::TEXT,
+           v."Modelo"::TEXT,
+           v."Observacion"::TEXT
     FROM   "Reserva" r
-    LEFT JOIN "Grua"     g ON g."Id" = r."IdGrua"
-    LEFT JOIN "Operador" o ON o."Id" = r."IdOperador"
-    LEFT JOIN "Usuario"  u ON o."IdUsuario" = u."Id"
+    LEFT JOIN "Grua"     g   ON g."Id"        = r."IdGrua"
+    LEFT JOIN "Operador" o   ON o."Id"        = r."IdOperador"
+    LEFT JOIN "Usuario"  u   ON o."IdUsuario" = u."Id"
+    LEFT JOIN "Cliente"  c   ON c."Id"        = r."IdCliente"
+    LEFT JOIN "Usuario"  u_c ON u_c."Id"      = c."IdUsuario"
+    LEFT JOIN LATERAL (
+        SELECT v2."Placa", v2."Marca", v2."Modelo", v2."Observacion"
+        FROM   "Vehiculo" v2
+        WHERE  v2."IdReserva" = r."Id" AND v2."Estado" = 'ACTIVO'
+        ORDER BY v2."Id" ASC
+        LIMIT 1
+    ) v ON TRUE
     WHERE  (_EstadoOperacion IS NULL OR r."EstadoOperacion" = _EstadoOperacion)
       AND  (_Id              IS NULL OR r."Id"              = _Id)
       AND  (_FechaServicio   IS NULL OR r."FechaServicio"   = _FechaServicio)
+      AND  (_IdOperador      IS NULL OR r."IdOperador"      = _IdOperador)
       AND  r."Estado" = 'ACTIVO'
     ORDER BY r."FechaServicio", r."HoraInicio", r."HoraFin", r."Id";
 END;
 $$;
 
 -- ── fn_LoginUsuario ──────────────────────────────────────────
+DROP FUNCTION IF EXISTS fn_LoginUsuario(VARCHAR, VARCHAR);
 CREATE OR REPLACE FUNCTION fn_LoginUsuario(
     _Identificador VARCHAR(100),
     _Contrasena    VARCHAR(100)
@@ -1269,7 +1302,8 @@ RETURNS TABLE(
     "IdCliente"          INT,
     "TarifaKmCliente"    DECIMAL(10,2),
     "TarifaBaseCliente"  DECIMAL(10,2),
-    "EmpresaCliente"     VARCHAR(100)
+    "EmpresaCliente"     VARCHAR(100),
+    "IdOperador"         INT
 )
 LANGUAGE plpgsql AS $$
 DECLARE
@@ -1297,7 +1331,8 @@ BEGIN
         RETURN QUERY SELECT 0,'Credenciales incorrectas'::TEXT,
             NULL::INT,NULL::VARCHAR(10),NULL::VARCHAR(100),NULL::VARCHAR(100),
             NULL::VARCHAR(100),NULL::VARCHAR(50),NULL::VARCHAR(100),
-            NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100);
+            NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100),
+            NULL::INT;
         RETURN;
     END IF;
 
@@ -1305,7 +1340,8 @@ BEGIN
         RETURN QUERY SELECT 0,'Usuario inactivo'::TEXT,
             NULL::INT,NULL::VARCHAR(10),NULL::VARCHAR(100),NULL::VARCHAR(100),
             NULL::VARCHAR(100),NULL::VARCHAR(50),NULL::VARCHAR(100),
-            NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100);
+            NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100),
+            NULL::INT;
         RETURN;
     END IF;
 
@@ -1313,9 +1349,11 @@ BEGIN
     SELECT 1,'OK'::TEXT,
            v_UsuarioId,v_Alias,v_Nombres,v_Apellidos,
            v_Correo,v_Telefono,v_Rol,
-           c."Id",c."TarifaKm",c."TarifaBase",c."Empresa"
+           c."Id",c."TarifaKm",c."TarifaBase",c."Empresa",
+           op."Id"
     FROM   (SELECT 1) base
-    LEFT JOIN "Cliente" c ON c."IdUsuario" = v_UsuarioId AND v_Rol = 'CLIENTE';
+    LEFT JOIN "Cliente"  c  ON c."IdUsuario"  = v_UsuarioId AND v_Rol = 'CLIENTE'
+    LEFT JOIN "Operador" op ON op."IdUsuario" = v_UsuarioId AND v_Rol = 'OPERADOR';
 END;
 $$;
 

@@ -21,8 +21,8 @@ public class OperacionService
         _configuracionRepository = configuracionRepository;
     }
 
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio)
-        => await _operacionRepository.ListarReservasAsync(estadoOperacion, id, fechaServicio);
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador)
+        => await _operacionRepository.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador);
 
     public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
         => await _operacionRepository.CancelarReservaAsync(dto);

@@ -48,7 +48,8 @@ public class AuthService
             IdCliente  = usuario.IdCliente,
             TarifaKm   = usuario.TarifaKm,
             TarifaBase = usuario.TarifaBase,
-            Empresa    = usuario.Empresa
+            Empresa    = usuario.Empresa,
+            IdOperador = usuario.IdOperador
         };
     }
 }

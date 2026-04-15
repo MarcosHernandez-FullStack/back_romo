@@ -11,7 +11,8 @@ public class LoginResponseDto
     public string Correo { get; set; } = string.Empty;
     public string? Telefono { get; set; }
     public string Rol { get; set; } = string.Empty;
-    public int? IdCliente { get; set; }
+    public int? IdCliente  { get; set; }
+    public int? IdOperador { get; set; }
     public decimal? TarifaKm { get; set; }
     public decimal? TarifaBase { get; set; }
     public string? Empresa { get; set; }

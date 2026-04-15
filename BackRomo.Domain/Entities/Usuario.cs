@@ -11,7 +11,8 @@ public class Usuario
     public string Rol { get; set; } = string.Empty;
     public string Estado { get; set; } = string.Empty;
     public string? Telefono { get; set; }
-    public int? IdCliente { get; set; }
+    public int? IdCliente  { get; set; }
+    public int? IdOperador { get; set; }
     public decimal? TarifaKm { get; set; }
     public decimal? TarifaBase { get; set; }
     public string? Empresa { get; set; }

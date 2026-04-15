@@ -20,9 +20,10 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> ListarReservas(
         [FromQuery] string?   estadoOperacion,
         [FromQuery] int?      id,
-        [FromQuery] DateTime? fechaServicio)
+        [FromQuery] DateTime? fechaServicio,
+        [FromQuery] int?      idOperador)
     {
-        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio);
+        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador);
         return Ok(reservas);
     }
 

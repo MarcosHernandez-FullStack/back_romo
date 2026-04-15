@@ -28,13 +28,13 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio)
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador)
     {
         using var conn = _db.CreateConnection();
 
         return await conn.QueryAsync<ReservaDto>(
-            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date)",
-            new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio },
+            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date, @IdOperador)",
+            new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio, IdOperador = idOperador },
             commandType: CommandType.Text
         );
     }
