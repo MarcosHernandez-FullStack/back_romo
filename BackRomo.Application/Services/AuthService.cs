@@ -49,7 +49,10 @@ public class AuthService
             TarifaKm   = usuario.TarifaKm,
             TarifaBase = usuario.TarifaBase,
             Empresa    = usuario.Empresa,
-            IdOperador = usuario.IdOperador
+            IdOperador = usuario.IdOperador,
+            NroLicencia          = usuario.NroLicencia,
+            FecVenLic            = usuario.FecVenLic,
+            ServiciosCompletados = usuario.ServiciosCompletados,
         };
     }
 }

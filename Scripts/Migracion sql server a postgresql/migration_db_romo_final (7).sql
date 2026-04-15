@@ -263,6 +263,13 @@ CREATE TABLE "Reserva" (
     "ActualizadoPor"       INT           NULL,
     "TipoHorario"          VARCHAR(50)   NULL,
     "MotivoCancelacion"    VARCHAR(255)  NULL,
+    "HoraInicioReal"       TIMESTAMP     NULL,
+    "HoraFinReal"          TIMESTAMP     NULL,
+    "TiempoReal"           INT           GENERATED ALWAYS AS (
+                               CASE WHEN "HoraFinReal" IS NOT NULL AND "HoraInicioReal" IS NOT NULL
+                               THEN EXTRACT(EPOCH FROM ("HoraFinReal" - "HoraInicioReal"))::INT / 60
+                               ELSE NULL END
+                           ) STORED,
     CONSTRAINT pk_Reserva                       PRIMARY KEY ("Id"),
     CONSTRAINT CK_Reserva_Estado                CHECK ("Estado"               IN ('ACTIVO','INACTIVO')),
     CONSTRAINT CK_Reserva_EstadoAdministrativo  CHECK ("EstadoAdministrativo" IN ('PENDIENTE','FACTURADO','PAGADO')),
@@ -585,6 +592,100 @@ BEGIN
     _Mensaje := 'Servicio asignado correctamente a la grúa con placa ' ||
                 v_PlacaGrua || ' y operador ' ||
                 v_NombresOp || ' ' || v_ApellidosOp || '.';
+
+END;
+$$;
+
+-- ── sp_ActualizarEnCursoReserva ─────────────────────────────
+CREATE OR REPLACE PROCEDURE sp_ActualizarEnCursoReserva(
+    _IdReserva      INT,
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT  DEFAULT 0,
+    INOUT _Mensaje  TEXT DEFAULT ''
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_FechaServicio DATE;
+BEGIN
+
+    SELECT "FechaServicio" INTO v_FechaServicio
+    FROM   "Reserva"
+    WHERE  "Id"              = _IdReserva
+      AND  "Estado"          = 'ACTIVO'
+      AND  "EstadoOperacion" = 'ASIGNADO';
+
+    IF v_FechaServicio IS NULL THEN
+        _Exitoso := 0;
+        _Mensaje := 'El servicio no existe o aún no se encuentra asignado';
+        RETURN;
+    END IF;
+
+    /* IF CURRENT_DATE <> v_FechaServicio THEN
+        _Exitoso := 0;
+        _Mensaje := 'Este servicio está programado para el ' ||
+                    to_char(v_FechaServicio, 'DD/MM/YYYY') ||
+                    '. Solo puede iniciarse en esa fecha (hoy es ' ||
+                    to_char(CURRENT_DATE, 'DD/MM/YYYY') || ')';
+        RETURN;
+    END IF; */
+
+    UPDATE "Reserva"
+    SET    "EstadoOperacion"    = 'ENCURSO',
+           "HoraInicioReal"     = NOW(),
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdReserva;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'El servicio pasó a estar EN CURSO con éxito';
+
+END;
+$$;
+
+-- ── sp_FinalizarServicio ─────────────────────────────────────
+CREATE OR REPLACE PROCEDURE sp_FinalizarServicio(
+    _IdReserva      INT,
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT  DEFAULT 0,
+    INOUT _Mensaje  TEXT DEFAULT ''
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_FechaServicio DATE;
+BEGIN
+
+    SELECT "FechaServicio" INTO v_FechaServicio
+    FROM   "Reserva"
+    WHERE  "Id"              = _IdReserva
+      AND  "Estado"          = 'ACTIVO'
+      AND  "EstadoOperacion" = 'ENCURSO';
+
+    IF v_FechaServicio IS NULL THEN
+        _Exitoso := 0;
+        _Mensaje := 'El servicio no existe o aún no se encuentra en curso';
+        RETURN;
+    END IF;
+
+    /* IF CURRENT_DATE <> v_FechaServicio THEN
+        _Exitoso := 0;
+        _Mensaje := 'Este servicio está programado para el ' ||
+                    to_char(v_FechaServicio, 'DD/MM/YYYY') ||
+                    '. Solo puede finalizarse en esa fecha (hoy es ' ||
+                    to_char(CURRENT_DATE, 'DD/MM/YYYY') || ')';
+        RETURN;
+    END IF; */
+
+    UPDATE "Reserva"
+    SET    "EstadoOperacion"    = 'FINALIZADO',
+           "HoraFinReal"        = NOW(),
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdReserva;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje := 'El servicio finalizó con éxito';
 
 END;
 $$;
@@ -1202,7 +1303,7 @@ END;
 $$;
 
 -- ── fn_ListReservas ──────────────────────────────────────────
--- [ELIMINADO] select * from Operador fuera del cuerpo del SP (era debug)
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, INT);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion VARCHAR(20),
     _Id              INT,
@@ -1231,10 +1332,7 @@ RETURNS TABLE(
     "NombreCliente"    TEXT,
     "GruaAsignada"     TEXT,
     "OperadorAsignado" TEXT,
-    "PlacaVehiculo"    TEXT,
-    "MarcaVehiculo"    TEXT,
-    "ModeloVehiculo"   TEXT,
-    "NotasAdicionales" TEXT
+    "Vehiculos"        JSON
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -1257,23 +1355,25 @@ BEGIN
            CASE WHEN o."Id" IS NOT NULL
                 THEN u."Nombres" || ' ' || u."Apellidos"
                 ELSE NULL END::TEXT,
-           v."Placa"::TEXT,
-           v."Marca"::TEXT,
-           v."Modelo"::TEXT,
-           v."Observacion"::TEXT
+           COALESCE(
+               (SELECT json_agg(
+                   json_build_object(
+                       'Placa',       v."Placa",
+                       'Modelo',      v."Modelo",
+                       'Tipo',        v."Tipo",
+                       'Observacion', v."Observacion"
+                   ) ORDER BY v."Id"
+               )
+               FROM "Vehiculo" v
+               WHERE v."IdReserva" = r."Id" AND v."Estado" = 'ACTIVO'),
+               '[]'::json
+           )
     FROM   "Reserva" r
     LEFT JOIN "Grua"     g   ON g."Id"        = r."IdGrua"
     LEFT JOIN "Operador" o   ON o."Id"        = r."IdOperador"
     LEFT JOIN "Usuario"  u   ON o."IdUsuario" = u."Id"
     LEFT JOIN "Cliente"  c   ON c."Id"        = r."IdCliente"
     LEFT JOIN "Usuario"  u_c ON u_c."Id"      = c."IdUsuario"
-    LEFT JOIN LATERAL (
-        SELECT v2."Placa", v2."Marca", v2."Modelo", v2."Observacion"
-        FROM   "Vehiculo" v2
-        WHERE  v2."IdReserva" = r."Id" AND v2."Estado" = 'ACTIVO'
-        ORDER BY v2."Id" ASC
-        LIMIT 1
-    ) v ON TRUE
     WHERE  (_EstadoOperacion IS NULL OR r."EstadoOperacion" = _EstadoOperacion)
       AND  (_Id              IS NULL OR r."Id"              = _Id)
       AND  (_FechaServicio   IS NULL OR r."FechaServicio"   = _FechaServicio)
@@ -1290,20 +1390,23 @@ CREATE OR REPLACE FUNCTION fn_LoginUsuario(
     _Contrasena    VARCHAR(100)
 )
 RETURNS TABLE(
-    "Exitoso"            INT,
-    "Mensaje"            TEXT,
-    "Id"                 INT,
-    "Alias"              VARCHAR(10),
-    "Nombres"            VARCHAR(100),
-    "Apellidos"          VARCHAR(100),
-    "Correo"             VARCHAR(100),
-    "Telefono"           VARCHAR(50),
-    "Rol"                VARCHAR(100),
-    "IdCliente"          INT,
-    "TarifaKmCliente"    DECIMAL(10,2),
-    "TarifaBaseCliente"  DECIMAL(10,2),
-    "EmpresaCliente"     VARCHAR(100),
-    "IdOperador"         INT
+    "Exitoso"              INT,
+    "Mensaje"              TEXT,
+    "Id"                   INT,
+    "Alias"                VARCHAR(10),
+    "Nombres"              VARCHAR(100),
+    "Apellidos"            VARCHAR(100),
+    "Correo"               VARCHAR(100),
+    "Telefono"             VARCHAR(50),
+    "Rol"                  VARCHAR(100),
+    "IdCliente"            INT,
+    "TarifaKmCliente"      DECIMAL(10,2),
+    "TarifaBaseCliente"    DECIMAL(10,2),
+    "EmpresaCliente"       VARCHAR(100),
+    "IdOperador"           INT,
+    "NroLicencia"          VARCHAR(9),
+    "FecVenLic"            DATE,
+    "ServiciosCompletados" INT
 )
 LANGUAGE plpgsql AS $$
 DECLARE
@@ -1332,7 +1435,7 @@ BEGIN
             NULL::INT,NULL::VARCHAR(10),NULL::VARCHAR(100),NULL::VARCHAR(100),
             NULL::VARCHAR(100),NULL::VARCHAR(50),NULL::VARCHAR(100),
             NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100),
-            NULL::INT;
+            NULL::INT,NULL::VARCHAR(9),NULL::DATE,NULL::INT;
         RETURN;
     END IF;
 
@@ -1341,7 +1444,7 @@ BEGIN
             NULL::INT,NULL::VARCHAR(10),NULL::VARCHAR(100),NULL::VARCHAR(100),
             NULL::VARCHAR(100),NULL::VARCHAR(50),NULL::VARCHAR(100),
             NULL::INT,NULL::DECIMAL(10,2),NULL::DECIMAL(10,2),NULL::VARCHAR(100),
-            NULL::INT;
+            NULL::INT,NULL::VARCHAR(9),NULL::DATE,NULL::INT;
         RETURN;
     END IF;
 
@@ -1350,7 +1453,12 @@ BEGIN
            v_UsuarioId,v_Alias,v_Nombres,v_Apellidos,
            v_Correo,v_Telefono,v_Rol,
            c."Id",c."TarifaKm",c."TarifaBase",c."Empresa",
-           op."Id"
+           op."Id",
+           op."NroLicencia",
+           op."FecVenLic",
+           (SELECT COUNT(*)::INT FROM "Reserva" r
+            WHERE r."IdOperador" = op."Id"
+              AND r."EstadoOperacion" = 'FINALIZADO')
     FROM   (SELECT 1) base
     LEFT JOIN "Cliente"  c  ON c."IdUsuario"  = v_UsuarioId AND v_Rol = 'CLIENTE'
     LEFT JOIN "Operador" op ON op."IdUsuario" = v_UsuarioId AND v_Rol = 'OPERADOR';

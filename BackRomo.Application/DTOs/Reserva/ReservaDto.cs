@@ -23,8 +23,5 @@ public class ReservaDto
     public string?   NombreCliente    { get; set; }
     public string?   GruaAsignada     { get; set; }
     public string?   OperadorAsignado { get; set; }
-    public string?   PlacaVehiculo    { get; set; }
-    public string?   MarcaVehiculo    { get; set; }
-    public string?   ModeloVehiculo   { get; set; }
-    public string?   NotasAdicionales { get; set; }
+    public List<VehiculoItemDto> Vehiculos { get; set; } = new();
 }

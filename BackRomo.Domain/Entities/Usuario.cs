@@ -16,6 +16,9 @@ public class Usuario
     public decimal? TarifaKm { get; set; }
     public decimal? TarifaBase { get; set; }
     public string? Empresa { get; set; }
+    public string? NroLicencia { get; set; }
+    public DateOnly? FecVenLic { get; set; }
+    public int? ServiciosCompletados { get; set; }
     public DateTime FechaCreacion { get; set; }
     public DateTime? FechaActualizacion { get; set; }
     public int CreadoPor { get; set; }

@@ -16,4 +16,7 @@ public class LoginResponseDto
     public decimal? TarifaKm { get; set; }
     public decimal? TarifaBase { get; set; }
     public string? Empresa { get; set; }
+    public string? NroLicencia { get; set; }
+    public DateOnly? FecVenLic { get; set; }
+    public int? ServiciosCompletados { get; set; }
 }

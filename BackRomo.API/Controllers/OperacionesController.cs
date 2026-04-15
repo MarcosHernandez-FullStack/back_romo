@@ -27,6 +27,30 @@ public class OperacionesController : ControllerBase
         return Ok(reservas);
     }
 
+    [HttpPatch("iniciar")]
+    public async Task<IActionResult> IniciarReserva([FromBody] IniciarReservaDto dto)
+    {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var result = await _operacionService.IniciarReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result);
+
+        return Ok(result);
+    }
+
+    [HttpPatch("finalizar")]
+    public async Task<IActionResult> FinalizarReserva([FromBody] FinalizarReservaDto dto)
+    {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var result = await _operacionService.FinalizarReservaAsync(dto);
+
+        if (result.Exitoso == 0)
+            return Conflict(result);
+
+        return Ok(result);
+    }
+
     [HttpPatch("cancelar")]
     public async Task<IActionResult> CancelarReserva([FromBody] CancelarServicioDto dto)
     {

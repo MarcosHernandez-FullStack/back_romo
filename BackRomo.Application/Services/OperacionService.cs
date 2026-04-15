@@ -24,6 +24,12 @@ public class OperacionService
     public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador)
         => await _operacionRepository.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador);
 
+    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto)
+        => await _operacionRepository.IniciarReservaAsync(dto);
+
+    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto)
+        => await _operacionRepository.FinalizarReservaAsync(dto);
+
     public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
         => await _operacionRepository.CancelarReservaAsync(dto);
 

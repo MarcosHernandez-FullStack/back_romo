@@ -1,4 +1,5 @@
 using System.Data;
+using System.Text.Json;
 using BackRomo.Application.DTOs.Operacion;
 using BackRomo.Application.DTOs.Reserva;
 using BackRomo.Application.Interfaces;
@@ -32,11 +33,41 @@ public class OperacionRepository : IOperacionRepository
     {
         using var conn = _db.CreateConnection();
 
-        return await conn.QueryAsync<ReservaDto>(
+        var rows = await conn.QueryAsync<ReservaDapperRow>(
             "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date, @IdOperador)",
             new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio, IdOperador = idOperador },
             commandType: CommandType.Text
         );
+
+        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+        return rows.Select(r => new ReservaDto
+        {
+            Id               = r.Id,
+            DireccionOrigen  = r.DireccionOrigen,
+            CoordLatOrigen   = r.CoordLatOrigen,
+            CoordLonOrigen   = r.CoordLonOrigen,
+            DireccionDestino = r.DireccionDestino,
+            CoordLatDestino  = r.CoordLatDestino,
+            CoordLonDestino  = r.CoordLonDestino,
+            CantidadCarga    = r.CantidadCarga,
+            FechaServicio    = r.FechaServicio,
+            HoraInicio       = r.HoraInicio,
+            HoraFin          = r.HoraFin,
+            NroBloques       = r.NroBloques,
+            DistanciaKm      = r.DistanciaKm,
+            TiempoEstimado   = r.TiempoEstimado,
+            TiempoManiobra   = r.TiempoManiobra,
+            TiempoRetorno    = r.TiempoRetorno,
+            Estado           = r.Estado,
+            EstadoOperacion  = r.EstadoOperacion,
+            NombreCliente    = r.NombreCliente,
+            GruaAsignada     = r.GruaAsignada,
+            OperadorAsignado = r.OperadorAsignado,
+            Vehiculos        = string.IsNullOrWhiteSpace(r.Vehiculos)
+                ? new()
+                : JsonSerializer.Deserialize<List<VehiculoItemDto>>(r.Vehiculos, options) ?? new(),
+        });
     }
 
     /*
@@ -51,6 +82,62 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
+    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdReserva",      dto.IdReserva,      DbType.Int32);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(
+                "CALL sp_ActualizarEnCursoReserva(@_IdReserva, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text
+            );
+
+            return new OperacionResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
+
+    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdReserva",      dto.IdReserva,      DbType.Int32);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(
+                "CALL sp_FinalizarServicio(@_IdReserva, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text
+            );
+
+            return new OperacionResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje")
+            };
+        }
+        catch (Exception ex)
+        {
+            return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
+
     public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
     {
         using var conn = _db.CreateConnection();
@@ -268,5 +355,31 @@ public class OperacionRepository : IOperacionRepository
     {
         public string CoordLatOrigen { get; set; } = string.Empty;
         public string CoordLonOrigen { get; set; } = string.Empty;
+    }
+
+    private class ReservaDapperRow
+    {
+        public int       Id               { get; set; }
+        public string    DireccionOrigen  { get; set; } = string.Empty;
+        public string    CoordLatOrigen   { get; set; } = string.Empty;
+        public string    CoordLonOrigen   { get; set; } = string.Empty;
+        public string    DireccionDestino { get; set; } = string.Empty;
+        public string    CoordLatDestino  { get; set; } = string.Empty;
+        public string    CoordLonDestino  { get; set; } = string.Empty;
+        public short     CantidadCarga    { get; set; }
+        public DateTime  FechaServicio    { get; set; }
+        public TimeSpan  HoraInicio       { get; set; }
+        public TimeSpan  HoraFin          { get; set; }
+        public int       NroBloques       { get; set; }
+        public decimal   DistanciaKm      { get; set; }
+        public int       TiempoEstimado   { get; set; }
+        public int       TiempoManiobra   { get; set; }
+        public int       TiempoRetorno    { get; set; }
+        public string    Estado           { get; set; } = string.Empty;
+        public string    EstadoOperacion  { get; set; } = string.Empty;
+        public string?   NombreCliente    { get; set; }
+        public string?   GruaAsignada     { get; set; }
+        public string?   OperadorAsignado { get; set; }
+        public string?   Vehiculos        { get; set; }  // columna JSON → se deserializa manualmente
     }
 }

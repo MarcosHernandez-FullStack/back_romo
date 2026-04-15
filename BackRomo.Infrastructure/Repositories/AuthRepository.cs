@@ -72,7 +72,10 @@ public class AuthRepository : IAuthRepository
             TarifaKm   = result.TarifaKmCliente,
             TarifaBase = result.TarifaBaseCliente,
             Empresa    = result.EmpresaCliente,
-            IdOperador = result.IdOperador
+            IdOperador = result.IdOperador,
+            NroLicencia          = result.NroLicencia,
+            FecVenLic            = result.FecVenLic.HasValue ? DateOnly.FromDateTime(result.FecVenLic.Value) : null,
+            ServiciosCompletados = result.ServiciosCompletados,
         };
     }
 
@@ -98,5 +101,8 @@ public class AuthRepository : IAuthRepository
         public decimal? TarifaBaseCliente { get; set; }
         public string?  EmpresaCliente    { get; set; }
         public int?     IdOperador        { get; set; }
+        public string?  NroLicencia       { get; set; }
+        public DateTime? FecVenLic        { get; set; }
+        public int?     ServiciosCompletados { get; set; }
     }
 }
