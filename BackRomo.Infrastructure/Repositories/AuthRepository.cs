@@ -46,7 +46,7 @@ public class AuthRepository : IAuthRepository
         };
     } */
     
-    public async Task<Usuario?> LoginAsync(string identificador, string contrasena)
+    public async Task<(Usuario? Usuario, string Mensaje)> LoginAsync(string identificador, string contrasena)
     {
         var hashContrasena = HashMd5ComoGuid(contrasena);
 
@@ -57,9 +57,9 @@ public class AuthRepository : IAuthRepository
         );
 
         if (result is null || result.Exitoso == 0)
-            return null;
+            return (null, result?.Mensaje ?? "Credenciales incorrectas o usuario inactivo.");
 
-        return new Usuario
+        return (new Usuario
         {
             Id         = result.Id,
             Alias      = result.Alias,
@@ -76,7 +76,7 @@ public class AuthRepository : IAuthRepository
             NroLicencia          = result.NroLicencia,
             FecVenLic            = result.FecVenLic.HasValue ? DateOnly.FromDateTime(result.FecVenLic.Value) : null,
             ServiciosCompletados = result.ServiciosCompletados,
-        };
+        }, string.Empty);
     }
 
     private static string HashMd5ComoGuid(string input)

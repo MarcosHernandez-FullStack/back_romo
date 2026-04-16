@@ -499,25 +499,47 @@ CREATE OR REPLACE PROCEDURE sp_AsignarServicio(
 )
 LANGUAGE plpgsql AS $$
 DECLARE
-    v_FechaServicio DATE;
-    v_HoraInicio    TIME;
-    v_HoraFin       TIME;
-    v_SlotInicioDT  TIMESTAMP;
-    v_TiempoCorte   INT;
-    v_PlacaGrua     VARCHAR(20);
-    v_NombresOp     VARCHAR(100);
-    v_ApellidosOp   VARCHAR(100);
+    v_FechaServicio   DATE;
+    v_HoraInicio      TIME;
+    v_HoraFin         TIME;
+    v_EstadoOperacion VARCHAR(20);
+    v_SlotInicioDT    TIMESTAMP;
+    v_TiempoCorte     INT;
+    v_NroDia          SMALLINT;
+    v_PlacaGrua       VARCHAR(20);
+    v_NombresOp       VARCHAR(100);
+    v_ApellidosOp     VARCHAR(100);
 BEGIN
 
     LOCK TABLE "Reserva" IN SHARE ROW EXCLUSIVE MODE;
 
-    SELECT r."FechaServicio", r."HoraInicio", r."HoraFin"
-    INTO   v_FechaServicio, v_HoraInicio, v_HoraFin
+    -- 1. Leer reserva
+    SELECT r."FechaServicio", r."HoraInicio", r."HoraFin", r."EstadoOperacion"
+    INTO   v_FechaServicio, v_HoraInicio, v_HoraFin, v_EstadoOperacion
     FROM   "Reserva" r
-    WHERE  r."Id" = _IdReserva;
+    WHERE  r."Id"     = _IdReserva
+      AND  r."Estado" = 'ACTIVO';
+
+    IF v_FechaServicio IS NULL THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'La reserva no existe o no se encuentra activa.';
+        RETURN;
+    END IF;
+
+    -- 2. Validar EstadoOperacion asignable
+    IF v_EstadoOperacion IN ('CANCELADO', 'ENCURSO', 'FINALIZADO') THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'La reserva no puede asignarse porque se encuentra en estado '
+                    || v_EstadoOperacion || '.';
+        RETURN;
+    END IF;
 
     v_SlotInicioDT := v_FechaServicio + v_HoraInicio;
+    v_NroDia       := (EXTRACT(DOW FROM v_FechaServicio)::INT + 1)::SMALLINT;
 
+    -- 3. Validar tiempo de corte
     SELECT "TiempoCorte" INTO v_TiempoCorte
     FROM   "ParametroOperativo" WHERE "Estado" = 'ACTIVO';
 
@@ -533,8 +555,35 @@ BEGIN
         RETURN;
     END IF;
 
+    -- 4. Leer operador
+    SELECT u."Nombres", u."Apellidos"
+    INTO   v_NombresOp, v_ApellidosOp
+    FROM   "Operador" o
+    INNER JOIN "Usuario" u ON u."Id" = o."IdUsuario"
+    WHERE  o."Id" = _IdOperador;
+
+    -- 5. Validar disponibilidad del operador
+    IF NOT EXISTS (
+        SELECT 1 FROM "Disponibilidad" d
+        WHERE  d."IdOperador" = _IdOperador
+          AND  d."NroDia"     = v_NroDia
+          AND  d."Estado"     = 'ACTIVO'
+          AND  d."HoraInicio" <= v_HoraInicio
+          AND  d."HoraFin"    >= v_HoraFin
+    ) THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'El operador ' || v_NombresOp || ' ' || v_ApellidosOp ||
+                    ' no tiene disponibilidad registrada para el horario ' ||
+                    to_char(v_HoraInicio,'HH24:MI') || ' - ' ||
+                    to_char(v_HoraFin,'HH24:MI') || '.';
+        RETURN;
+    END IF;
+
+    -- 6. Leer placa grúa
     SELECT "Placa" INTO v_PlacaGrua FROM "Grua" WHERE "Id" = _IdGrua;
 
+    -- 7. Validar conflicto de grúa
     IF EXISTS (
         SELECT 1 FROM "Reserva"
         WHERE  "IdGrua"          = _IdGrua
@@ -554,12 +603,7 @@ BEGIN
         RETURN;
     END IF;
 
-    SELECT u."Nombres", u."Apellidos"
-    INTO   v_NombresOp, v_ApellidosOp
-    FROM   "Operador" o
-    INNER JOIN "Usuario" u ON u."Id" = o."IdUsuario"
-    WHERE  o."Id" = _IdOperador;
-
+    -- 8. Validar conflicto de operador
     IF EXISTS (
         SELECT 1 FROM "Reserva"
         WHERE  "IdOperador"      = _IdOperador
@@ -579,6 +623,7 @@ BEGIN
         RETURN;
     END IF;
 
+    -- 9. Asignar
     UPDATE "Reserva"
     SET    "EstadoOperacion"    = 'ASIGNADO',
            "IdGrua"             = _IdGrua,
@@ -595,6 +640,7 @@ BEGIN
 
 END;
 $$;
+
 
 -- ── sp_ActualizarEnCursoReserva ─────────────────────────────
 CREATE OR REPLACE PROCEDURE sp_ActualizarEnCursoReserva(
@@ -700,24 +746,32 @@ CREATE OR REPLACE PROCEDURE sp_CancelarReserva(
 )
 LANGUAGE plpgsql AS $$
 DECLARE
-    v_FechaServicio DATE;
-    v_HoraInicio    TIME;
-    v_SlotInicioDT  TIMESTAMP;
-    v_TiempoCorte   INT;
+    v_FechaServicio   DATE;
+    v_HoraInicio      TIME;
+    v_EstadoOperacion VARCHAR(20);
+    v_SlotInicioDT    TIMESTAMP;
+    v_TiempoCorte     INT;
 BEGIN
 
-    SELECT r."FechaServicio", r."HoraInicio"
-    INTO   v_FechaServicio, v_HoraInicio
+    SELECT r."FechaServicio", r."HoraInicio", r."EstadoOperacion"
+    INTO   v_FechaServicio, v_HoraInicio, v_EstadoOperacion
     FROM   "Reserva" r
-    WHERE  r."Id"              = _Id
-      AND  r."Estado"          = 'ACTIVO'
-      AND  r."EstadoOperacion" != 'CANCELADO'
+    WHERE  r."Id"     = _Id
+      AND  r."Estado" = 'ACTIVO'
     FOR UPDATE;
 
     IF v_FechaServicio IS NULL THEN
         ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := 'La reserva no existe o ya fue cancelada.';
+        _Mensaje := 'El servicio no existe o no se encuentra activo.';
+        RETURN;
+    END IF;
+
+    IF v_EstadoOperacion IN ('CANCELADO', 'ENCURSO', 'FINALIZADO') THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'El servicio no puede cancelarse porque se encuentra en estado '
+                    || v_EstadoOperacion || '.';
         RETURN;
     END IF;
 
@@ -771,6 +825,7 @@ DECLARE
     v_SlotInicioDT     TIMESTAMP;
     v_SlotFinDT        TIMESTAMP;
     v_CantidadCarga    SMALLINT;
+    v_EstadoOperacion  VARCHAR(20);
     v_TiempoCorte      INT;
     v_HorasExcepcion   TEXT;
     v_GruasDisponibles INT;
@@ -787,15 +842,24 @@ BEGIN
         v_SlotFinDT := v_SlotFinDT + INTERVAL '1 day';
     END IF;
 
-    SELECT r."CantidadCarga" INTO v_CantidadCarga
+    SELECT r."CantidadCarga", r."EstadoOperacion"
+    INTO   v_CantidadCarga, v_EstadoOperacion
     FROM   "Reserva" r
-    WHERE  r."Id"              = _IdReserva
-      AND  r."Estado"          = 'ACTIVO'
-      AND  r."EstadoOperacion" != 'CANCELADO';
+    WHERE  r."Id"     = _IdReserva
+      AND  r."Estado" = 'ACTIVO';
 
     IF v_CantidadCarga IS NULL THEN
+        ROLLBACK;
         _Exitoso := 0;
-        _Mensaje := 'La reserva no existe/cancelada o no puede ser reprogramada.';
+        _Mensaje := 'El servicio no existe o no se encuentra activo.';
+        RETURN;
+    END IF;
+
+    IF v_EstadoOperacion IN ('CANCELADO', 'ENCURSO', 'FINALIZADO') THEN
+        ROLLBACK;
+        _Exitoso := 0;
+        _Mensaje := 'El servicio no puede reprogramarse porque se encuentra en estado '
+                    || v_EstadoOperacion || '.';
         RETURN;
     END IF;
 
@@ -935,7 +999,7 @@ BEGIN
 
     COMMIT;
     _Exitoso        := 1;
-    _Mensaje        := 'Reserva reprogramada correctamente.';
+    _Mensaje        := 'Servicio reprogramado correctamente.';
     _HorasConflicto := NULL;
 
 END;
@@ -983,6 +1047,9 @@ DECLARE
     v_GruasDisponibles INT;
     v_MaxOcupacion     INT;
 BEGIN
+
+    LOCK TABLE "TimerReserva" IN SHARE ROW EXCLUSIVE MODE;
+    LOCK TABLE "Reserva"      IN SHARE ROW EXCLUSIVE MODE;
 
     v_SlotInicioDT := _FechaServicio + _HoraInicio;
     v_SlotFinDT    := CASE WHEN _HoraFin <= _HoraInicio
@@ -1033,9 +1100,6 @@ BEGIN
             RETURN;
         END IF;
     END IF;
-
-    LOCK TABLE "TimerReserva" IN SHARE ROW EXCLUSIVE MODE;
-    LOCK TABLE "Reserva"      IN SHARE ROW EXCLUSIVE MODE;
 
     SELECT COUNT(*)::INT INTO v_GruasDisponibles
     FROM   "Grua"

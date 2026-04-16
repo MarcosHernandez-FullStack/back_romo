@@ -17,16 +17,16 @@ public class AuthService
         _logger         = logger;
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginRequestDto request)
+    public async Task<(LoginResponseDto? Response, string Mensaje)> LoginAsync(LoginRequestDto request)
     {
         _logger.LogInformation("Intento de login para identificador {Identificador}", request.Identificador);
 
-        var usuario = await _authRepository.LoginAsync(request.Identificador, request.Contrasena);
+        var (usuario, mensaje) = await _authRepository.LoginAsync(request.Identificador, request.Contrasena);
 
         if (usuario is null)
         {
-            _logger.LogWarning("Login fallido para identificador {Identificador}", request.Identificador);
-            return null;
+            _logger.LogWarning("Login fallido para identificador {Identificador}: {Mensaje}", request.Identificador, mensaje);
+            return (null, mensaje);
         }
 
         var (token, expiresAt) = _jwtService.GenerarToken(usuario);
@@ -34,7 +34,7 @@ public class AuthService
         _logger.LogInformation("Login exitoso para usuario {UserId} ({Rol}), token expira {ExpiresAt}",
             usuario.Id, usuario.Rol, expiresAt);
 
-        return new LoginResponseDto
+        return (new LoginResponseDto
         {
             Token      = token,
             ExpiresAt  = expiresAt,
@@ -53,6 +53,6 @@ public class AuthService
             NroLicencia          = usuario.NroLicencia,
             FecVenLic            = usuario.FecVenLic,
             ServiciosCompletados = usuario.ServiciosCompletados,
-        };
+        }, string.Empty);
     }
 }

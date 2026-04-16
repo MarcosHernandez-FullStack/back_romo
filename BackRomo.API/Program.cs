@@ -84,9 +84,9 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.WithOrigins(
-                  "http://localhost:4200",
-                  "https://mango-meadow-0fb31c60f.7.azurestaticapps.net"
+        policy.SetIsOriginAllowed(origin =>
+                  new Uri(origin).Host == "localhost" ||
+                  origin == "https://mango-meadow-0fb31c60f.7.azurestaticapps.net"
               )
               .AllowAnyHeader()
               .AllowAnyMethod();

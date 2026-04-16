@@ -20,10 +20,10 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        var response = await _authService.LoginAsync(request);
+        var (response, mensaje) = await _authService.LoginAsync(request);
 
         if (response is null)
-            return Unauthorized(new { mensaje = "Credenciales incorrectas o usuario inactivo" });
+            return Unauthorized(new { mensaje });
 
         return Ok(response);
     }
