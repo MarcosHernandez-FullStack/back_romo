@@ -21,40 +21,40 @@ public class OperacionService
         _configuracionRepository = configuracionRepository;
     }
 
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador)
-        => await _operacionRepository.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador);
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador, CancellationToken ct = default)
+        => await _operacionRepository.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador, ct);
 
-    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto)
-        => await _operacionRepository.IniciarReservaAsync(dto);
+    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto, CancellationToken ct = default)
+        => await _operacionRepository.IniciarReservaAsync(dto, ct);
 
-    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto)
-        => await _operacionRepository.FinalizarReservaAsync(dto);
+    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto, CancellationToken ct = default)
+        => await _operacionRepository.FinalizarReservaAsync(dto, ct);
 
-    public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
-        => await _operacionRepository.CancelarReservaAsync(dto);
+    public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto, CancellationToken ct = default)
+        => await _operacionRepository.CancelarReservaAsync(dto, ct);
 
-    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
-        => await _operacionRepository.AsignarReservaAsync(dto);
+    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto, CancellationToken ct = default)
+        => await _operacionRepository.AsignarReservaAsync(dto, ct);
 
-    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
-        => await _operacionRepository.ReprogramarReservaAsync(dto);
+    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto, CancellationToken ct = default)
+        => await _operacionRepository.ReprogramarReservaAsync(dto, ct);
 
-    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync()
-        => await _operacionRepository.ListarCapacidadesGruasAsync();
+    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync(CancellationToken ct = default)
+        => await _operacionRepository.ListarCapacidadesGruasAsync(ct);
 
-    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad)
-        => await _operacionRepository.ObtenerDisponibilidadGruasAsync(fechaServicio, capacidad);
+    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad, CancellationToken ct = default)
+        => await _operacionRepository.ObtenerDisponibilidadGruasAsync(fechaServicio, capacidad, ct);
 
-    public async Task<SugerenciasDto> SugerirAsignacionAsync(int idReserva)
+    public async Task<SugerenciasDto> SugerirAsignacionAsync(int idReserva, CancellationToken ct = default)
     {
-        var parametro = await _configuracionRepository.ObtenerParametroOperativoAsync()
+        var parametro = await _configuracionRepository.ObtenerParametroOperativoAsync(ct)
                         ?? new ParametroDto { MinutosCerca = 15, MinutosMedio = 35 };
 
-        var origen = await _operacionRepository.ObtenerOrigenReservaAsync(idReserva);
-        var (candidatosGruas, candidatosOperadores) = await _operacionRepository.ObtenerCandidatosAsync(idReserva);
+        var origen = await _operacionRepository.ObtenerOrigenReservaAsync(idReserva, ct);
+        var (candidatosGruas, candidatosOperadores) = await _operacionRepository.ObtenerCandidatosAsync(idReserva, ct);
 
-        var gruas      = await ClasificarGruasAsync(candidatosGruas, origen, parametro);
-        var operadores = await ClasificarOperadoresAsync(candidatosOperadores, origen, parametro);
+        var gruas      = await ClasificarGruasAsync(candidatosGruas, origen, parametro, ct);
+        var operadores = await ClasificarOperadoresAsync(candidatosOperadores, origen, parametro, ct);
 
         return new SugerenciasDto { Gruas = gruas, Operadores = operadores };
     }
@@ -62,12 +62,15 @@ public class OperacionService
     private async Task<List<GruaSugeridaDto>> ClasificarGruasAsync(
         IEnumerable<GruaCandidatoDto> candidatos,
         (string lat, string lon)? origen,
-        ParametroDto parametro)
+        ParametroDto parametro,
+        CancellationToken ct)
     {
         var result = new List<GruaSugeridaDto>();
 
         foreach (var g in candidatos)
         {
+            ct.ThrowIfCancellationRequested();
+
             var dto = new GruaSugeridaDto
             {
                 Id        = g.Id,
@@ -106,12 +109,15 @@ public class OperacionService
     private async Task<List<OperadorSugeridoDto>> ClasificarOperadoresAsync(
         IEnumerable<OperadorCandidatoDto> candidatos,
         (string lat, string lon)? origen,
-        ParametroDto parametro)
+        ParametroDto parametro,
+        CancellationToken ct)
     {
         var result = new List<OperadorSugeridoDto>();
 
         foreach (var o in candidatos)
         {
+            ct.ThrowIfCancellationRequested();
+
             var dto = new OperadorSugeridoDto
             {
                 Id       = o.Id,

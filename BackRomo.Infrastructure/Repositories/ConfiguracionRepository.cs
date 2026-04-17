@@ -27,14 +27,15 @@ public class ConfiguracionRepository : IConfiguracionRepository
     } */
 
 
-    public async Task<TarifaDto?> ObtenerTarifarioGlobalAsync()
+    public async Task<TarifaDto?> ObtenerTarifarioGlobalAsync(CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        return await conn.QueryFirstOrDefaultAsync<TarifaDto>(
+        return await conn.QueryFirstOrDefaultAsync<TarifaDto>(new CommandDefinition(
             "SELECT * FROM fn_TarifarioGlobal()",
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
     }
 
     /* 
@@ -49,13 +50,14 @@ public class ConfiguracionRepository : IConfiguracionRepository
         );
     } */
 
-    public async Task<ParametroDto?> ObtenerParametroOperativoAsync()
-{
-    using var conn = _db.CreateConnection();
+    public async Task<ParametroDto?> ObtenerParametroOperativoAsync(CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
 
-    return await conn.QueryFirstOrDefaultAsync<ParametroDto>(
-        "SELECT * FROM fn_ParametroOperativo()",
-        commandType: CommandType.Text
-    );
-}
+        return await conn.QueryFirstOrDefaultAsync<ParametroDto>(new CommandDefinition(
+            "SELECT * FROM fn_ParametroOperativo()",
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
+    }
 }

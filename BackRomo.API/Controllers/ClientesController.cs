@@ -1,5 +1,8 @@
 using BackRomo.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackRomo.API.Controllers;
 
@@ -14,12 +17,16 @@ public class ClientesController : ControllerBase
         _clienteService = clienteService;
     }
 
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
     [HttpGet]
     public async Task<IActionResult> ListarClientes(
         [FromQuery] string? estado,
-        [FromQuery] int?    id)
+        [FromQuery] int?    id,
+        CancellationToken   ct)
     {
-        var clientes = await _clienteService.ListarClientesAsync(estado, id);
+        var clientes = await _clienteService.ListarClientesAsync(estado, id, ct);
 
         if (!clientes.Any())
             return NoContent();

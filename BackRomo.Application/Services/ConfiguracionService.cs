@@ -12,9 +12,9 @@ public class ConfiguracionService
         _configuracionRepository = configuracionRepository;
     }
 
-    public async Task<TarifaDto?> ObtenerTarifarioGlobalAsync()
-        => await _configuracionRepository.ObtenerTarifarioGlobalAsync();
+    public async Task<TarifaDto?> ObtenerTarifarioGlobalAsync(CancellationToken ct = default)
+        => await _configuracionRepository.ObtenerTarifarioGlobalAsync(ct);
 
-    public async Task<ParametroDto?> ObtenerParametroOperativoAsync()
-        => await _configuracionRepository.ObtenerParametroOperativoAsync();
+    public async Task<ParametroDto?> ObtenerParametroOperativoAsync(CancellationToken ct = default)
+        => await _configuracionRepository.ObtenerParametroOperativoAsync(ct);
 }

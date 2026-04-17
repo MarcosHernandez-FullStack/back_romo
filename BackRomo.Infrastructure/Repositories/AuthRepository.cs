@@ -46,15 +46,16 @@ public class AuthRepository : IAuthRepository
         };
     } */
     
-    public async Task<(Usuario? Usuario, string Mensaje)> LoginAsync(string identificador, string contrasena)
+    public async Task<(Usuario? Usuario, string Mensaje)> LoginAsync(string identificador, string contrasena, CancellationToken ct = default)
     {
         var hashContrasena = HashMd5ComoGuid(contrasena);
 
         using var conn = _db.CreateConnection();
-        var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(
+        var result = await conn.QueryFirstOrDefaultAsync<SpLoginResult>(new CommandDefinition(
             "SELECT * FROM fn_LoginUsuario(@Identificador, @Contrasena)",
-            new { Identificador = identificador, Contrasena = hashContrasena }
-        );
+            new { Identificador = identificador, Contrasena = hashContrasena },
+            cancellationToken: ct
+        ));
 
         if (result is null || result.Exitoso == 0)
             return (null, result?.Mensaje ?? "Credenciales incorrectas o usuario inactivo.");

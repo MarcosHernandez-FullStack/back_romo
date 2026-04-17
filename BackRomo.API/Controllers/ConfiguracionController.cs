@@ -1,5 +1,8 @@
 using BackRomo.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackRomo.API.Controllers;
 
@@ -14,10 +17,13 @@ public class ConfiguracionController : ControllerBase
         _configuracionService = configuracionService;
     }
 
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
     [HttpGet("tarifario-global")]
-    public async Task<IActionResult> ObtenerTarifarioGlobal()
+    public async Task<IActionResult> ObtenerTarifarioGlobal(CancellationToken ct)
     {
-        var tarifa = await _configuracionService.ObtenerTarifarioGlobalAsync();
+        var tarifa = await _configuracionService.ObtenerTarifarioGlobalAsync(ct);
 
         if (tarifa is null)
             return NoContent();
@@ -25,10 +31,13 @@ public class ConfiguracionController : ControllerBase
         return Ok(tarifa);
     }
 
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
     [HttpGet("parametro-operativo")]
-    public async Task<IActionResult> ObtenerParametroOperativo()
+    public async Task<IActionResult> ObtenerParametroOperativo(CancellationToken ct)
     {
-        var parametro = await _configuracionService.ObtenerParametroOperativoAsync();
+        var parametro = await _configuracionService.ObtenerParametroOperativoAsync(ct);
 
         if (parametro is null)
             return NoContent();

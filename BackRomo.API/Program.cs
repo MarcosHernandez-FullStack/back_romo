@@ -1,4 +1,5 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using BackRomo.API.Middlewares;
 using BackRomo.Application.Interfaces;
 using BackRomo.Application.Services;
@@ -7,6 +8,7 @@ using BackRomo.Infrastructure.Data;
 using BackRomo.Infrastructure.Repositories;
 using BackRomo.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -84,12 +86,54 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendPolicy", policy =>
     {
-        policy.SetIsOriginAllowed(origin =>
-                  new Uri(origin).Host == "localhost" ||
-                  origin == "https://mango-meadow-0fb31c60f.7.azurestaticapps.net"
-              )
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        var allowedOrigins = builder.Configuration["Cors:AllowedOrigins"] ?? string.Empty;
+
+        if (allowedOrigins == "*")
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+        else
+        {
+            var origins = allowedOrigins.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            policy.WithOrigins(origins).AllowAnyHeader().AllowAnyMethod();
+        }
+    });
+});
+
+// Request Timeouts
+builder.Services.AddRequestTimeouts(options =>
+{
+    options.AddPolicy("corto", TimeSpan.FromSeconds(10));
+    options.AddPolicy("largo",  TimeSpan.FromSeconds(30));
+});
+
+// Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("login", config =>
+    {
+        config.PermitLimit          = 5;
+        config.Window               = TimeSpan.FromMinutes(1);
+        config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        config.QueueLimit           = 0;
+    });
+
+    options.AddFixedWindowLimiter("lectura", config =>
+    {
+        config.PermitLimit          = 100;
+        config.Window               = TimeSpan.FromMinutes(1);
+        config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        config.QueueLimit           = 0;
+    });
+
+    options.AddFixedWindowLimiter("escritura", config =>
+    {
+        config.PermitLimit          = 30;
+        config.Window               = TimeSpan.FromMinutes(1);
+        config.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        config.QueueLimit           = 0;
     });
 });
 
@@ -110,6 +154,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("FrontendPolicy");
 
+app.UseRequestTimeouts();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 

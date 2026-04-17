@@ -33,20 +33,16 @@ public class ReservaRepository : IReservaRepository
             .Where(r => r.Hora.HasValue)
             .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
     } */
-    public async Task<IEnumerable<HorarioDto>> ListarHorariosAsync(DateOnly fecha, string rol, short capacidad)
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosAsync(DateOnly fecha, string rol, short capacidad, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var results = await conn.QueryAsync<SpHorarioResult>(
+        var results = await conn.QueryAsync<SpHorarioResult>(new CommandDefinition(
             "SELECT * FROM fn_ListHorariosDisponibles(@FechaSeleccionada::date, @Rol, @Capacidad)",
-            new
-            {
-                FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue),
-                Rol = rol,
-                Capacidad = capacidad
-            },
-            commandType: CommandType.Text
-        );
+            new { FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue), Rol = rol, Capacidad = capacidad },
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
 
         return results
             .Where(r => r.Hora.HasValue)
@@ -69,21 +65,16 @@ public class ReservaRepository : IReservaRepository
             .Where(r => r.Hora.HasValue)
             .Select(r => new HorarioDto { Hora = r.Hora!.Value, Estado = r.Estado ?? "disponible" });
     } */
-    public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva)
+    public async Task<IEnumerable<HorarioDto>> ListarHorariosReprogramacionAsync(DateOnly fecha, string rol, short capacidad, int idReserva, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var results = await conn.QueryAsync<SpHorarioResult>(
+        var results = await conn.QueryAsync<SpHorarioResult>(new CommandDefinition(
             "SELECT * FROM fn_ListHorariosReprogramacion(@FechaSeleccionada::date, @Rol, @Capacidad, @IdReserva)",
-            new
-            {
-                FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue),
-                Rol               = rol,
-                Capacidad         = capacidad,
-                IdReserva         = idReserva
-            },
-            commandType: CommandType.Text
-        );
+            new { FechaSeleccionada = fecha.ToDateTime(TimeOnly.MinValue), Rol = rol, Capacidad = capacidad, IdReserva = idReserva },
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
 
         return results
             .Where(r => r.Hora.HasValue)
@@ -134,7 +125,7 @@ public class ReservaRepository : IReservaRepository
         return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al validar el horario." };
     } */
 
-   public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto)
+   public async Task<ValidarHorarioResultDto> ValidarHorarioAsync(CrearReservaDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -172,7 +163,7 @@ public class ReservaRepository : IReservaRepository
             p.Add("_HorasConflicto", value: null, dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
             p.Add("_Id",             value: null, dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 @"CALL sp_ValidarHorario(
                     @_FechaServicio::date, @_HoraInicio::time, @_HoraFin::time,
                     @_CantidadCarga::smallint, @_IdCliente::integer, @_IdOperador::integer, @_CreadoPor::integer,
@@ -183,7 +174,7 @@ public class ReservaRepository : IReservaRepository
                     @_TimerExpiracion::smallint, @_EstadoOperacion::varchar, @_EstadoAdministrativo::varchar,
                     @_Estado::varchar, @_FechaCreacion::timestamp, @_Rol::varchar, @_TipoHorario::varchar,
                     @_Exitoso, @_Mensaje, @_HorasConflicto, @_Id)",
-                p, commandType: CommandType.Text);
+                p, commandType: CommandType.Text, cancellationToken: ct));
 
             return new ValidarHorarioResultDto
             {
@@ -227,10 +218,10 @@ public class ReservaRepository : IReservaRepository
 
         return result ?? new ValidarHorarioResultDto { Exitoso = 0, Mensaje = "Error inesperado al crear la reserva." };
     } */
-    public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto)
+    public async Task<ValidarHorarioResultDto> CrearReservaAsync(ConfirmarReservaDto dto, CancellationToken ct = default)
     {
         using var conn = (NpgsqlConnection)_db.CreateConnection();
-        await conn.OpenAsync();
+        await conn.OpenAsync(ct);
 
         try
         {
@@ -269,7 +260,7 @@ public class ReservaRepository : IReservaRepository
 
             cmd.CommandText = $"CALL sp_CreateReserva(@_IdTimerReserva, {vehiculosExpr}, @_Rol, @_Exitoso, @_Mensaje, @_HorasConflicto, @_Id)";
 
-            await cmd.ExecuteNonQueryAsync();
+            await cmd.ExecuteNonQueryAsync(ct);
 
             return new ValidarHorarioResultDto
             {
@@ -295,7 +286,7 @@ public class ReservaRepository : IReservaRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<ValidarHorarioResultDto> EliminarTimerAsync(int idTimer)
+    public async Task<ValidarHorarioResultDto> EliminarTimerAsync(int idTimer, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -305,11 +296,10 @@ public class ReservaRepository : IReservaRepository
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 "CALL sp_DeleteTimerReserva(@_Id::integer, @_Exitoso, @_Mensaje)",
-                p,
-                commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new ValidarHorarioResultDto
             {

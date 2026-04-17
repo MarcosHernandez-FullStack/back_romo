@@ -1,7 +1,9 @@
 using BackRomo.Application.DTOs.Auth;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackRomo.API.Controllers;
 
@@ -17,10 +19,12 @@ public class AuthController : ControllerBase
     }
 
     [AllowAnonymous]
+    [EnableRateLimiting("login")]
+    [RequestTimeout("corto")]
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request, CancellationToken ct)
     {
-        var (response, mensaje) = await _authService.LoginAsync(request);
+        var (response, mensaje) = await _authService.LoginAsync(request, ct);
 
         if (response is null)
             return Unauthorized(new { mensaje });

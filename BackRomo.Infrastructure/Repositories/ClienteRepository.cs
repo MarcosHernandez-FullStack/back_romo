@@ -28,14 +28,15 @@ public class ClienteRepository : IClienteRepository
         );
     } */
 
-    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id)
+    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        return await conn.QueryAsync<ClienteDto>(
+        return await conn.QueryAsync<ClienteDto>(new CommandDefinition(
             "SELECT * FROM fn_ListClientes(@Estado, @Id)",
             new { Estado = estado, Id = id },
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
     }
 }

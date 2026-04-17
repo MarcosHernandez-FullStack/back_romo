@@ -29,15 +29,16 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador)
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var rows = await conn.QueryAsync<ReservaDapperRow>(
+        var rows = await conn.QueryAsync<ReservaDapperRow>(new CommandDefinition(
             "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date, @IdOperador)",
             new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio, IdOperador = idOperador },
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
 
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
@@ -82,7 +83,7 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto)
+    public async Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -93,10 +94,10 @@ public class OperacionRepository : IOperacionRepository
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 "CALL sp_ActualizarEnCursoReserva(@_IdReserva, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-                p, commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new OperacionResultDto
             {
@@ -110,7 +111,7 @@ public class OperacionRepository : IOperacionRepository
         }
     }
 
-    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto)
+    public async Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -121,10 +122,10 @@ public class OperacionRepository : IOperacionRepository
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 "CALL sp_FinalizarServicio(@_IdReserva, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-                p, commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new OperacionResultDto
             {
@@ -138,7 +139,7 @@ public class OperacionRepository : IOperacionRepository
         }
     }
 
-    public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto)
+    public async Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -150,10 +151,10 @@ public class OperacionRepository : IOperacionRepository
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 "CALL sp_CancelarReserva(@_Id, @_MotivoCancelacion, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-                p, commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new OperacionResultDto
             {
@@ -183,21 +184,23 @@ public class OperacionRepository : IOperacionRepository
 
         return (gruas, operadores);
     } */
-    public async Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva)
+    public async Task<(IEnumerable<GruaCandidatoDto> gruas, IEnumerable<OperadorCandidatoDto> operadores)> ObtenerCandidatosAsync(int idReserva, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var gruas = await conn.QueryAsync<GruaCandidatoDto>(
+        var gruas = await conn.QueryAsync<GruaCandidatoDto>(new CommandDefinition(
             "SELECT * FROM fn_SugerirAsignacion_Gruas(@IdReserva)",
             new { IdReserva = idReserva },
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
 
-        var operadores = await conn.QueryAsync<OperadorCandidatoDto>(
+        var operadores = await conn.QueryAsync<OperadorCandidatoDto>(new CommandDefinition(
             "SELECT * FROM fn_SugerirAsignacion_Operadores(@IdReserva)",
             new { IdReserva = idReserva },
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
 
         return (gruas, operadores);
     }
@@ -214,7 +217,7 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al asignar el servicio." };
     } */
-    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto)
+    public async Task<OperacionResultDto> AsignarReservaAsync(AsignarServicioDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -227,10 +230,10 @@ public class OperacionRepository : IOperacionRepository
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje",  value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 "CALL sp_AsignarServicio(@_IdReserva, @_IdGrua, @_IdOperador, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
-                p, commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new OperacionResultDto
             {
@@ -266,7 +269,7 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         ) ?? new OperacionResultDto { Exitoso = 0, Mensaje = "Error inesperado al reprogramar la reserva." };
     } */
-    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto)
+    public async Task<OperacionResultDto> ReprogramarReservaAsync(ReprogramarServicioDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
@@ -284,13 +287,13 @@ public class OperacionRepository : IOperacionRepository
             p.Add("_Mensaje",        value: "",   dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
             p.Add("_HorasConflicto", value: null, dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
-            await conn.ExecuteAsync(
+            await conn.ExecuteAsync(new CommandDefinition(
                 @"CALL sp_ReprogramarReserva(
                     @_IdReserva, @_NuevaFecha::date, @_NuevaHoraInicio::time,
                     @_NuevoNroBloques, @_ActualizadoPor, @_Rol,
                     @_Exitoso, @_Mensaje, @_HorasConflicto)",
-                p, commandType: CommandType.Text
-            );
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
 
             return new OperacionResultDto
             {
@@ -319,36 +322,39 @@ public class OperacionRepository : IOperacionRepository
         if (result is null) return null;
         return (result.CoordLatOrigen, result.CoordLonOrigen);
     } */
-    public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva)
+    public async Task<(string latOrigen, string lonOrigen)?> ObtenerOrigenReservaAsync(int idReserva, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var result = await conn.QueryFirstOrDefaultAsync<OrigenReserva>(
+        var result = await conn.QueryFirstOrDefaultAsync<OrigenReserva>(new CommandDefinition(
             @"SELECT ""CoordLatOrigen"", ""CoordLonOrigen"" FROM ""Reserva"" WHERE ""Id"" = @Id",
-            new { Id = idReserva }
-        );
+            new { Id = idReserva },
+            cancellationToken: ct
+        ));
 
         if (result is null) return null;
         return (result.CoordLatOrigen, result.CoordLonOrigen);
     }
 
-    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync()
+    public async Task<IEnumerable<short>> ListarCapacidadesGruasAsync(CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
-        return await conn.QueryAsync<short>(
+        return await conn.QueryAsync<short>(new CommandDefinition(
             "SELECT * FROM fn_ListCapacidadesGruas()",
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
     }
 
-    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad)
+    public async Task<IEnumerable<DisponibilidadGruaDto>> ObtenerDisponibilidadGruasAsync(DateOnly fechaServicio, short? capacidad, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
-        return await conn.QueryAsync<DisponibilidadGruaDto>(
+        return await conn.QueryAsync<DisponibilidadGruaDto>(new CommandDefinition(
             "SELECT * FROM fn_DisponibilidadGruas(@FechaServicio::date, @Capacidad::smallint)",
             new { FechaServicio = fechaServicio.ToDateTime(TimeOnly.MinValue), Capacidad = (object?)capacidad ?? DBNull.Value },
-            commandType: CommandType.Text
-        );
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
     }
 
     private class OrigenReserva

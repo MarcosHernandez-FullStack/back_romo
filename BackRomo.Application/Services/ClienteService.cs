@@ -12,6 +12,6 @@ public class ClienteService
         _clienteRepository = clienteRepository;
     }
 
-    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id)
-        => await _clienteRepository.ListarClientesAsync(estado, id);
+    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id, CancellationToken ct = default)
+        => await _clienteRepository.ListarClientesAsync(estado, id, ct);
 }

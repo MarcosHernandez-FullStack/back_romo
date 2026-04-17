@@ -17,11 +17,11 @@ public class AuthService
         _logger         = logger;
     }
 
-    public async Task<(LoginResponseDto? Response, string Mensaje)> LoginAsync(LoginRequestDto request)
+    public async Task<(LoginResponseDto? Response, string Mensaje)> LoginAsync(LoginRequestDto request, CancellationToken ct = default)
     {
         _logger.LogInformation("Intento de login para identificador {Identificador}", request.Identificador);
 
-        var (usuario, mensaje) = await _authRepository.LoginAsync(request.Identificador, request.Contrasena);
+        var (usuario, mensaje) = await _authRepository.LoginAsync(request.Identificador, request.Contrasena, ct);
 
         if (usuario is null)
         {
