@@ -17,4 +17,7 @@ public class ParametroDto
     public string   ZonaHoraria            { get; set; } = string.Empty;
     public int      MinutosCerca           { get; set; }
     public int      MinutosMedio           { get; set; }
+    public string   CoordLatMaps           { get; set; } = string.Empty;
+    public string   CoordLonMaps           { get; set; } = string.Empty;
+    public decimal  MetrosCercania         { get; set; }
 }

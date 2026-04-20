@@ -199,6 +199,9 @@ CREATE TABLE "ParametroOperativo" (
     "ZonaHoraria"          VARCHAR(50)   NOT NULL DEFAULT 'America/Lima',
     "MinutosCerca"         SMALLINT      NOT NULL DEFAULT 15,
     "MinutosMedio"         SMALLINT      NOT NULL DEFAULT 35,
+    "CoordLatMaps"         VARCHAR(20)   NOT NULL DEFAULT '',
+    "CoordLonMaps"         VARCHAR(20)   NOT NULL DEFAULT '',
+    "MetrosCercania"       DECIMAL(10,2) NOT NULL DEFAULT 0,
     CONSTRAINT pk_ParametroOperativo       PRIMARY KEY ("Id"),
     CONSTRAINT CK_ParametroOperativo_Estado CHECK ("Estado" IN ('ACTIVO','INACTIVO'))
 );
@@ -1546,7 +1549,10 @@ RETURNS TABLE(
     "TimerCliente"         SMALLINT,
     "ZonaHoraria"          VARCHAR(50),
     "MinutosCerca"         SMALLINT,
-    "MinutosMedio"         SMALLINT
+    "MinutosMedio"         SMALLINT,
+    "CoordLatMaps"         VARCHAR(20),
+    "CoordLonMaps"         VARCHAR(20),
+    "MetrosCercania"       DECIMAL(10,2)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -1555,7 +1561,8 @@ BEGIN
            p."TiempoTolerancia",p."FechaCreacion",p."FechaActualizacion",
            p."CreadoPor",p."ActualizadoPor",p."Estado",p."TiempoCorte",
            p."TimerAdministrativo",p."TimerCliente",p."ZonaHoraria",
-           p."MinutosCerca",p."MinutosMedio"
+           p."MinutosCerca",p."MinutosMedio",
+           p."CoordLatMaps",p."CoordLonMaps",p."MetrosCercania"
     FROM   "ParametroOperativo" p LIMIT 1;
 END;
 $$;
@@ -2093,7 +2100,7 @@ INSERT INTO "Excepcion" ("Id", "Fecha", "Motivo", "TiempoInicio", "TiempoFinal",
 SELECT setval(pg_get_serial_sequence('"Excepcion"', 'Id'), MAX("Id")) FROM "Excepcion";
 
 -- ── ParametroOperativo (1 filas) ────────────────────────────────────────
-INSERT INTO "ParametroOperativo" ("Id", "TiempoMargenManiobra", "TiempoRetornoBase", "UmbralLargaDistancia", "TiempoTolerancia", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor", "Estado", "TiempoCorte", "TimerAdministrativo", "TimerCliente", "ZonaHoraria", "MinutosCerca", "MinutosMedio") OVERRIDING SYSTEM VALUE VALUES (1, 60, 80, 20.00, 30, '2026-03-10 13:13:42.126666', NULL, 1, NULL, 'ACTIVO', 1, 15, 5, 'America/Lima', 15, 35);
+INSERT INTO "ParametroOperativo" ("Id", "TiempoMargenManiobra", "TiempoRetornoBase", "UmbralLargaDistancia", "TiempoTolerancia", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor", "Estado", "TiempoCorte", "TimerAdministrativo", "TimerCliente", "ZonaHoraria", "MinutosCerca", "MinutosMedio", "CoordLatMaps", "CoordLonMaps", "MetrosCercania") OVERRIDING SYSTEM VALUE VALUES (1, 60, 80, 20.00, 30, '2026-03-10 13:13:42.126666', NULL, 1, NULL, 'ACTIVO', 1, 15, 5, 'America/Lima', 15, 35, '', '', 0);
 SELECT setval(pg_get_serial_sequence('"ParametroOperativo"', 'Id'), MAX("Id")) FROM "ParametroOperativo";
 
 -- ── TarifarioGlobal (1 filas) ────────────────────────────────────────

@@ -89,3 +89,7 @@ C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.pdb
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\BackRomo.API.genruntimeconfig.cache
 C:\dev\back_romo\BackRomo.API\obj\Debug\net10.0\ref\BackRomo.API.dll
 C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Npgsql.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Azure.Storage.Blobs.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Azure.Storage.Common.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\Serilog.Sinks.AzureBlobStorage.dll
+C:\dev\back_romo\BackRomo.API\bin\Debug\net10.0\System.IO.Hashing.dll

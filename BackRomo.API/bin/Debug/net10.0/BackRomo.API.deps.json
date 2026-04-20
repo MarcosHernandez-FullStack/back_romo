@@ -13,6 +13,7 @@
           "Microsoft.AspNetCore.Authentication.JwtBearer": "10.0.3",
           "Microsoft.OpenApi": "3.4.0",
           "Serilog.AspNetCore": "10.0.0",
+          "Serilog.Sinks.AzureBlobStorage": "4.0.5",
           "Serilog.Sinks.Console": "6.1.1",
           "Serilog.Sinks.File": "7.0.0",
           "Swashbuckle.AspNetCore": "10.1.4"
@@ -44,6 +45,29 @@
           "lib/net8.0/Azure.Identity.dll": {
             "assemblyVersion": "1.17.1.0",
             "fileVersion": "1.1700.125.56903"
+          }
+        }
+      },
+      "Azure.Storage.Blobs/12.22.2": {
+        "dependencies": {
+          "Azure.Storage.Common": "12.21.1"
+        },
+        "runtime": {
+          "lib/net6.0/Azure.Storage.Blobs.dll": {
+            "assemblyVersion": "12.22.2.0",
+            "fileVersion": "12.2200.224.51019"
+          }
+        }
+      },
+      "Azure.Storage.Common/12.21.1": {
+        "dependencies": {
+          "Azure.Core": "1.50.0",
+          "System.IO.Hashing": "6.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/Azure.Storage.Common.dll": {
+            "assemblyVersion": "12.21.1.0",
+            "fileVersion": "12.2100.124.51010"
           }
         }
       },
@@ -357,6 +381,19 @@
           }
         }
       },
+      "Serilog.Sinks.AzureBlobStorage/4.0.5": {
+        "dependencies": {
+          "Azure.Identity": "1.17.1",
+          "Azure.Storage.Blobs": "12.22.2",
+          "Serilog": "4.3.0"
+        },
+        "runtime": {
+          "lib/net8.0/Serilog.Sinks.AzureBlobStorage.dll": {
+            "assemblyVersion": "4.0.5.0",
+            "fileVersion": "4.0.5.0"
+          }
+        }
+      },
       "Serilog.Sinks.Console/6.1.1": {
         "dependencies": {
           "Serilog": "4.3.0"
@@ -461,6 +498,14 @@
           }
         }
       },
+      "System.IO.Hashing/6.0.0": {
+        "runtime": {
+          "lib/net6.0/System.IO.Hashing.dll": {
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
+          }
+        }
+      },
       "System.Memory.Data/8.0.1": {
         "runtime": {
           "lib/net8.0/System.Memory.Data.dll": {
@@ -532,6 +577,20 @@
       "sha512": "sha512-MSZkBrctcpiGxs9Cvr2VKKoN6qFLZlP3I6xuCWJ9iTgitI5Rgxtk5gfOSpXPZE3+CJmZ/mnqpQyGyjawFn5Vvg==",
       "path": "azure.identity/1.17.1",
       "hashPath": "azure.identity.1.17.1.nupkg.sha512"
+    },
+    "Azure.Storage.Blobs/12.22.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/BK63qx31dhXjnqOXB90DP8mJM+pHbti45+v/D3SiEgP2A+ekvJlGWGLVGQznriT5UAOerM+3vAAEJNKolVSIQ==",
+      "path": "azure.storage.blobs/12.22.2",
+      "hashPath": "azure.storage.blobs.12.22.2.nupkg.sha512"
+    },
+    "Azure.Storage.Common/12.21.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-NgDJw/upcro33AgGf91sPIG+BU2pFTgGDBzWEp8HctGwzmbjG80eYTl4CJMIwgxVOQWnEXnQZXLY7w3k+BQ9ig==",
+      "path": "azure.storage.common/12.21.1",
+      "hashPath": "azure.storage.common.12.21.1.nupkg.sha512"
     },
     "Dapper/2.1.66": {
       "type": "package",
@@ -694,6 +753,13 @@
       "path": "serilog.settings.configuration/10.0.0",
       "hashPath": "serilog.settings.configuration.10.0.0.nupkg.sha512"
     },
+    "Serilog.Sinks.AzureBlobStorage/4.0.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/zClOKvhKArtznvg75v56sUfUk2zH6dMe+Z8Mx8VpW8fR5chxlMleqLfgJabZ2P3/5OpuMx+P8TBZJ2d13lCeQ==",
+      "path": "serilog.sinks.azureblobstorage/4.0.5",
+      "hashPath": "serilog.sinks.azureblobstorage.4.0.5.nupkg.sha512"
+    },
     "Serilog.Sinks.Console/6.1.1": {
       "type": "package",
       "serviceable": true,
@@ -763,6 +829,13 @@
       "sha512": "sha512-GJw3bYkWpOgvN3tJo5X4lYUeIFA2HD293FPUhKmp7qxS+g5ywAb34Dnd3cDAFLkcMohy5XTpoaZ4uAHuw0uSPQ==",
       "path": "system.identitymodel.tokens.jwt/8.0.1",
       "hashPath": "system.identitymodel.tokens.jwt.8.0.1.nupkg.sha512"
+    },
+    "System.IO.Hashing/6.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Rfm2jYCaUeGysFEZjDe7j1R4x6Z6BzumS/vUT5a1AA/AWJuGX71PoGB0RmpyX3VmrGqVnAwtfMn39OHR8Y/5+g==",
+      "path": "system.io.hashing/6.0.0",
+      "hashPath": "system.io.hashing.6.0.0.nupkg.sha512"
     },
     "System.Memory.Data/8.0.1": {
       "type": "package",

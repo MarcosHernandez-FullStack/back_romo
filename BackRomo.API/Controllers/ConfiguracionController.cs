@@ -31,7 +31,7 @@ public class ConfiguracionController : ControllerBase
         return Ok(tarifa);
     }
 
-    [Authorize(Roles = "ADMINISTRADOR")]
+    [Authorize(Roles = "ADMINISTRADOR,OPERADOR")]
     [EnableRateLimiting("lectura")]
     [RequestTimeout("corto")]
     [HttpGet("parametro-operativo")]
