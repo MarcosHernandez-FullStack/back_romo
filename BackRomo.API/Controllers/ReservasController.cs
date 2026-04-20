@@ -63,8 +63,8 @@ public class ReservasController : ControllerBase
     {
         var result = await _reservaService.ValidarHorarioAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -77,8 +77,8 @@ public class ReservasController : ControllerBase
     {
         var result = await _reservaService.CrearReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -91,8 +91,8 @@ public class ReservasController : ControllerBase
     {
         var result = await _reservaService.EliminarTimerAsync(id, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return NoContent();
     }

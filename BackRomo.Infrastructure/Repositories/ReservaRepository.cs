@@ -184,6 +184,10 @@ public class ReservaRepository : IReservaRepository
                 Id             = p.Get<int?>("_Id")
             };
         }
+        catch (OperationCanceledException)
+        {
+            return new ValidarHorarioResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
         catch (Exception ex)
         {
             return new ValidarHorarioResultDto { Exitoso = 0, Mensaje = ex.Message };
@@ -270,6 +274,10 @@ public class ReservaRepository : IReservaRepository
                 Id             = pId.Value == DBNull.Value ? null : (int?)pId.Value
             };
         }
+        catch (OperationCanceledException)
+        {
+            return new ValidarHorarioResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
         catch (Exception ex)
         {
             return new ValidarHorarioResultDto { Exitoso = 0, Mensaje = ex.Message };
@@ -306,6 +314,10 @@ public class ReservaRepository : IReservaRepository
                 Exitoso = p.Get<int>("_Exitoso"),
                 Mensaje = p.Get<string>("_Mensaje")
             };
+        }
+        catch (OperationCanceledException)
+        {
+            return new ValidarHorarioResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
         }
         catch (Exception ex)
         {

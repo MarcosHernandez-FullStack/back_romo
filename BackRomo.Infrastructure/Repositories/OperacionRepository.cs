@@ -105,6 +105,10 @@ public class OperacionRepository : IOperacionRepository
                 Mensaje = p.Get<string>("_Mensaje")
             };
         }
+        catch (OperationCanceledException)
+        {
+            return new OperacionResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
         catch (Exception ex)
         {
             return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
@@ -132,6 +136,10 @@ public class OperacionRepository : IOperacionRepository
                 Exitoso = p.Get<int>("_Exitoso"),
                 Mensaje = p.Get<string>("_Mensaje")
             };
+        }
+        catch (OperationCanceledException)
+        {
+            return new OperacionResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
         }
         catch (Exception ex)
         {
@@ -161,6 +169,10 @@ public class OperacionRepository : IOperacionRepository
                 Exitoso = p.Get<int>("_Exitoso"),
                 Mensaje = p.Get<string>("_Mensaje")
             };
+        }
+        catch (OperationCanceledException)
+        {
+            return new OperacionResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
         }
         catch (Exception ex)
         {
@@ -241,6 +253,10 @@ public class OperacionRepository : IOperacionRepository
                 Mensaje = p.Get<string>("_Mensaje")
             };
         }
+        catch (OperationCanceledException)
+        {
+            return new OperacionResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
         catch (Exception ex)
         {
             return new OperacionResultDto { Exitoso = 0, Mensaje = ex.Message };
@@ -301,6 +317,10 @@ public class OperacionRepository : IOperacionRepository
                 Mensaje        = p.Get<string>("_Mensaje"),
                 HorasConflicto = p.Get<string?>("_HorasConflicto")
             };
+        }
+        catch (OperationCanceledException)
+        {
+            return new OperacionResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
         }
         catch (Exception ex)
         {

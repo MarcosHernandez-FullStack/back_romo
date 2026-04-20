@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[10.0.0, )"
             },
+            "Serilog.Sinks.AzureBlobStorage": {
+              "target": "Package",
+              "version": "[4.0.5, )"
+            },
             "Serilog.Sinks.Console": {
               "target": "Package",
               "version": "[6.1.1, )"

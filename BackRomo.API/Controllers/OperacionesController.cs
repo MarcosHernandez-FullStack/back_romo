@@ -43,8 +43,8 @@ public class OperacionesController : ControllerBase
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var result = await _operacionService.IniciarReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -58,8 +58,8 @@ public class OperacionesController : ControllerBase
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var result = await _operacionService.FinalizarReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -73,8 +73,8 @@ public class OperacionesController : ControllerBase
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var result = await _operacionService.CancelarReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -99,8 +99,8 @@ public class OperacionesController : ControllerBase
 
         var result = await _operacionService.AsignarReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
@@ -116,8 +116,8 @@ public class OperacionesController : ControllerBase
 
         var result = await _operacionService.ReprogramarReservaAsync(dto, ct);
 
-        if (result.Exitoso == 0)
-            return Conflict(result);
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
 
         return Ok(result);
     }
