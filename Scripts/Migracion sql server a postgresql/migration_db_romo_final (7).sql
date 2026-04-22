@@ -1567,6 +1567,68 @@ BEGIN
 END;
 $$;
 
+-- ── fn_ListOperadores ────────────────────────────────────────
+DROP FUNCTION IF EXISTS fn_ListOperadores(VARCHAR);
+CREATE OR REPLACE FUNCTION fn_ListOperadores(_Estado VARCHAR)
+RETURNS TABLE(
+    "Id"                      INT,
+    "Alias"                   VARCHAR(10),
+    "NombresCompleto"         TEXT,
+    "Telefono"                VARCHAR(50),
+    "NroLicencia"             VARCHAR(9),
+    "FecVenLic"               DATE,
+    "Estado"                  VARCHAR(20),
+    "ProximaFechaServicio"    DATE,
+    "ProximaHoraServicio"     TIME,
+    "TotalServiciosAsignados" INT,
+    "TotalHorasSemanales"     INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        o."Id",
+        u."Alias",
+        (u."Nombres" || ' ' || u."Apellidos")::TEXT AS "NombresCompleto",
+        u."Telefono",
+        o."NroLicencia",
+        o."FecVenLic",
+        o."Estado",
+        prx."FechaServicio"                 AS "ProximaFechaServicio",
+        prx."HoraInicio"                    AS "ProximaHoraServicio",
+        COALESCE(cnt."Total",       0)::INT AS "TotalServiciosAsignados",
+        COALESCE(disp."TotalHoras", 0)::INT AS "TotalHorasSemanales"
+    FROM "Operador" o
+    INNER JOIN "Usuario" u ON u."Id" = o."IdUsuario"
+    LEFT JOIN LATERAL (
+        SELECT r."FechaServicio", r."HoraInicio"
+        FROM   "Reserva" r
+        WHERE  r."IdOperador"      = o."Id"
+          AND  r."Estado"          = 'ACTIVO'
+          AND  r."EstadoOperacion" NOT IN ('CANCELADO','FINALIZADO')
+          AND  r."FechaServicio"  >= CURRENT_DATE
+        ORDER BY r."FechaServicio", r."HoraInicio"
+        LIMIT 1
+    ) prx ON TRUE
+    LEFT JOIN LATERAL (
+        SELECT COUNT(*)::INT AS "Total"
+        FROM   "Reserva" r2
+        WHERE  r2."IdOperador"      = o."Id"
+          AND  r2."Estado"          = 'ACTIVO'
+          AND  r2."EstadoOperacion" NOT IN ('CANCELADO','FINALIZADO')
+          AND  r2."FechaServicio"  >= CURRENT_DATE
+    ) cnt ON TRUE
+    LEFT JOIN LATERAL (
+        SELECT SUM(EXTRACT(EPOCH FROM (d."HoraFin" - d."HoraInicio")) / 3600)::INT AS "TotalHoras"
+        FROM   "Disponibilidad" d
+        WHERE  d."IdOperador" = o."Id"
+          AND  d."Estado"     = 'ACTIVO'
+    ) disp ON TRUE
+    WHERE (_Estado IS NULL OR o."Estado" = _Estado)
+    ORDER BY o."Id";
+END;
+$$;
+
 -- ── fn_TarifarioGlobal ───────────────────────────────────────
 CREATE OR REPLACE FUNCTION fn_TarifarioGlobal()
 RETURNS TABLE("TarifaBase" DECIMAL(10,2), "TarifaKm" DECIMAL(10,2), "Estado" VARCHAR(10))

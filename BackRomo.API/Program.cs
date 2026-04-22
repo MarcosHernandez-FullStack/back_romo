@@ -42,6 +42,10 @@ builder.Services.AddScoped<IFechaService, FechaService>();
 builder.Services.AddScoped<IReservaRepository, ReservaRepository>();
 builder.Services.AddScoped<ReservaService>();
 
+// Operadores
+builder.Services.AddScoped<IOperadorRepository, OperadorRepository>();
+builder.Services.AddScoped<OperadorService>();
+
 // Operaciones
 builder.Services.AddScoped<IOperacionRepository, OperacionRepository>();
 builder.Services.AddScoped<OperacionService>();
