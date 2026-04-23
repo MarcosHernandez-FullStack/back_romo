@@ -10,14 +10,15 @@
 -- CLASIFICACIÓN DE SPs:
 --   PROCEDURE (con COMMIT/ROLLBACK + INOUT escalares):
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
---     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva
+--     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
+--     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_UpdEstadoOperador
 --
 --   FUNCTION (retorna filas, sin transacción):
 --     fn_ListClientes, fn_ListHorariosDisponibles,
 --     fn_ListHorariosReprogramacion, fn_ListReservas,
 --     fn_LoginUsuario, fn_ParametroOperativo,
 --     fn_SugerirAsignacion_Gruas, fn_SugerirAsignacion_Operadores,
---     fn_TarifarioGlobal
+--     fn_TarifarioGlobal, fn_ListDispOperador
 --
 -- MAPA DE TIPOS:
 --   DATETIME2(7)     → TIMESTAMP(6)
@@ -374,6 +375,12 @@ ALTER TABLE "Disponibilidad"
 ALTER TABLE "Operador"
     ADD CONSTRAINT fk_Operador_Usuario
         FOREIGN KEY ("IdUsuario") REFERENCES "Usuario" ("Id");
+
+ALTER TABLE "Operador"
+    ADD CONSTRAINT unq_Operador_NroLicencia UNIQUE ("NroLicencia");
+
+ALTER TABLE "Usuario"
+    ADD CONSTRAINT unq_Usuario_Alias UNIQUE ("Alias");
 
 ALTER TABLE "Reserva"
     ADD CONSTRAINT fk_Reserva_Cliente
@@ -1333,6 +1340,413 @@ BEGIN
 END;
 $$;
 
+-- ── sp_AsignarDispOperador ─────────────────────────────────────
+-- Guarda / actualiza la disponibilidad semanal de un operador.
+--
+-- Parámetros de entrada:
+--   _IdOperador     → ID del operador
+--   _Disponibilidad → JSON con array de rangos:
+--                     [{"NroDia":2,"NombreDia":"Lun","HoraInicio":"08:00","HoraFin":"13:00"}, ...]
+--   _Confirmar      → FALSE = verificar conflictos y retornar warning si los hay
+--                     TRUE  = aplicar cambios aunque haya conflictos
+--   _ActualizadoPor → ID del usuario que realiza la operación
+--
+-- Valores de salida _Exitoso:
+--   0 → Error (no se guardó)
+--   1 → Éxito
+--   3 → Advertencia: hay conflictos, requiere confirmación del usuario
+--
+-- Nota: al confirmar con conflictos, las reservas ASIGNADAS fuera del nuevo
+-- horario pasan a EstadoOperacion = 'RESERVADO' y se libera operador + grúa.
+-- ('PENDIENTE' no es un valor válido del CHECK constraint de EstadoOperacion)
+
+DROP PROCEDURE IF EXISTS sp_AsignarDispOperador(INT, TEXT, BOOLEAN, INT, INT, TEXT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_AsignarDispOperador(
+    _IdOperador      INT,
+    _Disponibilidad  TEXT,
+    _Confirmar       BOOLEAN,
+    _ActualizadoPor  INT,
+    INOUT _Exitoso   INT,
+    INOUT _Mensaje   TEXT,
+    INOUT _Conflictos TEXT
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_DispJson     JSONB;
+    v_ConflictoArr JSONB;
+    v_Count        INT;
+BEGIN
+    _Exitoso    := 0;
+    _Mensaje    := '';
+    _Conflictos := '[]';
+
+    -- Parsear JSON
+    v_DispJson := _Disponibilidad::JSONB;
+
+    -- Detectar reservas ASIGNADAS que quedarían fuera del nuevo horario
+    SELECT COALESCE(
+        jsonb_agg(
+            jsonb_build_object(
+                'IdReserva',     r."Id",
+                'FechaServicio', to_char(r."FechaServicio", 'YYYY-MM-DD'),
+                'HoraInicio',    to_char(r."HoraInicio", 'HH24:MI')
+            )
+        ),
+        '[]'::JSONB
+    )
+    INTO v_ConflictoArr
+    FROM "Reserva" r
+    WHERE r."IdOperador"      = _IdOperador
+      AND r."EstadoOperacion" = 'ASIGNADO'
+      AND r."Estado"          = 'ACTIVO'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM   jsonb_array_elements(v_DispJson) jd
+          WHERE  (jd->>'NroDia')::SMALLINT =
+                     (EXTRACT(DOW FROM r."FechaServicio")::INT + 1)::SMALLINT
+            AND  (jd->>'HoraInicio')::TIME <= r."HoraInicio"
+            AND  (jd->>'HoraFin')::TIME    >= r."HoraFin"
+      );
+
+    v_Count := jsonb_array_length(v_ConflictoArr);
+
+    -- Si hay conflictos y no se confirmó, retornar advertencia sin modificar datos
+    IF v_Count > 0 AND NOT COALESCE(_Confirmar, FALSE) THEN
+        _Exitoso    := 3;
+        _Conflictos := v_ConflictoArr::TEXT;
+        _Mensaje    := 'El operador tiene ' || v_Count ||
+                       ' reserva(s) ASIGNADA(s) en horarios que se intentan desactivar. ' ||
+                       'Si continúa, dichas reservas volverán a estado RESERVADO y ' ||
+                       'se liberará el operador y la grúa asignada. ¿Desea continuar?';
+        RETURN;
+    END IF;
+
+    -- Liberar reservas conflictivas si se confirmó
+    IF v_Count > 0 THEN
+        UPDATE "Reserva"
+        SET    "EstadoOperacion"    = 'RESERVADO',
+               "IdOperador"         = NULL,
+               "IdGrua"             = NULL,
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"     = _ActualizadoPor
+        WHERE  "IdOperador"      = _IdOperador
+          AND  "EstadoOperacion" = 'ASIGNADO'
+          AND  "Estado"          = 'ACTIVO'
+          AND  NOT EXISTS (
+              SELECT 1
+              FROM   jsonb_array_elements(v_DispJson) jd
+              WHERE  (jd->>'NroDia')::SMALLINT =
+                         (EXTRACT(DOW FROM "Reserva"."FechaServicio")::INT + 1)::SMALLINT
+                AND  (jd->>'HoraInicio')::TIME <= "Reserva"."HoraInicio"
+                AND  (jd->>'HoraFin')::TIME    >= "Reserva"."HoraFin"
+          );
+    END IF;
+
+    -- Desactivar disponibilidad actual
+    UPDATE "Disponibilidad"
+    SET    "Estado"             = 'INACTIVO',
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "IdOperador" = _IdOperador
+      AND  "Estado"     = 'ACTIVO';
+
+    -- Insertar nueva disponibilidad
+    INSERT INTO "Disponibilidad" (
+        "NroDia", "NombreDia", "Estado", "IdOperador",
+        "FechaCreacion", "CreadoPor", "HoraInicio", "HoraFin"
+    )
+    SELECT
+        (jd->>'NroDia')::SMALLINT,
+        jd->>'NombreDia',
+        'ACTIVO',
+        _IdOperador,
+        NOW(),
+        _ActualizadoPor,
+        (jd->>'HoraInicio')::TIME,
+        (jd->>'HoraFin')::TIME
+    FROM   jsonb_array_elements(v_DispJson) AS jd;
+
+    COMMIT;
+    _Exitoso    := 1;
+    _Mensaje    := 'Disponibilidad actualizada correctamente.';
+    _Conflictos := '[]';
+END;
+$$;
+
+-- ── sp_CreUpdUsuario ───────────────────────────────────────────
+-- Crea o actualiza un usuario y su tabla derivada según el rol.
+--
+-- Parámetros de entrada:
+--   _IdUsuario   → 0 = crear nuevo usuario / > 0 = actualizar existente (Usuario."Id")
+--   _Alias       → Identificador de login (único; solo se usa en creación, nunca se edita)
+--   _Contrasena  → Contraseña ya hasheada (MD5-como-GUID, uppercase).
+--                  En actualización, si viene vacío/NULL se conserva la contraseña actual.
+--   _Nombres     → Nombres del usuario
+--   _Apellidos   → Apellidos del usuario
+--   _Telefono    → Teléfono (opcional, puede ser NULL o vacío)
+--   _Correo      → Correo electrónico
+--   _Rol         → Rol del usuario: 'OPERADOR', 'CLIENTE', 'STAFF', 'ADMINISTRADOR'
+--   _NroLicencia → Número de licencia (requerido si _Rol = 'OPERADOR')
+--   _FecVenLic   → Fecha de vencimiento de licencia (requerido si _Rol = 'OPERADOR')
+--   _CreadoPor   → ID del usuario que ejecuta la operación (CreadoPor en INSERT, ActualizadoPor en UPDATE)
+--
+-- Valores de salida _Exitoso:
+--   0 → Error de validación o error interno (ver _Mensaje)
+--   1 → Éxito
+--
+-- Notas:
+--   · El alias debe ser único entre usuarios ACTIVOS (solo se valida en creación).
+--   · Para OPERADOR, el NroLicencia debe ser único entre operadores ACTIVOS (excluye el actual en actualización).
+--   · _Telefono vacío o NULL se almacena como NULL.
+
+DROP PROCEDURE IF EXISTS sp_CreUpdUsuario(INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, DATE, INT, INT, TEXT, INT);
+CREATE OR REPLACE PROCEDURE sp_CreUpdUsuario(
+    _IdUsuario      INT,
+    _Alias          VARCHAR,
+    _Contrasena     VARCHAR,
+    _Nombres        VARCHAR,
+    _Apellidos      VARCHAR,
+    _Telefono       VARCHAR,
+    _Correo         VARCHAR,
+    _Rol            VARCHAR,
+    _NroLicencia    VARCHAR,
+    _FecVenLic      DATE,
+    _CreadoPor      INT,
+    INOUT _Exitoso  INT  DEFAULT 0,
+    INOUT _Mensaje  TEXT DEFAULT '',
+    INOUT _IdNuevo  INT  DEFAULT 0
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_IdUsuario INT;
+BEGIN
+
+    -- ── CREAR ──────────────────────────────────────────────────
+    IF _IdUsuario = 0 THEN
+
+        -- Alias único entre usuarios activos
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Alias"  = _Alias
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe un usuario activo con el alias "' || _Alias || '".';
+            RETURN;
+        END IF;
+
+        -- Validaciones específicas por rol
+        CASE _Rol
+            WHEN 'OPERADOR' THEN
+                IF COALESCE(TRIM(_NroLicencia), '') = '' OR _FecVenLic IS NULL THEN
+                    ROLLBACK;
+                    _Exitoso := 0;
+                    _Mensaje := 'Para el rol OPERADOR se requieren número de licencia y fecha de vencimiento.';
+                    RETURN;
+                END IF;
+                IF EXISTS (
+                    SELECT 1 FROM "Operador"
+                    WHERE  "NroLicencia" = _NroLicencia
+                      AND  "Estado"      = 'ACTIVO'
+                ) THEN
+                    ROLLBACK;
+                    _Exitoso := 0;
+                    _Mensaje := 'Ya existe un operador activo con el número de licencia ' || _NroLicencia || '.';
+                    RETURN;
+                END IF;
+            ELSE
+                NULL;
+        END CASE;
+
+        -- Insertar en Usuario
+        INSERT INTO "Usuario" (
+            "Alias", "Contraseña", "Correo", "Nombres", "Apellidos",
+            "Rol", "Telefono", "CreadoPor"
+        ) VALUES (
+            _Alias,
+            _Contrasena,
+            _Correo,
+            _Nombres,
+            _Apellidos,
+            _Rol,
+            NULLIF(TRIM(_Telefono), ''),
+            _CreadoPor
+        )
+        RETURNING "Id" INTO v_IdUsuario;
+
+        -- Insertar tabla derivada según rol
+        CASE _Rol
+            WHEN 'OPERADOR' THEN
+                INSERT INTO "Operador" (
+                    "NroLicencia", "FecVenLic", "IdUsuario", "CreadorPor"
+                ) VALUES (
+                    _NroLicencia, _FecVenLic, v_IdUsuario, _CreadoPor
+                );
+            ELSE
+                NULL;  -- Otros roles: solo requieren registro en "Usuario"
+        END CASE;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := CASE _Rol
+            WHEN 'OPERADOR' THEN 'Operador creado exitosamente.'
+            ELSE                 'Usuario creado exitosamente.'
+        END;
+        _IdNuevo := v_IdUsuario;
+
+    -- ── ACTUALIZAR ─────────────────────────────────────────────
+    ELSE
+
+        -- Verificar que el usuario existe y está activo
+        IF NOT EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Id"     = _IdUsuario
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'El usuario no existe o no está activo.';
+            RETURN;
+        END IF;
+
+        -- Validaciones específicas por rol (actualización)
+        CASE _Rol
+            WHEN 'OPERADOR' THEN
+                IF COALESCE(TRIM(_NroLicencia), '') = '' OR _FecVenLic IS NULL THEN
+                    ROLLBACK;
+                    _Exitoso := 0;
+                    _Mensaje := 'Para el rol OPERADOR se requieren número de licencia y fecha de vencimiento.';
+                    RETURN;
+                END IF;
+                -- NroLicencia único entre operadores activos, excluyendo el actual
+                IF EXISTS (
+                    SELECT 1 FROM "Operador"
+                    WHERE  "NroLicencia" = _NroLicencia
+                      AND  "Estado"      = 'ACTIVO'
+                      AND  "IdUsuario"  <> _IdUsuario
+                ) THEN
+                    ROLLBACK;
+                    _Exitoso := 0;
+                    _Mensaje := 'Ya existe un operador activo con el número de licencia ' || _NroLicencia || '.';
+                    RETURN;
+                END IF;
+            ELSE
+                NULL;
+        END CASE;
+
+        -- Actualizar Usuario (el Alias nunca se modifica)
+        UPDATE "Usuario"
+        SET    "Contraseña"         = CASE WHEN COALESCE(TRIM(_Contrasena), '') = ''
+                                           THEN "Contraseña"
+                                           ELSE _Contrasena
+                                      END,
+               "Nombres"            = _Nombres,
+               "Apellidos"          = _Apellidos,
+               "Telefono"           = NULLIF(TRIM(_Telefono), ''),
+               "Correo"             = _Correo,
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"     = _CreadoPor
+        WHERE  "Id" = _IdUsuario;
+
+        -- Actualizar tabla derivada según rol
+        CASE _Rol
+            WHEN 'OPERADOR' THEN
+                UPDATE "Operador"
+                SET    "NroLicencia"        = _NroLicencia,
+                       "FecVenLic"          = _FecVenLic,
+                       "FechaActualizacion" = NOW(),
+                       "ActualizadoPor"     = _CreadoPor
+                WHERE  "IdUsuario" = _IdUsuario;
+            ELSE
+                NULL;
+        END CASE;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := CASE _Rol
+            WHEN 'OPERADOR' THEN 'Operador actualizado exitosamente.'
+            ELSE                 'Usuario actualizado exitosamente.'
+        END;
+        _IdNuevo := _IdUsuario;
+
+    END IF;
+
+END;
+$$;
+
+-- ── sp_UpdEstadoOperador ─────────────────────────────────────
+-- Cambia el Estado de un operador (ACTIVO ↔ INACTIVO).
+-- Actualiza tanto "Operador" como "Usuario" para sincronizar
+-- el acceso a la app móvil con el estado en el sistema.
+--
+-- Parámetros:
+--   _IdOperador     → ID de la tabla Operador
+--   _NuevoEstado    → 'ACTIVO' | 'INACTIVO'
+--   _ActualizadoPor → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoOperador(INT, VARCHAR, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoOperador(
+    _IdOperador     INT,
+    _NuevoEstado    VARCHAR(10),
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_IdUsuario INT;
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que el operador existe y obtener su IdUsuario
+    SELECT "IdUsuario" INTO v_IdUsuario
+    FROM   "Operador"
+    WHERE  "Id" = _IdOperador;
+
+    IF NOT FOUND THEN
+        _Mensaje := 'El operador no existe.';
+        RETURN;
+    END IF;
+
+    -- Verificar que no se intenta asignar el mismo estado actual
+    IF EXISTS (
+        SELECT 1 FROM "Operador"
+        WHERE  "Id"     = _IdOperador
+          AND  "Estado" = _NuevoEstado
+    ) THEN
+        _Mensaje := 'El operador ya se encuentra en estado ' || _NuevoEstado || '.';
+        RETURN;
+    END IF;
+
+    -- Actualizar estado en Operador
+    UPDATE "Operador"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdOperador;
+
+    -- Actualizar estado en Usuario (controla acceso a app móvil)
+    UPDATE "Usuario"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = v_IdUsuario;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := CASE _NuevoEstado
+        WHEN 'INACTIVO' THEN 'Operador desactivado correctamente.'
+        WHEN 'ACTIVO'   THEN 'Operador reactivado correctamente.'
+        ELSE                 'Estado actualizado correctamente.'
+    END;
+END;
+$$;
+
+
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
 -- ============================================================
@@ -1574,6 +1988,9 @@ RETURNS TABLE(
     "Id"                      INT,
     "Alias"                   VARCHAR(10),
     "NombresCompleto"         TEXT,
+    "Nombres"                 VARCHAR(100),
+    "Apellidos"               VARCHAR(100),
+    "Correo"                  VARCHAR(100),
     "Telefono"                VARCHAR(50),
     "NroLicencia"             VARCHAR(9),
     "FecVenLic"               DATE,
@@ -1590,6 +2007,9 @@ BEGIN
         o."Id",
         u."Alias",
         (u."Nombres" || ' ' || u."Apellidos")::TEXT AS "NombresCompleto",
+        u."Nombres",
+        u."Apellidos",
+        u."Correo",
         u."Telefono",
         o."NroLicencia",
         o."FecVenLic",
@@ -2015,6 +2435,115 @@ BEGIN
            );
 END;
 $$;
+
+-- ── fn_ListDispOperador ────────────────────────────────────────
+-- Retorna todos los slots ACTIVOS del operador y columnas de resumen.
+-- Si no tiene disponibilidad registrada, retorna 0 filas.
+DROP FUNCTION IF EXISTS fn_ListDispOperador(INT);
+CREATE OR REPLACE FUNCTION fn_ListDispOperador(_IdOperador INT)
+RETURNS TABLE(
+    "Id"                  INT,
+    "NroDia"              SMALLINT,
+    "NombreDia"           VARCHAR(9),
+    "HoraInicio"          TIME,
+    "HoraFin"             TIME,
+    "TotalHorasSemanales" INT,
+    "DiasActivos"         INT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    WITH resumen AS (
+        SELECT
+            COALESCE(
+                SUM(EXTRACT(EPOCH FROM (d2."HoraFin" - d2."HoraInicio")) / 3600)::INT,
+                0
+            )                              AS total_horas,
+            COUNT(DISTINCT d2."NroDia")::INT AS dias_activos
+        FROM "Disponibilidad" d2
+        WHERE d2."IdOperador" = _IdOperador
+          AND d2."Estado"     = 'ACTIVO'
+    )
+    SELECT
+        d."Id"::INT,
+        d."NroDia",
+        d."NombreDia",
+        d."HoraInicio",
+        d."HoraFin",
+        r.total_horas::INT,
+        r.dias_activos::INT
+    FROM   "Disponibilidad" d
+    CROSS  JOIN resumen r
+    WHERE  d."IdOperador" = _IdOperador
+      AND  d."Estado"     = 'ACTIVO'
+    ORDER  BY d."NroDia", d."HoraInicio";
+END;
+$$;
+
+-- ── fn_ProxServOperador ────────────────────────────────────────
+--Retorna 4 servicios próximos del operador
+DROP FUNCTION IF EXISTS fn_ProxServOperador(INT);
+CREATE OR REPLACE FUNCTION fn_ProxServOperador(
+    _IdOperador    INT
+)
+RETURNS TABLE(
+    "Id"             INT,
+    "FechaServicio"  DATE,
+    "HoraInicio"     TEXT,
+    "HoraFin"        TEXT,
+    "NomCliente"     TEXT,
+    "FechaAbreviada" TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        rva."Id"::INT,
+        rva."FechaServicio"::DATE,
+        TO_CHAR(rva."HoraInicio", 'HH24:MI'),
+        TO_CHAR(rva."HoraFin", 'HH24:MI'),
+        nte."NomContacto"::TEXT,
+        (
+            CASE EXTRACT(DOW FROM rva."FechaServicio")
+                WHEN 0 THEN 'Dom.'
+                WHEN 1 THEN 'Lun.'
+                WHEN 2 THEN 'Mar.'
+                WHEN 3 THEN 'Mié.'
+                WHEN 4 THEN 'Jue.'
+                WHEN 5 THEN 'Vie.'
+                WHEN 6 THEN 'Sáb.'
+            END
+            || ' ' ||
+            EXTRACT(DAY FROM rva."FechaServicio")::TEXT || ' ' ||
+            CASE EXTRACT(MONTH FROM rva."FechaServicio")
+                WHEN 1  THEN 'Ene.'
+                WHEN 2  THEN 'Feb.'
+                WHEN 3  THEN 'Mar.'
+                WHEN 4  THEN 'Abr.'
+                WHEN 5  THEN 'May.'
+                WHEN 6  THEN 'Jun.'
+                WHEN 7  THEN 'Jul.'
+                WHEN 8  THEN 'Ago.'
+                WHEN 9  THEN 'Sep.'
+                WHEN 10 THEN 'Oct.'
+                WHEN 11 THEN 'Nov.'
+                WHEN 12 THEN 'Dic.'
+            END
+            || ' ' ||
+            EXTRACT(YEAR FROM rva."FechaServicio")::TEXT
+        )
+    FROM  "Reserva"  AS rva
+    INNER JOIN "Cliente" AS nte ON rva."IdCliente" = nte."Id"
+    WHERE rva."IdOperador"       = _IdOperador
+      AND rva."FechaServicio"::DATE >= CURRENT_DATE
+      AND rva."Estado"              = 'ACTIVO'
+      AND rva."EstadoOperacion"    != 'CANCELADO'
+    ORDER BY rva."FechaServicio" ASC
+    LIMIT 4;
+
+END;
+$$;
+
 
 
 -- ============================================================

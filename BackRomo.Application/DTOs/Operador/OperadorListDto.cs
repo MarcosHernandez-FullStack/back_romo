@@ -5,6 +5,9 @@ public class OperadorListDto
     public int     Id                      { get; set; }
     public string  Alias                   { get; set; } = string.Empty;
     public string  NombresCompleto         { get; set; } = string.Empty;
+    public string  Nombres                 { get; set; } = string.Empty;
+    public string  Apellidos               { get; set; } = string.Empty;
+    public string  Correo                  { get; set; } = string.Empty;
     public string? Telefono                { get; set; }
     public string  NroLicencia             { get; set; } = string.Empty;
     public DateOnly FecVenLic              { get; set; }
