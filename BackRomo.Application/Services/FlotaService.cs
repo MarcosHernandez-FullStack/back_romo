@@ -24,6 +24,15 @@ public class FlotaService
     public async Task<UnidadResultDto> DarDeBajaGruaAsync(DarDeBajaUnidadDto dto, CancellationToken ct = default)
         => await _flotaRepository.DarDeBajaGruaAsync(dto, ct);
 
+    public async Task<UnidadResultDto> IngresoTallerAsync(IngresoTallerDto dto, CancellationToken ct = default)
+        => await _flotaRepository.IngresoTallerAsync(dto, ct);
+
+    public async Task<UnidadResultDto> RetornoOperativaAsync(RetornoOperativaDto dto, CancellationToken ct = default)
+        => await _flotaRepository.RetornoOperativaAsync(dto, ct);
+
+    public async Task<IEnumerable<ReservaALiberarDto>> ListarReservasALiberarAsync(int idGrua, CancellationToken ct = default)
+        => await _flotaRepository.ListarReservasALiberarAsync(idGrua, ct);
+
     public async Task<IEnumerable<BitaMantDto>> ListarBitaMantAsync(int idGrua, CancellationToken ct = default)
         => await _flotaRepository.ListarBitaMantAsync(idGrua, ct);
 }

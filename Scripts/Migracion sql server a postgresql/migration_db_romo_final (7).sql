@@ -12,11 +12,12 @@
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
 --     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
 --     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_UpdEstadoOperador,
---     sp_CreUpdGrua, sp_UpdEstadoGrua
+--     sp_CreUpdGrua, sp_UpdEstadoGrua,
+--     sp_IngresoTaller, sp_RetornoOperativa
 --
 --   FUNCTION (retorna filas, sin transacción):
 --     fn_ListClientes, fn_ListHorariosDisponibles,
---     fn_ListHorariosReprogramacion, fn_ListReservas,
+--     fn_ListHorariosReprogramacion, fn_ListReservas, fn_ListReservasALiberar,
 --     fn_LoginUsuario, fn_ParametroOperativo,
 --     fn_SugerirAsignacion_Gruas, fn_SugerirAsignacion_Operadores,
 --     fn_TarifarioGlobal, fn_ListDispOperador, fn_ListGruas,
@@ -1370,18 +1371,21 @@ CREATE OR REPLACE PROCEDURE sp_AsignarDispOperador(
     _Confirmar       BOOLEAN,
     _ActualizadoPor  INT,
     INOUT _Exitoso   INT,
-    INOUT _Mensaje   TEXT,
-    INOUT _Conflictos TEXT
+    INOUT _Mensaje   TEXT
 )
 LANGUAGE plpgsql AS $$
 DECLARE
-    v_DispJson     JSONB;
-    v_ConflictoArr JSONB;
-    v_Count        INT;
+    v_DispJson           JSONB;
+    v_ConflictoArr       JSONB;
+    v_Count              INT;
+    v_ListaConflictos    TEXT;
+    v_FechaCreacion      TIMESTAMP(6);
+    v_CreadoPor          INT;
+    v_FechaActualizacion TIMESTAMP(6);
+    v_ActualizadoPor     INT;
 BEGIN
-    _Exitoso    := 0;
-    _Mensaje    := '';
-    _Conflictos := '[]';
+    _Exitoso := 0;
+    _Mensaje := '';
 
     -- Parsear JSON
     v_DispJson := _Disponibilidad::JSONB;
@@ -1415,12 +1419,21 @@ BEGIN
 
     -- Si hay conflictos y no se confirmó, retornar advertencia sin modificar datos
     IF v_Count > 0 AND NOT COALESCE(_Confirmar, FALSE) THEN
-        _Exitoso    := 3;
-        _Conflictos := v_ConflictoArr::TEXT;
-        _Mensaje    := 'El operador tiene ' || v_Count ||
-                       ' reserva(s) ASIGNADA(s) en horarios que se intentan desactivar. ' ||
+        SELECT string_agg(
+            '• Reserva #' || (elem->>'IdReserva') ||
+            ' — ' || to_char((elem->>'FechaServicio')::DATE, 'DD/MM/YYYY') ||
+            ' a las ' || (elem->>'HoraInicio'),
+            E'\n' ORDER BY (elem->>'FechaServicio'), (elem->>'HoraInicio')
+        )
+        INTO v_ListaConflictos
+        FROM jsonb_array_elements(v_ConflictoArr) AS elem;
+
+        _Exitoso := 3;
+        _Mensaje := 'El operador tiene ' || v_Count ||
+                       ' reserva(s) ASIGNADA(s) que quedarían fuera del nuevo horario:' || E'\n' ||
+                       v_ListaConflictos || E'\n\n' ||
                        'Si continúa, dichas reservas volverán a estado RESERVADO y ' ||
-                       'se liberará el operador y la grúa asignada. ¿Desea continuar?';
+                       'se liberará el operador asignado. ¿Desea continuar?';
         RETURN;
     END IF;
 
@@ -1429,7 +1442,7 @@ BEGIN
         UPDATE "Reserva"
         SET    "EstadoOperacion"    = 'RESERVADO',
                "IdOperador"         = NULL,
-               "IdGrua"             = NULL,
+               --"IdGrua"             = NULL,
                "FechaActualizacion" = NOW(),
                "ActualizadoPor"     = _ActualizadoPor
         WHERE  "IdOperador"      = _IdOperador
@@ -1445,34 +1458,64 @@ BEGIN
           );
     END IF;
 
-    -- Desactivar disponibilidad actual
-    UPDATE "Disponibilidad"
-    SET    "Estado"             = 'INACTIVO',
-           "FechaActualizacion" = NOW(),
-           "ActualizadoPor"     = _ActualizadoPor
+    -- Recuperar auditoría del registro original más antiguo (si existe)
+    -- Primera vez → FechaCreacion/CreadoPor son del momento actual
+    -- Actualización → se heredan del registro eliminado más antiguo
+    SELECT "FechaCreacion", "CreadoPor"
+    INTO   v_FechaCreacion, v_CreadoPor
+    FROM   "Disponibilidad"
     WHERE  "IdOperador" = _IdOperador
-      AND  "Estado"     = 'ACTIVO';
+    ORDER BY "FechaCreacion" ASC
+    LIMIT 1;
+
+    IF v_FechaCreacion IS NOT NULL THEN
+        -- Actualización: preservar autoría original, registrar quién actualizó
+        v_FechaActualizacion := NOW();
+        v_ActualizadoPor     := _ActualizadoPor;
+    ELSE
+        -- Primera asignación: toda la auditoría apunta a la creación actual
+        v_FechaCreacion      := NOW();
+        v_CreadoPor          := _ActualizadoPor;
+        v_FechaActualizacion := NULL;
+        v_ActualizadoPor     := NULL;
+    END IF;
+
+    -- Eliminar disponibilidad anterior
+    DELETE FROM "Disponibilidad"
+    WHERE  "IdOperador" = _IdOperador;
 
     -- Insertar nueva disponibilidad
+    -- NombreDia se deriva de NroDia en el SP (Domingo=1 … Sábado=7)
     INSERT INTO "Disponibilidad" (
         "NroDia", "NombreDia", "Estado", "IdOperador",
-        "FechaCreacion", "CreadoPor", "HoraInicio", "HoraFin"
+        "FechaCreacion", "FechaActualizacion",
+        "CreadoPor", "ActualizadoPor",
+        "HoraInicio", "HoraFin"
     )
     SELECT
         (jd->>'NroDia')::SMALLINT,
-        jd->>'NombreDia',
+        CASE (jd->>'NroDia')::SMALLINT
+            WHEN 1 THEN 'Domingo'
+            WHEN 2 THEN 'Lunes'
+            WHEN 3 THEN 'Martes'
+            WHEN 4 THEN 'Miércoles'
+            WHEN 5 THEN 'Jueves'
+            WHEN 6 THEN 'Viernes'
+            WHEN 7 THEN 'Sábado'
+        END,
         'ACTIVO',
         _IdOperador,
-        NOW(),
-        _ActualizadoPor,
+        v_FechaCreacion,
+        v_FechaActualizacion,
+        v_CreadoPor,
+        v_ActualizadoPor,
         (jd->>'HoraInicio')::TIME,
         (jd->>'HoraFin')::TIME
     FROM   jsonb_array_elements(v_DispJson) AS jd;
 
     COMMIT;
-    _Exitoso    := 1;
-    _Mensaje    := 'Disponibilidad actualizada correctamente.';
-    _Conflictos := '[]';
+    _Exitoso := 1;
+    _Mensaje := 'Disponibilidad actualizada correctamente.';
 END;
 $$;
 
@@ -1910,6 +1953,155 @@ END;
 $$;
 
 
+-- ── sp_IngresoTaller ──────────────────────────────────────────
+-- Envía una grúa OPERATIVA al taller:
+--   · Libera solo las reservas ASIGNADAS con FechaServicio >= CURRENT_DATE:
+--     IdGrua → NULL, EstadoOperacion → 'RESERVADO'
+--     (las reservas pasadas ya se ejecutaron; no se modifican)
+--   · Registra el ingreso en BitacoraMantenimiento con EstadoOperacion='ENTALLER'
+--   · Cambia EstadoOperacion → 'ENTALLER'
+--
+-- Parámetros:
+--   _IdGrua            → ID de la tabla Grua
+--   _NombreResponsable → Nombre del responsable que recibe la unidad en taller
+--   _Kilometraje       → Kilometraje actual del odómetro al ingreso
+--   _Nota              → Motivo del ingreso a taller (nullable)
+--   _ActualizadoPor    → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_IngresoTaller(INT, VARCHAR, INT, TEXT, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_IngresoTaller(
+    _IdGrua            INT,
+    _NombreResponsable VARCHAR(50),
+    _Kilometraje       INT,
+    _Nota              TEXT,
+    _ActualizadoPor    INT,
+    INOUT _Exitoso     INT,
+    INOUT _Mensaje     TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que la grúa existe, está activa y en estado operativa
+    IF NOT EXISTS (
+        SELECT 1 FROM "Grua"
+        WHERE  "Id"              = _IdGrua
+          AND  "Estado"          = 'ACTIVO'
+          AND  "EstadoOperacion" = 'OPERATIVA'
+    ) THEN
+        _Mensaje := 'La grúa no existe, no está activa o ya se encuentra en taller.';
+        RETURN;
+    END IF;
+
+    -- Liberar reservas asignadas futuras: limpiar IdGrua y revertir a RESERVADO
+    -- Solo FechaServicio >= CURRENT_DATE; las pasadas ya se ejecutaron
+    UPDATE "Reserva"
+    SET    "IdGrua"              = NULL,
+           "EstadoOperacion"     = 'RESERVADO',
+           "FechaActualizacion"  = NOW(),
+           "ActualizadoPor"      = _ActualizadoPor
+    WHERE  "IdGrua"              = _IdGrua
+      AND  "EstadoOperacion"     = 'ASIGNADO'
+      AND  "FechaServicio"      >= CURRENT_DATE
+      AND  "Estado"              = 'ACTIVO';
+
+    -- Registrar ingreso en bitácora de mantenimiento
+    INSERT INTO "BitacoraMantenimiento" (
+        "NombreResponsable", "Nota", "Kilometraje",
+        "EstadoOperacion",   "IdGrua", "CreadoPor"
+    ) VALUES (
+        TRIM(_NombreResponsable),
+        NULLIF(TRIM(_Nota), ''),
+        _Kilometraje,
+        'ENTALLER',
+        _IdGrua,
+        _ActualizadoPor
+    );
+
+    -- Cambiar EstadoOperacion de la grúa a ENTALLER
+    UPDATE "Grua"
+    SET    "EstadoOperacion"     = 'ENTALLER',
+           "FechaActualizacion"  = NOW(),
+           "ActualizadoPor"      = _ActualizadoPor
+    WHERE  "Id" = _IdGrua;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := 'Grúa enviada a taller. Las reservas que estaban asignadas se liberaron correctamente.';
+END;
+$$;
+
+
+-- ── sp_RetornoOperativa ───────────────────────────────────────
+-- Retorna una grúa EN TALLER a estado OPERATIVA:
+--   · Registra el cierre de mantenimiento en BitacoraMantenimiento
+--   · Cambia EstadoOperacion → 'OPERATIVA'
+--
+-- Parámetros:
+--   _IdGrua            → ID de la tabla Grua
+--   _NombreResponsable → Nombre del responsable del mantenimiento
+--   _Kilometraje       → Kilometraje actual del odómetro al retorno
+--   _Nota              → Descripción del trabajo realizado (nullable)
+--   _ActualizadoPor    → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_RetornoOperativa(INT, VARCHAR, INT, TEXT, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_RetornoOperativa(
+    _IdGrua            INT,
+    _NombreResponsable VARCHAR(50),
+    _Kilometraje       INT,
+    _Nota              TEXT,
+    _ActualizadoPor    INT,
+    INOUT _Exitoso     INT,
+    INOUT _Mensaje     TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que la grúa existe, está activa y en taller
+    IF NOT EXISTS (
+        SELECT 1 FROM "Grua"
+        WHERE  "Id"              = _IdGrua
+          AND  "Estado"          = 'ACTIVO'
+          AND  "EstadoOperacion" = 'ENTALLER'
+    ) THEN
+        _Mensaje := 'La grúa no existe, no está activa o no se encuentra en taller.';
+        RETURN;
+    END IF;
+
+    -- Registrar cierre de mantenimiento en bitácora
+    INSERT INTO "BitacoraMantenimiento" (
+        "NombreResponsable", "Nota", "Kilometraje",
+        "EstadoOperacion",   "IdGrua", "CreadoPor"
+    ) VALUES (
+        TRIM(_NombreResponsable),
+        NULLIF(TRIM(_Nota), ''),
+        _Kilometraje,
+        'OPERATIVA',
+        _IdGrua,
+        _ActualizadoPor
+    );
+
+    -- Retornar la grúa a estado operativa
+    UPDATE "Grua"
+    SET    "EstadoOperacion"     = 'OPERATIVA',
+           "FechaActualizacion"  = NOW(),
+           "ActualizadoPor"      = _ActualizadoPor
+    WHERE  "Id" = _IdGrua;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := 'Grúa retornada a operativa correctamente.';
+END;
+$$;
+
+
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
 -- ============================================================
@@ -1947,12 +2139,13 @@ END;
 $$;
 
 -- ── fn_ListReservas ──────────────────────────────────────────
-DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, INT);
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion VARCHAR(20),
     _Id              INT,
     _FechaServicio   DATE,
-    _IdOperador      INT
+    _IdOperador      INT,
+    _IdGrua          INT
 )
 RETURNS TABLE(
     "Id"               INT,
@@ -2022,10 +2215,49 @@ BEGIN
       AND  (_Id              IS NULL OR r."Id"              = _Id)
       AND  (_FechaServicio   IS NULL OR r."FechaServicio"   = _FechaServicio)
       AND  (_IdOperador      IS NULL OR r."IdOperador"      = _IdOperador)
+      AND  (_IdGrua          IS NULL OR r."IdGrua"          = _IdGrua)
       AND  r."Estado" = 'ACTIVO'
     ORDER BY r."FechaServicio", r."HoraInicio", r."HoraFin", r."Id";
 END;
 $$;
+
+
+-- ── fn_ListReservasALiberar ───────────────────────────────────
+-- Retorna las reservas ASIGNADAS a una grúa con FechaServicio
+-- mayor o igual a la fecha actual. Solo estas reservas deben
+-- liberarse al enviar la grúa a taller; las pasadas ya se
+-- ejecutaron y no corresponde modificarlas.
+--
+-- Parámetros:
+--   _IdGrua → ID de la tabla Grua
+
+DROP FUNCTION IF EXISTS fn_ListReservasALiberar(INT);
+CREATE OR REPLACE FUNCTION fn_ListReservasALiberar(_IdGrua INT)
+RETURNS TABLE(
+    "Id"              INT,
+    "FechaServicio"   TEXT,
+    "HoraInicio"      TEXT,
+    "NombreCliente"   TEXT,
+    "EstadoOperacion" VARCHAR(50)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT r."Id",
+           TO_CHAR(r."FechaServicio", 'YYYY-MM-DD'),
+           TO_CHAR(r."HoraInicio",    'HH24:MI'),
+           c."Empresa"::TEXT,
+           r."EstadoOperacion"
+    FROM   "Reserva" r
+    JOIN   "Cliente" c ON c."Id" = r."IdCliente"
+    WHERE  r."IdGrua"          = _IdGrua
+      AND  r."EstadoOperacion" = 'ASIGNADO'
+      AND  r."FechaServicio"  >= CURRENT_DATE
+      AND  r."Estado"          = 'ACTIVO'
+    ORDER BY r."FechaServicio", r."HoraInicio";
+END;
+$$;
+
 
 -- ── fn_LoginUsuario ──────────────────────────────────────────
 DROP FUNCTION IF EXISTS fn_LoginUsuario(VARCHAR, VARCHAR);

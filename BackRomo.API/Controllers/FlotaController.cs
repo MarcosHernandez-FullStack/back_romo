@@ -80,6 +80,54 @@ public class FlotaController : ControllerBase
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
+    [HttpGet("{idGrua:int}/reservas-a-liberar")]
+    public async Task<IActionResult> ListarReservasALiberar(int idGrua, CancellationToken ct)
+    {
+        var reservas = await _flotaService.ListarReservasALiberarAsync(idGrua, ct);
+        return Ok(reservas);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPut("{idGrua:int}/taller")]
+    public async Task<IActionResult> IngresoTaller(
+        int idGrua,
+        [FromBody] IngresoTallerDto dto,
+        CancellationToken ct)
+    {
+        dto.IdGrua         = idGrua;
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _flotaService.IngresoTallerAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPut("{idGrua:int}/operativa")]
+    public async Task<IActionResult> RetornoOperativa(
+        int idGrua,
+        [FromBody] RetornoOperativaDto dto,
+        CancellationToken ct)
+    {
+        dto.IdGrua         = idGrua;
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _flotaService.RetornoOperativaAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
     [HttpDelete("{idGrua:int}")]

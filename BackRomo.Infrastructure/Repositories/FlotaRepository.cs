@@ -150,4 +150,86 @@ public class FlotaRepository : IFlotaRepository
             return new UnidadResultDto { Exitoso = 0, Mensaje = ex.Message };
         }
     }
+
+    public async Task<IEnumerable<ReservaALiberarDto>> ListarReservasALiberarAsync(int idGrua, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+
+        return await conn.QueryAsync<ReservaALiberarDto>(new CommandDefinition(
+            "SELECT * FROM fn_ListReservasALiberar(@IdGrua)",
+            new { IdGrua = idGrua },
+            commandType: CommandType.Text,
+            cancellationToken: ct
+        ));
+    }
+
+    public async Task<UnidadResultDto> IngresoTallerAsync(IngresoTallerDto dto, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdGrua",            dto.IdGrua,            DbType.Int32);
+            p.Add("_NombreResponsable", dto.NombreResponsable, DbType.String);
+            p.Add("_Kilometraje",       dto.Kilometraje,       DbType.Int32);
+            p.Add("_Nota",              dto.Nota,              DbType.String);
+            p.Add("_ActualizadoPor",    dto.ActualizadoPor,    DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_IngresoTaller(@_IdGrua, @_NombreResponsable, @_Kilometraje, @_Nota, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new UnidadResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje"),
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            return new UnidadResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si la grúa fue enviada a taller." };
+        }
+        catch (Exception ex)
+        {
+            return new UnidadResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
+
+    public async Task<UnidadResultDto> RetornoOperativaAsync(RetornoOperativaDto dto, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdGrua",            dto.IdGrua,            DbType.Int32);
+            p.Add("_NombreResponsable", dto.NombreResponsable, DbType.String);
+            p.Add("_Kilometraje",       dto.Kilometraje,       DbType.Int32);
+            p.Add("_Nota",              dto.Nota,              DbType.String);
+            p.Add("_ActualizadoPor",    dto.ActualizadoPor,    DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_RetornoOperativa(@_IdGrua, @_NombreResponsable, @_Kilometraje, @_Nota, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new UnidadResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje"),
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            return new UnidadResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si la grúa fue retornada a operativa." };
+        }
+        catch (Exception ex)
+        {
+            return new UnidadResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
 }

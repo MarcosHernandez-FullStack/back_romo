@@ -96,27 +96,15 @@ public class OperadorRepository : IOperadorRepository
             p.Add("_Disponibilidad",  dispJson,            DbType.String);
             p.Add("_Confirmar",       dto.Confirmar,       DbType.Boolean);
             p.Add("_ActualizadoPor",  dto.ActualizadoPor, DbType.Int32);
-            p.Add("_Exitoso",    value: 0,    dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
-            p.Add("_Mensaje",    value: "",   dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
-            p.Add("_Conflictos", value: "[]", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 4000);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 2000);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_AsignarDispOperador(@_IdOperador, @_Disponibilidad, @_Confirmar, @_ActualizadoPor, @_Exitoso, @_Mensaje, @_Conflictos)",
+                "CALL sp_AsignarDispOperador(@_IdOperador, @_Disponibilidad, @_Confirmar, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 
-            var exitoso    = p.Get<int>("_Exitoso");
-            var mensaje    = p.Get<string>("_Mensaje");
-            var conflictos = p.Get<string?>("_Conflictos");
-
-            List<DispConflictoDto>? conflictoList = null;
-            if (!string.IsNullOrWhiteSpace(conflictos) && conflictos != "[]")
-            {
-                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                conflictoList = JsonSerializer.Deserialize<List<DispConflictoDto>>(conflictos, opts);
-            }
-
-            return new DispResultDto { Exitoso = exitoso, Mensaje = mensaje, Conflictos = conflictoList };
+            return new DispResultDto { Exitoso = p.Get<int>("_Exitoso"), Mensaje = p.Get<string>("_Mensaje") };
         }
         catch (OperationCanceledException)
         {

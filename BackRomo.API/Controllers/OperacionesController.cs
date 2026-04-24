@@ -28,9 +28,10 @@ public class OperacionesController : ControllerBase
         [FromQuery] int?      id,
         [FromQuery] DateTime? fechaServicio,
         [FromQuery] int?      idOperador,
+        [FromQuery] int?      idGrua,
         CancellationToken     ct)
     {
-        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador, ct);
+        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador, idGrua, ct);
         return Ok(reservas);
     }
 
