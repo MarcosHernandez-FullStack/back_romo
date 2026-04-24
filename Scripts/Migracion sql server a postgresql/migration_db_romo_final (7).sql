@@ -11,7 +11,8 @@
 --   PROCEDURE (con COMMIT/ROLLBACK + INOUT escalares):
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
 --     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
---     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_UpdEstadoOperador,
+--     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_CreUpdCliente,
+--     sp_UpdEstadoOperador,
 --     sp_CreUpdGrua, sp_UpdEstadoGrua,
 --     sp_IngresoTaller, sp_RetornoOperativa
 --
@@ -1721,6 +1722,154 @@ BEGIN
 END;
 $$;
 
+-- ── sp_CreUpdCliente ───────────────────────────────────────────
+-- Crea o actualiza un cliente B2B junto a su registro en Usuario.
+--
+-- Parámetros de entrada:
+--   _IdCliente      → 0 = crear nuevo cliente / > 0 = actualizar existente (Cliente."Id")
+--   _Alias          → Identificador de login (único entre usuarios ACTIVOS; solo se usa en creación)
+--   _Contrasena     → Contraseña ya hasheada. En actualización, si viene vacío/NULL se conserva la actual.
+--   _Empresa        → Razón social del cliente
+--   _NomContacto    → Nombre del contacto principal
+--   _NroContacto    → Teléfono de contacto
+--   _CorreoContacto → Correo electrónico
+--   _TarifaBase     → Tarifa base personalizada (0 = usar tarifa global del sistema)
+--   _TarifaKm       → Tarifa por kilómetro personalizada (0 = usar tarifa global del sistema)
+--   _CreadoPor      → ID del usuario que ejecuta la operación
+--
+-- Valores de salida _Exitoso:
+--   0 → Error de validación o error interno (ver _Mensaje)
+--   1 → Éxito
+--
+-- Notas:
+--   · El alias debe ser único entre usuarios ACTIVOS (solo se valida en creación).
+--   · El alias nunca se modifica en actualización.
+--   · _NroContacto vacío o NULL se almacena como cadena vacía (columna NOT NULL).
+
+DROP PROCEDURE IF EXISTS sp_CreUpdCliente(INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, DECIMAL, DECIMAL, INT, INT, TEXT, INT);
+CREATE OR REPLACE PROCEDURE sp_CreUpdCliente(
+    _IdCliente      INT,
+    _Alias          VARCHAR,
+    _Contrasena     VARCHAR,
+    _Empresa        VARCHAR,
+    _NomContacto    VARCHAR,
+    _NroContacto    VARCHAR,
+    _CorreoContacto VARCHAR,
+    _TarifaBase     DECIMAL,
+    _TarifaKm       DECIMAL,
+    _CreadoPor      INT,
+    INOUT _Exitoso  INT  DEFAULT 0,
+    INOUT _Mensaje  TEXT DEFAULT '',
+    INOUT _IdNuevo  INT  DEFAULT 0
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_IdUsuario INT;
+BEGIN
+
+    -- ── CREAR ──────────────────────────────────────────────────
+    IF _IdCliente = 0 THEN
+
+        -- Alias único entre usuarios activos
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Alias"  = TRIM(_Alias)
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe un usuario activo con el alias "' || TRIM(_Alias) || '".';
+            RETURN;
+        END IF;
+
+        -- Insertar en Usuario con rol CLIENTE
+        INSERT INTO "Usuario" (
+            "Alias", "Contraseña", "Correo", "Nombres", "Apellidos",
+            "Rol", "Telefono", "CreadoPor"
+        ) VALUES (
+            TRIM(_Alias),
+            _Contrasena,
+            TRIM(_CorreoContacto),
+            TRIM(_NomContacto),
+            '',
+            'CLIENTE',
+            NULLIF(TRIM(_NroContacto), ''),
+            _CreadoPor
+        )
+        RETURNING "Id" INTO v_IdUsuario;
+
+        -- Insertar en Cliente
+        INSERT INTO "Cliente" (
+            "Empresa", "NomContacto", "NroContacto", "CorreoContacto",
+            "TarifaBase", "TarifaKm", "IdUsuario", "CreadoPor"
+        ) VALUES (
+            TRIM(_Empresa),
+            TRIM(_NomContacto),
+            COALESCE(NULLIF(TRIM(_NroContacto), ''), ''),
+            TRIM(_CorreoContacto),
+            _TarifaBase,
+            _TarifaKm,
+            v_IdUsuario,
+            _CreadoPor
+        )
+        RETURNING "Id" INTO _IdNuevo;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := 'Cliente creado exitosamente.';
+
+    -- ── ACTUALIZAR ─────────────────────────────────────────────
+    ELSE
+
+        -- Verificar que el cliente existe y está activo; obtener su IdUsuario
+        SELECT "IdUsuario" INTO v_IdUsuario
+        FROM   "Cliente"
+        WHERE  "Id"     = _IdCliente
+          AND  "Estado" = 'ACTIVO';
+
+        IF NOT FOUND THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'El cliente no existe o no está activo.';
+            RETURN;
+        END IF;
+
+        -- Actualizar Usuario (Alias nunca se modifica)
+        UPDATE "Usuario"
+        SET    "Contraseña"         = CASE WHEN COALESCE(TRIM(_Contrasena), '') = ''
+                                           THEN "Contraseña"
+                                           ELSE _Contrasena
+                                      END,
+               "Nombres"            = TRIM(_NomContacto),
+               "Correo"             = TRIM(_CorreoContacto),
+               "Telefono"           = NULLIF(TRIM(_NroContacto), ''),
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"     = _CreadoPor
+        WHERE  "Id" = v_IdUsuario;
+
+        -- Actualizar Cliente
+        UPDATE "Cliente"
+        SET    "Empresa"            = TRIM(_Empresa),
+               "NomContacto"       = TRIM(_NomContacto),
+               "NroContacto"       = COALESCE(NULLIF(TRIM(_NroContacto), ''), ''),
+               "CorreoContacto"    = TRIM(_CorreoContacto),
+               "TarifaBase"        = _TarifaBase,
+               "TarifaKm"          = _TarifaKm,
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"    = _CreadoPor
+        WHERE  "Id" = _IdCliente;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := 'Cliente actualizado exitosamente.';
+        _IdNuevo := _IdCliente;
+
+    END IF;
+
+END;
+$$;
+
+
 -- ── sp_UpdEstadoOperador ─────────────────────────────────────
 -- Cambia el Estado de un operador (ACTIVO ↔ INACTIVO).
 -- Actualiza tanto "Operador" como "Usuario" para sincronizar
@@ -2109,28 +2258,45 @@ $$;
 -- ────────────────────────────────────────────────────────────
 
 -- ── fn_ListClientes ──────────────────────────────────────────
+-- Retorna los clientes B2B con sus credenciales de acceso y el
+-- tipo de tarifa calculado:
+--   TipoTarifaBase / TipoTarifaKm: 'GLOBAL' si el valor = 0
+--   (se aplica el tarifario global del sistema), 'CUSTOM' si > 0.
+
+DROP FUNCTION IF EXISTS fn_ListClientes(VARCHAR, INT);
 CREATE OR REPLACE FUNCTION fn_ListClientes(
     _Estado VARCHAR(20),
     _Id     INT
 )
 RETURNS TABLE(
-    "Id"             INT,
-    "Empresa"        VARCHAR(100),
-    "NomContacto"    VARCHAR(100),
-    "NroContacto"    VARCHAR(20),
-    "CorreoContacto" VARCHAR(100),
-    "TarifaBase"     DECIMAL(10,2),
-    "TarifaKm"       DECIMAL(10,2),
-    "Estado"         VARCHAR(20),
-    "Alias"          VARCHAR(10),
-    "Contraseña"     VARCHAR(100)
+    "Id"              INT,
+    "Empresa"         VARCHAR(100),
+    "NomContacto"     VARCHAR(100),
+    "NroContacto"     VARCHAR(20),
+    "CorreoContacto"  VARCHAR(100),
+    "TarifaBase"      DECIMAL(10,2),
+    "TarifaKm"        DECIMAL(10,2),
+    "TipoTarifaBase"  VARCHAR(10),
+    "TipoTarifaKm"    VARCHAR(10),
+    "Estado"          VARCHAR(20),
+    "Alias"           VARCHAR(10),
+    "Contraseña"      VARCHAR(100)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT nte."Id",nte."Empresa",nte."NomContacto",nte."NroContacto",
-           nte."CorreoContacto",nte."TarifaBase",nte."TarifaKm",nte."Estado",
-           rio."Alias",rio."Contraseña"
+    SELECT nte."Id",
+           nte."Empresa",
+           nte."NomContacto",
+           nte."NroContacto",
+           nte."CorreoContacto",
+           nte."TarifaBase",
+           nte."TarifaKm",
+           CASE WHEN nte."TarifaBase" = 0 THEN 'GLOBAL' ELSE 'CUSTOM' END::VARCHAR(10),
+           CASE WHEN nte."TarifaKm"   = 0 THEN 'GLOBAL' ELSE 'CUSTOM' END::VARCHAR(10),
+           nte."Estado",
+           rio."Alias",
+           rio."Contraseña"
     FROM   "Cliente" nte
     INNER JOIN "Usuario" rio ON nte."IdUsuario" = rio."Id"
     WHERE  (_Estado IS NULL OR nte."Estado" = _Estado)
