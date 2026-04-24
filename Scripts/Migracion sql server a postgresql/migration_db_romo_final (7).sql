@@ -11,14 +11,16 @@
 --   PROCEDURE (con COMMIT/ROLLBACK + INOUT escalares):
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
 --     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
---     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_UpdEstadoOperador
+--     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_UpdEstadoOperador,
+--     sp_CreUpdGrua, sp_UpdEstadoGrua
 --
 --   FUNCTION (retorna filas, sin transacción):
 --     fn_ListClientes, fn_ListHorariosDisponibles,
 --     fn_ListHorariosReprogramacion, fn_ListReservas,
 --     fn_LoginUsuario, fn_ParametroOperativo,
 --     fn_SugerirAsignacion_Gruas, fn_SugerirAsignacion_Operadores,
---     fn_TarifarioGlobal, fn_ListDispOperador
+--     fn_TarifarioGlobal, fn_ListDispOperador, fn_ListGruas,
+--     fn_ListBitaMant
 --
 -- MAPA DE TIPOS:
 --   DATETIME2(7)     → TIMESTAMP(6)
@@ -226,14 +228,15 @@ CREATE TABLE "BitacoraMantenimiento" (
     "Nota"               TEXT          NULL,
     "Kilometraje"        INT           NOT NULL,
     "Estado"             VARCHAR(10)   NOT NULL DEFAULT 'ACTIVO',
+    "EstadoOperacion"    VARCHAR(20)   NOT NULL DEFAULT 'ENTALLER',
     "IdGrua"             INT           NOT NULL,
     "FechaCreacion"      TIMESTAMP(6)  NOT NULL DEFAULT NOW(),
     "FechaActualizacion" TIMESTAMP(6)  NULL,
     "CreadoPor"          INT           NOT NULL,
     "ActualizadoPor"     INT           NULL,
     CONSTRAINT pk_BitacoraMantenimiento        PRIMARY KEY ("Id"),
-    CONSTRAINT unq_BitacoraMantenimiento_IdGrua UNIQUE ("IdGrua"),
     CONSTRAINT CK_BitacoraMantenimiento_Estado  CHECK ("Estado" IN ('ACTIVO','INACTIVO'))
+    CONSTRAINT CK_BitacoraMantenimiento_EstadoOperacion  CHECK ("EstadoOperacion" IN ('ENTALLER','OPERATIVA'))
 );
 
 CREATE TABLE "Reserva" (
@@ -1747,6 +1750,166 @@ END;
 $$;
 
 
+-- ── sp_CreUpdGrua ─────────────────────────────────────────────
+-- Crea o actualiza una grúa.
+--
+-- Parámetros de entrada:
+--   _IdGrua         → 0 = crear nueva grúa / > 0 = actualizar existente (Grua."Id")
+--   _Placa          → Matrícula (única entre grúas activas; en actualización excluye la actual)
+--   _Marca          → Marca del vehículo
+--   _Modelo         → Modelo del vehículo
+--   _AñoFabricacion → Año de fabricación
+--   _Capacidad      → Capacidad de carga
+--   _FecVenSeg      → Fecha de vencimiento del seguro
+--   _CreadoPor      → ID del usuario que ejecuta la operación (CreadoPor en INSERT, ActualizadoPor en UPDATE)
+--
+-- Valores de salida _Exitoso:
+--   0 → Error de validación o error interno (ver _Mensaje)
+--   1 → Éxito
+--
+-- Notas:
+--   · Estado y EstadoOperacion no se modifican aquí; tienen sus propios procedimientos.
+
+DROP PROCEDURE IF EXISTS sp_CreUpdGrua(INT, VARCHAR, VARCHAR, VARCHAR, SMALLINT, SMALLINT, DATE, INT, INT, TEXT, INT);
+CREATE OR REPLACE PROCEDURE sp_CreUpdGrua(
+    _IdGrua          INT,
+    _Placa           VARCHAR,
+    _Marca           VARCHAR,
+    _Modelo          VARCHAR,
+    _AñoFabricacion  SMALLINT,
+    _Capacidad       SMALLINT,
+    _FecVenSeg       DATE,
+    _CreadoPor       INT,
+    INOUT _Exitoso   INT  DEFAULT 0,
+    INOUT _Mensaje   TEXT DEFAULT '',
+    INOUT _IdNuevo   INT  DEFAULT 0
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+
+    -- ── CREAR ──────────────────────────────────────────────────
+    IF _IdGrua = 0 THEN
+
+        -- Placa única entre grúas activas
+        IF EXISTS (
+            SELECT 1 FROM "Grua"
+            WHERE  "Placa"  = TRIM(_Placa)
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe una grúa activa con la placa "' || TRIM(_Placa) || '".';
+            RETURN;
+        END IF;
+
+        INSERT INTO "Grua" (
+            "Placa", "Marca", "Modelo", "AñoFabricacion",
+            "Capacidad", "FecVenSeg", "CreadoPor"
+        ) VALUES (
+            TRIM(_Placa), TRIM(_Marca), TRIM(_Modelo), _AñoFabricacion,
+            _Capacidad, _FecVenSeg, _CreadoPor
+        )
+        RETURNING "Id" INTO _IdNuevo;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := 'Grúa creada exitosamente.';
+
+    -- ── ACTUALIZAR ─────────────────────────────────────────────
+    ELSE
+
+        -- Verificar que la grúa existe y está activa
+        IF NOT EXISTS (
+            SELECT 1 FROM "Grua"
+            WHERE  "Id"     = _IdGrua
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'La grúa no existe o no está activa.';
+            RETURN;
+        END IF;
+
+        -- Placa única entre grúas activas, excluyendo la actual
+        IF EXISTS (
+            SELECT 1 FROM "Grua"
+            WHERE  "Placa"  = TRIM(_Placa)
+              AND  "Estado" = 'ACTIVO'
+              AND  "Id"    <> _IdGrua
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe otra grúa activa con la placa "' || TRIM(_Placa) || '".';
+            RETURN;
+        END IF;
+
+        UPDATE "Grua"
+        SET    "Placa"              = TRIM(_Placa),
+               "Marca"              = TRIM(_Marca),
+               "Modelo"             = TRIM(_Modelo),
+               "AñoFabricacion"     = _AñoFabricacion,
+               "Capacidad"          = _Capacidad,
+               "FecVenSeg"          = _FecVenSeg,
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"     = _CreadoPor
+        WHERE  "Id" = _IdGrua;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje := 'Grúa actualizada exitosamente.';
+        _IdNuevo := _IdGrua;
+
+    END IF;
+
+END;
+$$;
+
+
+-- ── sp_UpdEstadoGrua ──────────────────────────────────────────
+-- Cambia el Estado de una grúa (ACTIVO → INACTIVO).
+--
+-- Parámetros:
+--   _IdGrua         → ID de la tabla Grua
+--   _ActualizadoPor → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoGrua(INT, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoGrua(
+    _IdGrua         INT,
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que la grúa existe y está activa
+    IF NOT EXISTS (
+        SELECT 1 FROM "Grua"
+        WHERE  "Id"     = _IdGrua
+          AND  "Estado" = 'ACTIVO'
+    ) THEN
+        _Mensaje := 'La grúa no existe o ya se encuentra inactiva.';
+        RETURN;
+    END IF;
+
+    -- Dar de baja la grúa
+    UPDATE "Grua"
+    SET    "Estado"             = 'INACTIVO',
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdGrua;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := 'Grúa dada de baja correctamente.';
+END;
+$$;
+
+
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
 -- ============================================================
@@ -2544,6 +2707,86 @@ BEGIN
 END;
 $$;
 
+-- ── fn_ListGruas ────────────────────────────────────────────
+--Retorna listado de grúas
+CREATE OR REPLACE FUNCTION fn_ListGruas(
+    _Estado          VARCHAR(20),
+    _EstadoOperacion VARCHAR(20),
+    _Id              INT
+)
+RETURNS TABLE(
+    "Id"              INT,
+    "Placa"           VARCHAR(10),
+    "Marca"           VARCHAR(30),
+    "Modelo"          VARCHAR(30),
+    "AñoFabricacion"  SMALLINT,
+    "Capacidad"       SMALLINT,
+    "FecVenSeg"       TEXT,
+    "EstadoOperacion" VARCHAR(20),
+    "Estado"          VARCHAR(20)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        rua."Id",
+        rua."Placa",
+        rua."Marca",
+        rua."Modelo",
+        rua."AñoFabricacion",
+        rua."Capacidad",
+        TO_CHAR(rua."FecVenSeg", 'DD/MM/YYYY'),
+        rua."EstadoOperacion",
+        rua."Estado"
+    FROM "Grua" AS rua
+    WHERE (_EstadoOperacion IS NULL OR rua."EstadoOperacion" = _EstadoOperacion)
+      AND (_Estado          IS NULL OR rua."Estado"          = _Estado)
+      AND (_Id              IS NULL OR rua."Id"              = _Id);
+END;
+$$;
+
+
+
+-- ── fn_ListBitaMant ──────────────────────────────────────────
+-- Retorna el historial cronológico de mantenimiento de una grúa,
+-- ordenado del más reciente al más antiguo.
+--
+-- Parámetros:
+--   _IdGrua → ID de la tabla Grua
+--
+-- Título derivado de EstadoOperacion:
+--   'OPERATIVA' → 'Retorno a Operativa'
+--   'ENTALLER'  → 'Ingreso a Taller'
+DROP FUNCTION IF EXISTS fn_ListBitaMant(INT);
+CREATE OR REPLACE FUNCTION fn_ListBitaMant(_IdGrua INT)
+RETURNS TABLE(
+    "Titulo"            TEXT,
+    "FechaCreacion"     TEXT,
+    "Responsable"       VARCHAR(50),
+    "Kilometraje"       INT,
+    "Nota"              TEXT,
+    "EstadoOperacion"   VARCHAR(20)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        CASE b."EstadoOperacion"
+            WHEN 'OPERATIVA' THEN 'Retorno a Operativa'::TEXT
+            WHEN 'ENTALLER'  THEN 'Ingreso a Taller'::TEXT
+            ELSE                   b."EstadoOperacion"::TEXT
+        END,
+        TO_CHAR(b."FechaCreacion", 'YYYY-MM-DD'),
+        b."NombreResponsable",
+        b."Kilometraje",
+        b."Nota",
+        b."EstadoOperacion"
+    FROM  "BitacoraMantenimiento" b
+    WHERE b."IdGrua" = _IdGrua
+      AND b."Estado" = 'ACTIVO'
+    ORDER BY b."FechaCreacion" DESC;
+END;
+$$;
 
 
 -- ============================================================

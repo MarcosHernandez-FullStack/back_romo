@@ -50,6 +50,10 @@ builder.Services.AddScoped<OperadorService>();
 builder.Services.AddScoped<IOperacionRepository, OperacionRepository>();
 builder.Services.AddScoped<OperacionService>();
 
+// Flota
+builder.Services.AddScoped<IFlotaRepository, FlotaRepository>();
+builder.Services.AddScoped<FlotaService>();
+
 // Google Maps
 builder.Services.AddHttpClient<IGoogleMapsService, GoogleMapsService>();
 
