@@ -119,19 +119,20 @@ public class FlotaRepository : IFlotaRepository
         }
     }
 
-    public async Task<UnidadResultDto> DarDeBajaGruaAsync(DarDeBajaUnidadDto dto, CancellationToken ct = default)
+    public async Task<UnidadResultDto> ActualizarEstadoAsync(UpdEstadoGruaDto dto, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
         {
             var p = new DynamicParameters();
             p.Add("_IdGrua",         dto.IdGrua,         DbType.Int32);
+            p.Add("_NuevoEstado",    dto.NuevoEstado,    DbType.String);
             p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_UpdEstadoGrua(@_IdGrua, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                "CALL sp_UpdEstadoGrua(@_IdGrua, @_NuevoEstado, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 
@@ -143,7 +144,7 @@ public class FlotaRepository : IFlotaRepository
         }
         catch (OperationCanceledException)
         {
-            return new UnidadResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si la grúa fue dada de baja." };
+            return new UnidadResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el estado de la grúa fue actualizado." };
         }
         catch (Exception ex)
         {

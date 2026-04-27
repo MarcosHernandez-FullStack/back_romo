@@ -21,8 +21,8 @@ public class FlotaService
     public async Task<UnidadResultDto> EditarGruaAsync(EditarUnidadDto dto, CancellationToken ct = default)
         => await _flotaRepository.EditarGruaAsync(dto, ct);
 
-    public async Task<UnidadResultDto> DarDeBajaGruaAsync(DarDeBajaUnidadDto dto, CancellationToken ct = default)
-        => await _flotaRepository.DarDeBajaGruaAsync(dto, ct);
+    public async Task<UnidadResultDto> ActualizarEstadoAsync(UpdEstadoGruaDto dto, CancellationToken ct = default)
+        => await _flotaRepository.ActualizarEstadoAsync(dto, ct);
 
     public async Task<UnidadResultDto> IngresoTallerAsync(IngresoTallerDto dto, CancellationToken ct = default)
         => await _flotaRepository.IngresoTallerAsync(dto, ct);

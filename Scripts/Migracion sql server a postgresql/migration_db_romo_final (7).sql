@@ -72,7 +72,7 @@ CREATE TABLE "Usuario" (
     "Apellidos"          VARCHAR(100)  NOT NULL,
     "Rol"                VARCHAR(100)  NOT NULL DEFAULT 'CLIENTE',
     "Estado"             VARCHAR(20)   NOT NULL DEFAULT 'ACTIVO',
-    "Telefono"           VARCHAR(50)   NULL,
+    "Telefono"           VARCHAR(50)   NOT NULL,
     "FechaCreacion"      TIMESTAMP(6)  NOT NULL DEFAULT NOW(),
     "FechaActualizacion" TIMESTAMP(6)  NULL,
     "CreadoPor"          INT           NOT NULL,
@@ -2058,17 +2058,20 @@ $$;
 
 
 -- ── sp_UpdEstadoGrua ──────────────────────────────────────────
--- Cambia el Estado de una grúa (ACTIVO → INACTIVO).
+-- Cambia el Estado de una grúa (ACTIVO ↔ INACTIVO).
 --
 -- Parámetros:
 --   _IdGrua         → ID de la tabla Grua
+--   _NuevoEstado    → 'ACTIVO' | 'INACTIVO'
 --   _ActualizadoPor → ID del usuario que realiza la acción
 --
 -- _Exitoso: 0=error, 1=éxito
 
 DROP PROCEDURE IF EXISTS sp_UpdEstadoGrua(INT, INT, INT, TEXT);
+DROP PROCEDURE IF EXISTS sp_UpdEstadoGrua(INT, VARCHAR, INT, INT, TEXT);
 CREATE OR REPLACE PROCEDURE sp_UpdEstadoGrua(
     _IdGrua         INT,
+    _NuevoEstado    VARCHAR(20),
     _ActualizadoPor INT,
     INOUT _Exitoso  INT,
     INOUT _Mensaje  TEXT
@@ -2078,26 +2081,37 @@ BEGIN
     _Exitoso := 0;
     _Mensaje  := '';
 
-    -- Verificar que la grúa existe y está activa
+    -- Verificar que la grúa existe
     IF NOT EXISTS (
-        SELECT 1 FROM "Grua"
-        WHERE  "Id"     = _IdGrua
-          AND  "Estado" = 'ACTIVO'
+        SELECT 1 FROM "Grua" WHERE "Id" = _IdGrua
     ) THEN
-        _Mensaje := 'La grúa no existe o ya se encuentra inactiva.';
+        _Mensaje := 'La grúa no existe.';
         RETURN;
     END IF;
 
-    -- Dar de baja la grúa
+    -- Verificar que no se intenta asignar el mismo estado actual
+    IF EXISTS (
+        SELECT 1 FROM "Grua"
+        WHERE  "Id"     = _IdGrua
+          AND  "Estado" = _NuevoEstado
+    ) THEN
+        _Mensaje := 'La grúa ya se encuentra en estado ' || _NuevoEstado || '.';
+        RETURN;
+    END IF;
+
     UPDATE "Grua"
-    SET    "Estado"             = 'INACTIVO',
+    SET    "Estado"             = _NuevoEstado,
            "FechaActualizacion" = NOW(),
            "ActualizadoPor"     = _ActualizadoPor
     WHERE  "Id" = _IdGrua;
 
     COMMIT;
     _Exitoso := 1;
-    _Mensaje  := 'Grúa dada de baja correctamente.';
+    _Mensaje  := CASE _NuevoEstado
+        WHEN 'INACTIVO' THEN 'Grúa dada de baja correctamente.'
+        WHEN 'ACTIVO'   THEN 'Grúa reactivada correctamente.'
+        ELSE                 'Estado actualizado correctamente.'
+    END;
 END;
 $$;
 
@@ -3193,12 +3207,12 @@ $$;
 
 -- ── Usuario (18 filas) ────────────────────────────────────────
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (801, 'dkb', 'CE30D407-EC23-BA43-6A63-1DDE9B17FC2D', 'oupov31@gmail.com', 'Devon', 'Mayer', 'OPERADOR', 'ACTIVO', '527-606-8283', '2008-09-24 00:00:00.000000', '2026-03-31 08:16:14.963333', 7, 803);
-INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (802, 'qse', '07A19353-47BD-8C47-0E22-F3DE8B778D6C', 'ukcxsd.iojjdc@gmail.com', 'Gabriel', 'Horne', 'STAFF', 'ACTIVO', NULL, '2008-04-02 00:00:00.000000', '2008-05-31 00:00:00.000000', 4, 5);
+INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (802, 'qse', '07A19353-47BD-8C47-0E22-F3DE8B778D6C', 'ukcxsd.iojjdc@gmail.com', 'Gabriel', 'Horne', 'STAFF', 'ACTIVO', '+51 987 345 298', '2008-04-02 00:00:00.000000', '2008-05-31 00:00:00.000000', 4, 5);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (803, 'eox', '3A029201-BD7B-2573-0516-F069DF18B500', 'nosj.xvxx@gmail.com', 'Alfredo', 'Arellano', 'ADMINISTRADOR', 'ACTIVO', '145-166-7022', '2008-10-07 00:00:00.000000', NULL, 6, 6);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (804, 'mxe', 'E0BB5971-CAC8-672A-230A-26B72DEA7557', 'eghc339@gmail.com', 'Demond', 'Noble', 'CLIENTE', 'ACTIVO', '597-330-9328', '2008-10-25 00:00:00.000000', '2008-03-30 00:00:00.000000', 1, 4);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (805, 'jwn', '07EF4DC3-17D5-7C3E-0113-5200EB21051A', 'yjvj7@gmail.com', 'Jeannie', 'Chan', 'CLIENTE', 'ACTIVO', '767-022-3465', '2008-10-08 00:00:00.000000', '2008-10-26 00:00:00.000000', 2, 2);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (806, 'pbt', '0054B67C-6FAC-B5B4-028A-715D0DC222DE', 'gvvgjjw.ddthfjh@gmail.com', 'Ron', 'Stephens', 'ADMINISTRADOR', 'INACTIVO', '291-865-8709', '2008-11-08 00:00:00.000000', '2008-05-15 00:00:00.000000', 1, 7);
-INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (807, 'qwl', '08525CB1-12D5-E2D7-0977-B08F0D7EC57F', 'lruc.sblnc@gmail.com', 'Tom', 'Barrera', 'ADMINISTRADOR', 'ACTIVO', NULL, '2008-08-04 00:00:00.000000', '2008-11-09 00:00:00.000000', 4, 9);
+INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (807, 'qwl', '08525CB1-12D5-E2D7-0977-B08F0D7EC57F', 'lruc.sblnc@gmail.com', 'Tom', 'Barrera', 'ADMINISTRADOR', 'ACTIVO', '+51 234 874 294', '2008-08-04 00:00:00.000000', '2008-11-09 00:00:00.000000', 4, 9);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (808, 'avb', '028E6CF9-0BCF-CD3E-04E7-60B3DD628354', 'xtbw@gmail.com', 'Tia', 'Santana', 'CLIENTE', 'ACTIVO', '621-222-5551', '2008-12-29 00:00:00.000000', '2008-09-18 00:00:00.000000', 7, 7);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (809, 'shc', '07E6FF36-D35A-8355-0C7C-DD2B34D72D5C', 'zuyc496@gmail.com', 'Ramiro', 'Berger', 'OPERADOR', 'ACTIVO', '373-139-2181', '2008-12-06 00:00:00.000000', '2008-04-15 00:00:00.000000', 4, 7);
 INSERT INTO "Usuario" ("Id", "Alias", "Contraseña", "Correo", "Nombres", "Apellidos", "Rol", "Estado", "Telefono", "FechaCreacion", "FechaActualizacion", "CreadoPor", "ActualizadoPor") OVERRIDING SYSTEM VALUE VALUES (810, 'pyh', '0EB33A91-DECE-BBAE-0D42-62DDBEFBC5CC', 'wcabs@gmail.com', 'Jodie', 'Wong', 'CLIENTE', 'INACTIVO', '486-348-7684', '2008-02-22 00:00:00.000000', '2008-12-01 00:00:00.000000', 9, 4);

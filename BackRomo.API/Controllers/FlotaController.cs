@@ -130,18 +130,16 @@ public class FlotaController : ControllerBase
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
-    [HttpDelete("{idGrua:int}")]
-    public async Task<IActionResult> DarDeBajaGrua(
+    [HttpPatch("{idGrua:int}/estado")]
+    public async Task<IActionResult> ActualizarEstado(
         int idGrua,
+        [FromBody] UpdEstadoGruaDto dto,
         CancellationToken ct)
     {
-        var dto = new DarDeBajaUnidadDto
-        {
-            IdGrua         = idGrua,
-            ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0"),
-        };
+        dto.IdGrua         = idGrua;
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
 
-        var result = await _flotaService.DarDeBajaGruaAsync(dto, ct);
+        var result = await _flotaService.ActualizarEstadoAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
         if (result.Exitoso == 2) return Accepted(result);
