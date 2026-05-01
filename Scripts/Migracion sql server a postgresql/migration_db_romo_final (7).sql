@@ -65,7 +65,7 @@ CREATE TYPE tipo_vehiculo_detalle AS (
 
 CREATE TABLE "Usuario" (
     "Id"                 INT           GENERATED ALWAYS AS IDENTITY,
-    "Alias"              VARCHAR(10)   NOT NULL,
+    "Alias"              VARCHAR(10)   NULL,
     "Contraseña"         VARCHAR(100)  NOT NULL,
     "Correo"             VARCHAR(100)  NOT NULL,
     "Nombres"            VARCHAR(100)  NOT NULL,
@@ -2317,6 +2317,52 @@ BEGIN
       AND  (_Id     IS NULL OR nte."Id"     = _Id);
 END;
 $$;
+
+-- ── fn_ListUsuarios ──────────────────────────────────────────
+-- Retorna los usuarios administrativos (ADMINISTRADOR / STAFF)
+-- con los campos necesarios para la gestión del panel de control.
+--
+-- Parámetros:
+--   _Estado → 'ACTIVO' | 'INACTIVO' | NULL (todos)
+--   _Id     → ID específico            | NULL (todos)
+--   _Rol    → 'ADMINISTRADOR' | 'STAFF' | NULL (ambos)
+
+DROP FUNCTION IF EXISTS fn_ListUsuarios(VARCHAR, INT, VARCHAR);
+CREATE OR REPLACE FUNCTION fn_ListUsuarios(
+    _Estado VARCHAR(20),
+    _Id     INT,
+    _Rol    VARCHAR(100)
+)
+RETURNS TABLE(
+    "Id"            INT,
+    "Nombres"       VARCHAR(100),
+    "Apellidos"     VARCHAR(100),
+    "Correo"        VARCHAR(100),
+    "Telefono"      VARCHAR(50),
+    "Rol"           VARCHAR(100),
+    "Estado"        VARCHAR(20),
+    "FechaCreacion" TIMESTAMP(6)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT u."Id",
+           u."Nombres",
+           u."Apellidos",
+           u."Correo",
+           u."Telefono",
+           u."Rol",
+           u."Estado",
+           u."FechaCreacion"
+    FROM   "Usuario" u
+    WHERE  u."Rol" IN ('ADMINISTRADOR', 'STAFF')
+      AND  (_Estado IS NULL OR u."Estado" = _Estado)
+      AND  (_Id     IS NULL OR u."Id"     = _Id)
+      AND  (_Rol    IS NULL OR u."Rol"    = _Rol)
+    ORDER BY u."FechaCreacion" ASC;
+END;
+$$;
+
 
 -- ── fn_ListReservas ──────────────────────────────────────────
 DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, INT, INT);
