@@ -37,6 +37,58 @@ public class AgendaController : ControllerBase
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
+    [HttpGet("excepciones")]
+    public async Task<IActionResult> ListarExcepciones(
+        [FromQuery] string? estado,
+        [FromQuery] int?    id,
+        CancellationToken   ct)
+    {
+        var excepciones = await _agendaService.ListarExcepcionesAsync(estado, id, ct);
+
+        if (!excepciones.Any())
+            return NoContent();
+
+        return Ok(excepciones);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPost("excepciones")]
+    public async Task<IActionResult> CreUpdExcepcion(
+        [FromBody] CrearExcepcionDto dto,
+        CancellationToken ct)
+    {
+        dto.UsuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _agendaService.CreUpdExcepcionAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPatch("excepciones/{id:int}/estado")]
+    public async Task<IActionResult> UpdEstadoExcepcion(
+        int id,
+        [FromBody] UpdEstadoExcepcionDto dto,
+        CancellationToken ct)
+    {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _agendaService.UpdEstadoExcepcionAsync(id, dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
     [HttpPut("horarios")]

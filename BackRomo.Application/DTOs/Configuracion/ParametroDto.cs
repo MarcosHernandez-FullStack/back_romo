@@ -20,4 +20,5 @@ public class ParametroDto
     public string   CoordLatMaps           { get; set; } = string.Empty;
     public string   CoordLonMaps           { get; set; } = string.Empty;
     public decimal  MetrosCercania         { get; set; }
+    public bool     ReservaClienteOn       { get; set; }
 }

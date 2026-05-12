@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Timeouts;
@@ -17,7 +18,7 @@ public class ConfiguracionController : ControllerBase
         _configuracionService = configuracionService;
     }
 
-    [Authorize(Roles = "ADMINISTRADOR")]
+    [Authorize(Roles = "ADMINISTRADOR,CLIENTE")]
     [EnableRateLimiting("lectura")]
     [RequestTimeout("corto")]
     [HttpGet("tarifario-global")]
@@ -31,7 +32,7 @@ public class ConfiguracionController : ControllerBase
         return Ok(tarifa);
     }
 
-    [Authorize(Roles = "ADMINISTRADOR,OPERADOR")]
+    [Authorize(Roles = "ADMINISTRADOR,OPERADOR,CLIENTE")]
     [EnableRateLimiting("lectura")]
     [RequestTimeout("corto")]
     [HttpGet("parametro-operativo")]
@@ -43,5 +44,33 @@ public class ConfiguracionController : ControllerBase
             return NoContent();
 
         return Ok(parametro);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR,CLIENTE")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
+    [HttpGet("publica")]
+    public async Task<IActionResult> ObtenerConfigPublica(CancellationToken ct)
+    {
+        var parametro = await _configuracionService.ObtenerParametroOperativoAsync(ct);
+
+        if (parametro is null)
+            return NoContent();
+
+        return Ok(new { reservaClienteOn = parametro.ReservaClienteOn });
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPatch("reserva-cliente-on")]
+    public async Task<IActionResult> ActualizarReservaClienteOn([FromBody] bool value, CancellationToken ct)
+    {
+        var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var result = await _configuracionService.ActualizarReservaClienteOnAsync(value, actualizadoPor, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
     }
 }

@@ -208,6 +208,7 @@ CREATE TABLE "ParametroOperativo" (
     "CoordLatMaps"         VARCHAR(20)   NOT NULL DEFAULT '',
     "CoordLonMaps"         VARCHAR(20)   NOT NULL DEFAULT '',
     "MetrosCercania"       DECIMAL(10,2) NOT NULL DEFAULT 0,
+    "ReservaClienteOn"     BOOLEAN       NOT NULL DEFAULT TRUE
     CONSTRAINT pk_ParametroOperativo       PRIMARY KEY ("Id"),
     CONSTRAINT CK_ParametroOperativo_Estado CHECK ("Estado" IN ('ACTIVO','INACTIVO'))
 );
@@ -2272,6 +2273,44 @@ END;
 $$;
 
 
+-- ── sp_UpdReservaClienteOn ───────────────────────────────────
+-- Activa o desactiva el flag ReservaClienteOn en ParametroOperativo.
+--
+-- Parámetros:
+--   _Activo         → TRUE = activar reservas | FALSE = suspender reservas
+--   _ActualizadoPor → ID del usuario administrador que realiza el cambio
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdReservaClienteOn(BOOLEAN, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdReservaClienteOn(
+    _Activo         BOOLEAN,
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    UPDATE "ParametroOperativo"
+    SET    "ReservaClienteOn"   = _Activo,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor;
+
+    IF NOT FOUND THEN
+        _Mensaje := 'No se encontró el registro de parámetros operativos.';
+        RETURN;
+    END IF;
+
+    _Exitoso := 1;
+    _Mensaje  := CASE WHEN _Activo THEN 'Reservas online activadas correctamente.'
+                                   ELSE 'Reservas online suspendidas correctamente.' END;
+END;
+$$;
+
+
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
 -- ============================================================
@@ -2575,6 +2614,7 @@ END;
 $$;
 
 -- ── fn_ParametroOperativo ────────────────────────────────────
+DROP FUNCTION IF EXISTS fn_ParametroOperativo();
 CREATE OR REPLACE FUNCTION fn_ParametroOperativo()
 RETURNS TABLE(
     "TiempoMargenManiobra" SMALLINT,
@@ -2594,7 +2634,8 @@ RETURNS TABLE(
     "MinutosMedio"         SMALLINT,
     "CoordLatMaps"         VARCHAR(20),
     "CoordLonMaps"         VARCHAR(20),
-    "MetrosCercania"       DECIMAL(10,2)
+    "MetrosCercania"       DECIMAL(10,2),
+    "ReservaClienteOn"     BOOLEAN
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -2604,7 +2645,8 @@ BEGIN
            p."CreadoPor",p."ActualizadoPor",p."Estado",p."TiempoCorte",
            p."TimerAdministrativo",p."TimerCliente",p."ZonaHoraria",
            p."MinutosCerca",p."MinutosMedio",
-           p."CoordLatMaps",p."CoordLonMaps",p."MetrosCercania"
+           p."CoordLatMaps",p."CoordLonMaps",p."MetrosCercania",
+           p."ReservaClienteOn"
     FROM   "ParametroOperativo" p LIMIT 1;
 END;
 $$;
@@ -4697,6 +4739,214 @@ BEGIN
     COMMIT;
     _Exitoso := 1;
     _Mensaje  := 'Horarios actualizados correctamente.';
+END;
+$$;
+
+-- ── fn_ListExcepciones ──────────────────────────────────────
+-- Retorna las excepciones de agenda filtradas por Estado e Id.
+-- El campo Alcance se deriva: si TiempoInicio='00:00' y TiempoFinal='23:59',
+-- es 'Día Completo'; en caso contrario, 'Rango de Horas'.
+--
+-- Parámetros:
+--   _Estado → 'ACTIVO' | 'INACTIVO' | NULL (todos)
+--   _Id     → ID de la excepción | NULL (todos)
+
+DROP FUNCTION IF EXISTS fn_ListExcepciones(VARCHAR, INT);
+CREATE OR REPLACE FUNCTION fn_ListExcepciones(
+    _Estado VARCHAR(20),
+    _Id     INT
+)
+RETURNS TABLE(
+    "Id"                INT,
+    "Fecha"             DATE,
+    "Motivo"            VARCHAR(50),
+    "Alcance"           VARCHAR(15),
+    "TiempoInicio"      TIME(6),
+    "TiempoFinal"       TIME(6),
+    "DescripcionMotivo" VARCHAR(100),
+    "Estado"            VARCHAR(20)
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        e."Id"::INT,
+        e."Fecha",
+        e."Motivo",
+        CASE
+            WHEN e."TiempoInicio" = '00:00:00' AND e."TiempoFinal" = '23:59:00'
+            THEN 'Día Completo'::VARCHAR(15)
+            ELSE 'Rango de Horas'::VARCHAR(15)
+        END AS "Alcance",
+        e."TiempoInicio",
+        e."TiempoFinal",
+        e."DescripcionMotivo",
+        e."Estado"
+    FROM   "Excepcion" e
+    WHERE  (_Estado IS NULL OR e."Estado" = _Estado)
+      AND  (_Id     IS NULL OR e."Id"     = _Id)
+    ORDER  BY e."Fecha" DESC, e."TiempoInicio";
+END;
+$$;
+
+-- ── sp_CreUpdExcepcion ────────────────────────────────────────
+-- Crea o actualiza una excepción de agenda.
+--
+-- Parámetros de entrada:
+--   _Id                → 0 = crear nueva excepción / > 0 = actualizar existente
+--   _Fecha             → Fecha de la excepción
+--   _Motivo            → Tipo de excepción: 'Feriado' | 'Mantenimiento' | 'Bloqueo'
+--   _HoraInicio        → Hora de inicio ('00:00' si es Día Completo)
+--   _HoraFin           → Hora de fin    ('23:59' si es Día Completo)
+--   _DescripcionMotivo → Descripción interna del motivo
+--   _UsuarioId         → ID del usuario que ejecuta la operación
+--
+-- Valores de salida _Exitoso:
+--   0 → Error de validación (ver _Mensaje)
+--   1 → Éxito
+--
+-- Notas:
+--   · _HoraInicio debe ser menor a _HoraFin.
+--   · No se permite registrar dos excepciones en la misma fecha con rangos solapados.
+--   · El estado se fija en 'ACTIVO' al crear; para desactivar usar sp_UpdEstadoExcepcion.
+
+DROP PROCEDURE IF EXISTS sp_CreUpdExcepcion(INT, DATE, VARCHAR, TIME, TIME, VARCHAR, INT, INT, TEXT, INT);
+CREATE OR REPLACE PROCEDURE sp_CreUpdExcepcion(
+    _Id                INT,
+    _Fecha             DATE,
+    _Motivo            VARCHAR(50),
+    _HoraInicio        TIME,
+    _HoraFin           TIME,
+    _DescripcionMotivo VARCHAR(100),
+    _UsuarioId         INT,
+    INOUT _Exitoso     INT  DEFAULT 0,
+    INOUT _Mensaje     TEXT DEFAULT '',
+    INOUT _IdNuevo     INT  DEFAULT 0
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+    _IdNuevo  := 0;
+
+    -- ── CREAR ───────────────────────────────────────────────────
+    IF _Id = 0 THEN
+
+        -- Verificar solapamiento de horario en la misma fecha (solo ACTIVOS)
+        IF EXISTS (
+            SELECT 1 FROM "Excepcion"
+            WHERE  "Fecha"   = _Fecha
+              AND  "Estado"  = 'ACTIVO'
+              AND  "TiempoInicio" < _HoraFin
+              AND  "TiempoFinal"  > _HoraInicio
+        ) THEN
+            _Mensaje := 'Ya existe una excepción activa en esa fecha que se solapa con el horario indicado.';
+            RETURN;
+        END IF;
+
+        INSERT INTO "Excepcion" (
+            "Fecha", "Motivo", "TiempoInicio", "TiempoFinal",
+            "DescripcionMotivo", "Estado", "FechaCreacion", "CreadoPor"
+        )
+        VALUES (
+            _Fecha, _Motivo, _HoraInicio, _HoraFin,
+            _DescripcionMotivo, 'ACTIVO', NOW(), _UsuarioId
+        )
+        RETURNING "Id" INTO _IdNuevo;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje  := 'Excepción registrada correctamente.';
+
+    -- ── ACTUALIZAR ──────────────────────────────────────────────
+    ELSE
+
+        -- Verificar que la excepción existe
+        IF NOT EXISTS (SELECT 1 FROM "Excepcion" WHERE "Id" = _Id) THEN
+            _Mensaje := 'La excepción no existe.';
+            RETURN;
+        END IF;
+
+        -- Verificar solapamiento con otras excepciones activas en la misma fecha (excluye la actual)
+        IF EXISTS (
+            SELECT 1 FROM "Excepcion"
+            WHERE  "Fecha"   = _Fecha
+              AND  "Estado"  = 'ACTIVO'
+              AND  "Id"      <> _Id
+              AND  "TiempoInicio" < _HoraFin
+              AND  "TiempoFinal"  > _HoraInicio
+        ) THEN
+            _Mensaje := 'Ya existe otra excepción activa en esa fecha que se solapa con el horario indicado.';
+            RETURN;
+        END IF;
+
+        UPDATE "Excepcion"
+        SET    "Fecha"             = _Fecha,
+               "Motivo"           = _Motivo,
+               "TiempoInicio"     = _HoraInicio,
+               "TiempoFinal"      = _HoraFin,
+               "DescripcionMotivo" = _DescripcionMotivo,
+               "FechaActualizacion" = NOW(),
+               "ActualizadoPor"   = _UsuarioId
+        WHERE  "Id" = _Id;
+
+        COMMIT;
+        _Exitoso := 1;
+        _Mensaje  := 'Excepción actualizada correctamente.';
+
+    END IF;
+
+END;
+$$;
+
+-- ── sp_UpdEstadoExcepcion ─────────────────────────────────────
+-- Cambia el Estado de una excepción (ACTIVO ↔ INACTIVO).
+--
+-- Parámetros:
+--   _Id             → ID de la excepción
+--   _NuevoEstado    → 'ACTIVO' | 'INACTIVO'
+--   _ActualizadoPor → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoExcepcion(INT, VARCHAR, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoExcepcion(
+    _Id             INT,
+    _NuevoEstado    VARCHAR(10),
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT  DEFAULT 0,
+    INOUT _Mensaje  TEXT DEFAULT ''
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que la excepción existe
+    IF NOT EXISTS (SELECT 1 FROM "Excepcion" WHERE "Id" = _Id) THEN
+        _Mensaje := 'La excepción no existe.';
+        RETURN;
+    END IF;
+
+    -- Verificar que no se asigna el mismo estado actual
+    IF EXISTS (
+        SELECT 1 FROM "Excepcion"
+        WHERE  "Id"     = _Id
+          AND  "Estado" = _NuevoEstado
+    ) THEN
+        _Mensaje := 'La excepción ya se encuentra en estado ' || _NuevoEstado || '.';
+        RETURN;
+    END IF;
+
+    UPDATE "Excepcion"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _Id;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := 'Estado de la excepción actualizado correctamente.';
 END;
 $$;
 

@@ -17,4 +17,7 @@ public class ConfiguracionService
 
     public async Task<ParametroDto?> ObtenerParametroOperativoAsync(CancellationToken ct = default)
         => await _configuracionRepository.ObtenerParametroOperativoAsync(ct);
+
+    public async Task<ConfigResultDto> ActualizarReservaClienteOnAsync(bool value, int actualizadoPor, CancellationToken ct = default)
+        => await _configuracionRepository.ActualizarReservaClienteOnAsync(value, actualizadoPor, ct);
 }

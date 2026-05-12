@@ -60,4 +60,32 @@ public class ConfiguracionRepository : IConfiguracionRepository
             cancellationToken: ct
         ));
     }
+
+    public async Task<ConfigResultDto> ActualizarReservaClienteOnAsync(bool value, int actualizadoPor, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_Activo",         value,          DbType.Boolean);
+            p.Add("_ActualizadoPor", actualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_UpdReservaClienteOn(@_Activo, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new ConfigResultDto { Exitoso = p.Get<int>("_Exitoso"), Mensaje = p.Get<string>("_Mensaje") };
+        }
+        catch (OperationCanceledException)
+        {
+            return new ConfigResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
+        catch (Exception ex)
+        {
+            return new ConfigResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
 }
