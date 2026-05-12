@@ -1,4 +1,10 @@
+using System.Security.Claims;
+using BackRomo.Application.DTOs.Agenda;
+using BackRomo.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Timeouts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BackRomo.API.Controllers;
 
@@ -6,4 +12,44 @@ namespace BackRomo.API.Controllers;
 [Route("api/[controller]")]
 public class AgendaController : ControllerBase
 {
+    private readonly AgendaService _agendaService;
+
+    public AgendaController(AgendaService agendaService)
+    {
+        _agendaService = agendaService;
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("lectura")]
+    [RequestTimeout("corto")]
+    [HttpGet("horarios")]
+    public async Task<IActionResult> ListarConfiguracionHorario(
+        [FromQuery] string? rol,
+        [FromQuery] string? estado,
+        CancellationToken   ct)
+    {
+        var horarios = await _agendaService.ListarConfiguracionHorarioAsync(rol, estado, ct);
+
+        if (!horarios.Any())
+            return NoContent();
+
+        return Ok(horarios);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPut("horarios")]
+    public async Task<IActionResult> ActualizarConfiguracionHorario(
+        [FromBody] UpdConfiguracionHorarioDto dto,
+        CancellationToken ct)
+    {
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _agendaService.ActualizarConfiguracionHorarioAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
 }
