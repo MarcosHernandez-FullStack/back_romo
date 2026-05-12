@@ -32,7 +32,9 @@ public class UsuarioRepository : IUsuarioRepository
         using var conn = _db.CreateConnection();
         try
         {
-            var alias = GenerarAlias(dto.Correo);
+            var alias = (dto.Rol == "ADMINISTRADOR" || dto.Rol == "STAFF")
+                ? null
+                : dto.Alias;
 
             var p = new DynamicParameters();
             p.Add("_IdUsuario",   0,              DbType.Int32);
@@ -115,8 +117,4 @@ public class UsuarioRepository : IUsuarioRepository
         }
     }
 
-    // Genera el alias de login a partir del prefijo del correo (antes del @), en mayúsculas.
-    // Garantiza unicidad indirecta: si el correo es único, el alias derivado también lo es.
-    private static string GenerarAlias(string correo)
-        => correo.Split('@')[0].ToUpperInvariant();
 }

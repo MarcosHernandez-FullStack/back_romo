@@ -1574,7 +1574,8 @@ BEGIN
         -- Alias único entre usuarios activos
         IF EXISTS (
             SELECT 1 FROM "Usuario"
-            WHERE  "Alias"  = _Alias
+            WHERE  "Alias" IS NOT NULL 
+              AND "Alias"  = _Alias
               AND  "Estado" = 'ACTIVO'
         ) THEN
             ROLLBACK;
