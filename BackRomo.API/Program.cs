@@ -62,6 +62,10 @@ builder.Services.AddScoped<FlotaService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
 
+// Reportes
+builder.Services.AddScoped<IReporteRepository, ReporteRepository>();
+builder.Services.AddScoped<ReporteService>();
+
 // Google Maps
 builder.Services.AddHttpClient<IGoogleMapsService, GoogleMapsService>();
 

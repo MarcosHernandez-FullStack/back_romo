@@ -12,7 +12,7 @@
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
 --     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
 --     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_CreUpdCliente,
---     sp_UpdEstadoOperador,
+--     sp_UpdEstadoOperador, sp_UpdEstadoAdministrativo,
 --     sp_CreUpdGrua, sp_UpdEstadoGrua,
 --     sp_IngresoTaller, sp_RetornoOperativa,
 --     sp_UpdConfiguracionHorario
@@ -23,7 +23,8 @@
 --     fn_LoginUsuario, fn_ParametroOperativo,
 --     fn_SugerirAsignacion_Gruas, fn_SugerirAsignacion_Operadores,
 --     fn_TarifarioGlobal, fn_ListDispOperador, fn_ListGruas,
---     fn_ListBitaMant, fn_ListConfiguracionHorario
+--     fn_ListBitaMant, fn_ListConfiguracionHorario,
+--     fn_ReporteServicios
 --
 -- MAPA DE TIPOS:
 --   DATETIME2(7)     → TIMESTAMP(6)
@@ -1945,6 +1946,75 @@ BEGIN
         WHEN 'INACTIVO' THEN 'Operador desactivado correctamente.'
         WHEN 'ACTIVO'   THEN 'Operador reactivado correctamente.'
         ELSE                 'Estado actualizado correctamente.'
+    END;
+END;
+$$;
+
+
+-- ── sp_UpdEstadoAdministrativo ────────────────────────────────
+-- Actualiza el estado administrativo de una reserva finalizada
+-- (PENDIENTE → FACTURADO → PAGADO).
+--
+-- Parámetros:
+--   _EstadoAdministrativo → 'PENDIENTE' | 'FACTURADO' | 'PAGADO'
+--   _IdReserva            → ID de la reserva a actualizar
+--   _ActualizadoPor       → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoAdministrativo(VARCHAR, INT, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoAdministrativo(
+    _EstadoAdministrativo VARCHAR(20),
+    _IdReserva            INT,
+    _ActualizadoPor       INT,
+    INOUT _Exitoso        INT,
+    INOUT _Mensaje        TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que el valor recibido sea un estado administrativo válido
+    IF _EstadoAdministrativo NOT IN ('PENDIENTE', 'FACTURADO', 'PAGADO') THEN
+        _Mensaje := 'Estado administrativo no válido: ' || _EstadoAdministrativo || '.';
+        RETURN;
+    END IF;
+
+    -- Verificar que la reserva existe, está activa y ha sido finalizada
+    IF NOT EXISTS (
+        SELECT 1 FROM "Reserva"
+        WHERE  "Id"              = _IdReserva
+          AND  "Estado"          = 'ACTIVO'
+          AND  "EstadoOperacion" = 'FINALIZADO'
+    ) THEN
+        _Mensaje := 'La reserva no existe, no está activa o no ha sido finalizada.';
+        RETURN;
+    END IF;
+
+    -- Verificar que no se intenta asignar el mismo estado actual
+    IF EXISTS (
+        SELECT 1 FROM "Reserva"
+        WHERE  "Id"                   = _IdReserva
+          AND  "EstadoAdministrativo" = _EstadoAdministrativo
+    ) THEN
+        _Mensaje := 'La reserva ya se encuentra en estado administrativo ' || _EstadoAdministrativo || '.';
+        RETURN;
+    END IF;
+
+    -- Actualizar estado administrativo
+    UPDATE "Reserva"
+    SET    "EstadoAdministrativo" = _EstadoAdministrativo,
+           "FechaActualizacion"   = NOW(),
+           "ActualizadoPor"       = _ActualizadoPor
+    WHERE  "Id" = _IdReserva;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := CASE _EstadoAdministrativo
+        WHEN 'FACTURADO' THEN 'Reserva facturada correctamente.'
+        WHEN 'PAGADO'    THEN 'Pago registrado correctamente.'
+        ELSE                  'Estado administrativo actualizado correctamente.'
     END;
 END;
 $$;
@@ -4949,6 +5019,125 @@ BEGIN
     _Mensaje  := 'Estado de la excepción actualizado correctamente.';
 END;
 $$;
+
+-- ── fn_ReporteServicios ──────────────────────────────────────
+-- Retorna servicios FINALIZADOS y CANCELADOS para el módulo de
+-- Reportes Administrativos. Filtra server-side según los mismos
+-- controles que aparecen en el UI (búsqueda, cliente, fechas,
+-- estado operativo y estado administrativo).
+--
+-- Costo total  = CostoBase + CostoKm * DistanciaKm
+-- Grua         = 'Placa (Cap. N)' | '—' si no estaba asignada
+-- FechaCompleta = '15 feb 2024, 09:30' (mes en español)
+-- CanceladoPor  se resuelve solo cuando EstadoOperacion='CANCELADO'
+--
+-- Parámetros (NULL o '' = sin filtro):
+--   _Busqueda             → ID de servicio (ej. 'SRV-001') o placa de grúa
+--   _IdCliente            → ID de Cliente B2B (NULL = todos)
+--   _FechaDesde           → Límite inferior de FechaServicio
+--   _FechaHasta           → Límite superior de FechaServicio
+--   _EstadoOperacion      → 'Finalizado' | 'Cancelado' (NULL = todos)
+--   _EstadoAdministrativo → 'Pendiente'  | 'Facturado' | 'Pagado' (NULL = todos)
+DROP FUNCTION IF EXISTS fn_ReporteServicios(VARCHAR, INT, DATE, DATE, VARCHAR, VARCHAR);
+CREATE OR REPLACE FUNCTION fn_ReporteServicios(
+    _Busqueda             VARCHAR(50),
+    _IdCliente            INT,
+    _FechaDesde           DATE,
+    _FechaHasta           DATE,
+    _EstadoOperacion      VARCHAR(20),
+    _EstadoAdministrativo VARCHAR(20)
+)
+RETURNS TABLE(
+    "Id"                   TEXT,
+    "Cliente"              TEXT,
+    "Costo"                DECIMAL(10,2),
+    "Origen"               TEXT,
+    "Destino"              TEXT,
+    "DistanciaKm"          DECIMAL(10,2),
+    "Fecha"                TEXT,
+    "Hora"                 TEXT,
+    "TiempoMin"            INT,
+    "Bloques"              INT,
+    "CantidadCarga"        INT,
+    "Operador"             TEXT,
+    "Unidad"               TEXT,
+    "Estado"               TEXT,
+    "EstadoAdministrativo" TEXT,
+    "FechaCompleta"        TEXT,
+    "Grua"                 TEXT,
+    "MotivoCancelacion"    TEXT,
+    "CanceladoPor"         TEXT,
+    "FechaCorta"           TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        --('SRV-' || LPAD(r."Id"::TEXT, 3, '0'))::TEXT,
+        'SRV' || r."Id"::TEXT,
+        c."Empresa"::TEXT,
+        (r."CostoBase" + r."CostoKm" * r."DistanciaKm")::DECIMAL(10,2),
+        r."DireccionOrigen",
+        r."DireccionDestino",
+        r."DistanciaKm",
+        TO_CHAR(r."FechaServicio", 'YYYY-MM-DD')::TEXT,
+        TO_CHAR(r."HoraInicio", 'HH24:MI')::TEXT,
+        r."TiempoEstimado"::INT,
+        r."NroBloques"::INT,
+        r."CantidadCarga"::INT,
+        CASE WHEN o."Id" IS NOT NULL
+             THEN (u_o."Nombres" || ' ' || u_o."Apellidos")::TEXT
+             ELSE NULL END,
+        CASE WHEN g."Id" IS NOT NULL
+             THEN g."Placa"::TEXT
+             ELSE NULL END,
+        CASE r."EstadoOperacion"
+             WHEN 'FINALIZADO' THEN 'Finalizado'
+             WHEN 'CANCELADO'  THEN 'Cancelado'
+             ELSE r."EstadoOperacion"
+        END::TEXT,
+        INITCAP(LOWER(r."EstadoAdministrativo"))::TEXT,
+        -- FechaCompleta: '15 feb 2024, 09:30' con mes en español
+        (TO_CHAR(r."FechaServicio", 'DD') || ' ' ||
+         CASE EXTRACT(MONTH FROM r."FechaServicio")::INT
+             WHEN 1  THEN 'ene' WHEN 2  THEN 'feb' WHEN 3  THEN 'mar'
+             WHEN 4  THEN 'abr' WHEN 5  THEN 'may' WHEN 6  THEN 'jun'
+             WHEN 7  THEN 'jul' WHEN 8  THEN 'ago' WHEN 9  THEN 'sep'
+             WHEN 10 THEN 'oct' WHEN 11 THEN 'nov' WHEN 12 THEN 'dic'
+         END || ' ' ||
+         TO_CHAR(r."FechaServicio", 'YYYY') || ', ' ||
+         TO_CHAR(r."HoraInicio", 'HH24:MI'))::TEXT,
+        CASE WHEN g."Id" IS NOT NULL
+             THEN (g."Placa" || ' (Cap. ' || g."Capacidad" || ')')::TEXT
+             ELSE '—'::TEXT
+        END,
+        r."MotivoCancelacion"::TEXT,
+        CASE WHEN r."EstadoOperacion" = 'CANCELADO' AND u_a."Id" IS NOT NULL
+             THEN (u_a."Nombres" || ' ' || u_a."Apellidos")::TEXT
+             ELSE NULL END,
+        TO_CHAR(r."FechaServicio", 'DD/MM/YYYY')::TEXT
+    FROM   "Reserva"  r
+    JOIN   "Cliente"  c   ON c."Id"      = r."IdCliente"
+    LEFT JOIN "Grua"     g   ON g."Id"   = r."IdGrua"
+    LEFT JOIN "Operador" o   ON o."Id"   = r."IdOperador"
+    LEFT JOIN "Usuario"  u_o ON u_o."Id" = o."IdUsuario"
+    LEFT JOIN "Usuario"  u_a ON u_a."Id" = r."ActualizadoPor"
+    WHERE  r."EstadoOperacion" IN ('FINALIZADO', 'CANCELADO')
+      AND  r."Estado" = 'ACTIVO'
+      AND  (_IdCliente            IS NULL OR r."IdCliente"          = _IdCliente)
+      AND  (_FechaDesde           IS NULL OR r."FechaServicio"      >= _FechaDesde)
+      AND  (_FechaHasta           IS NULL OR r."FechaServicio"      <= _FechaHasta)
+      AND  (_EstadoOperacion      IS NULL OR _EstadoOperacion       = ''
+            OR r."EstadoOperacion"      = UPPER(_EstadoOperacion))
+      AND  (_EstadoAdministrativo IS NULL OR _EstadoAdministrativo  = ''
+            OR r."EstadoAdministrativo" = UPPER(_EstadoAdministrativo))
+      AND  (_Busqueda IS NULL OR _Busqueda = ''
+            OR ('SRV-' || LPAD(r."Id"::TEXT, 3, '0')) ILIKE '%' || _Busqueda || '%'
+            OR g."Placa" ILIKE '%' || _Busqueda || '%')
+    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."Id" DESC;
+END;
+$$;
+
 
 -- ============================================================
 -- Zona horaria de la base de datos (tomada de ParametroOperativo)
