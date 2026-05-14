@@ -1486,11 +1486,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
+      "projectUniqueName": "c:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
       "projectName": "BackRomo.Infrastructure",
-      "projectPath": "C:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
+      "projectPath": "c:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
       "packagesPath": "C:\\Users\\mhern\\.nuget\\packages\\",
-      "outputPath": "C:\\dev\\back_romo\\BackRomo.Infrastructure\\obj\\",
+      "outputPath": "c:\\dev\\back_romo\\BackRomo.Infrastructure\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\mhern\\AppData\\Roaming\\NuGet\\NuGet.Config"

@@ -1,9 +1,8 @@
 namespace BackRomo.Application.DTOs.Configuracion;
 
-public class TarifaDto
+public class UpdTarifarioDto
 {
     public int     Id         { get; set; }
     public decimal TarifaBase { get; set; }
     public decimal TarifaKm   { get; set; }
-    public string  Estado     { get; set; } = string.Empty;
 }

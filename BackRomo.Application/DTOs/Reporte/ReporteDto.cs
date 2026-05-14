@@ -2,7 +2,7 @@ namespace BackRomo.Application.DTOs.Reporte;
 
 public class ReporteDto
 {
-    public string   Id                   { get; set; } = string.Empty;
+    public int      Id                   { get; set; }
     public string   Cliente              { get; set; } = string.Empty;
     public decimal  Costo                { get; set; }
     public string   Origen               { get; set; } = string.Empty;

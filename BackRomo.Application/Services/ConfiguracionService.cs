@@ -20,4 +20,10 @@ public class ConfiguracionService
 
     public async Task<ConfigResultDto> ActualizarReservaClienteOnAsync(bool value, int actualizadoPor, CancellationToken ct = default)
         => await _configuracionRepository.ActualizarReservaClienteOnAsync(value, actualizadoPor, ct);
+
+    public async Task<ConfigResultDto> ActualizarTarifarioGlobalAsync(UpdTarifarioDto dto, int actualizadoPor, CancellationToken ct = default)
+        => await _configuracionRepository.ActualizarTarifarioGlobalAsync(dto, actualizadoPor, ct);
+
+    public async Task<ConfigResultDto> ActualizarParametroOperativoAsync(UpdParametroDto dto, int actualizadoPor, CancellationToken ct = default)
+        => await _configuracionRepository.ActualizarParametroOperativoAsync(dto, actualizadoPor, ct);
 }

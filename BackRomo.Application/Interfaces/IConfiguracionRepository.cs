@@ -7,4 +7,6 @@ public interface IConfiguracionRepository
     Task<TarifaDto?>       ObtenerTarifarioGlobalAsync(CancellationToken ct = default);
     Task<ParametroDto?>    ObtenerParametroOperativoAsync(CancellationToken ct = default);
     Task<ConfigResultDto>  ActualizarReservaClienteOnAsync(bool value, int actualizadoPor, CancellationToken ct = default);
+    Task<ConfigResultDto>  ActualizarTarifarioGlobalAsync(UpdTarifarioDto dto, int actualizadoPor, CancellationToken ct = default);
+    Task<ConfigResultDto>  ActualizarParametroOperativoAsync(UpdParametroDto dto, int actualizadoPor, CancellationToken ct = default);
 }

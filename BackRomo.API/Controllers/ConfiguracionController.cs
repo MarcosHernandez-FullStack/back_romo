@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BackRomo.Application.DTOs.Configuracion;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Timeouts;
@@ -63,11 +64,39 @@ public class ConfiguracionController : ControllerBase
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
+    [HttpPut("tarifario-global")]
+    public async Task<IActionResult> ActualizarTarifarioGlobal([FromBody] UpdTarifarioDto dto, CancellationToken ct)
+    {
+        var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var result = await _configuracionService.ActualizarTarifarioGlobalAsync(dto, actualizadoPor, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
     [HttpPatch("reserva-cliente-on")]
     public async Task<IActionResult> ActualizarReservaClienteOn([FromBody] bool value, CancellationToken ct)
     {
         var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         var result = await _configuracionService.ActualizarReservaClienteOnAsync(value, actualizadoPor, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
+        if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPut("parametro-operativo")]
+    public async Task<IActionResult> ActualizarParametroOperativo([FromBody] UpdParametroDto dto, CancellationToken ct)
+    {
+        var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        var result = await _configuracionService.ActualizarParametroOperativoAsync(dto, actualizadoPor, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
         if (result.Exitoso == 2) return Accepted(result);

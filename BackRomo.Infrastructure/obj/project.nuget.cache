@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "wd1OU/ddF9M=",
+  "dgSpecHash": "oV6AsPptk7s=",
   "success": true,
-  "projectFilePath": "C:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
+  "projectFilePath": "c:\\dev\\back_romo\\BackRomo.Infrastructure\\BackRomo.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\mhern\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\mhern\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",

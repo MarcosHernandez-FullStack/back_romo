@@ -88,4 +88,74 @@ public class ConfiguracionRepository : IConfiguracionRepository
             return new ConfigResultDto { Exitoso = 0, Mensaje = ex.Message };
         }
     }
+
+    public async Task<ConfigResultDto> ActualizarTarifarioGlobalAsync(UpdTarifarioDto dto, int actualizadoPor, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_Id",             dto.Id,         DbType.Int32);
+            p.Add("_TarifaBase",     dto.TarifaBase, DbType.Decimal);
+            p.Add("_TarifaKm",       dto.TarifaKm,   DbType.Decimal);
+            p.Add("_ActualizadoPor", actualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_UpdTarifarioGlobal(@_Id, @_TarifaBase, @_TarifaKm, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new ConfigResultDto { Exitoso = p.Get<int>("_Exitoso"), Mensaje = p.Get<string>("_Mensaje") };
+        }
+        catch (OperationCanceledException)
+        {
+            return new ConfigResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
+        catch (Exception ex)
+        {
+            return new ConfigResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
+
+    public async Task<ConfigResultDto> ActualizarParametroOperativoAsync(UpdParametroDto dto, int actualizadoPor, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_TiempoMargenManiobra", dto.TiempoMargenManiobra, DbType.Int16);
+            p.Add("_TiempoRetornoBase",    dto.TiempoRetornoBase,    DbType.Int16);
+            p.Add("_UmbralLargaDistancia", dto.UmbralLargaDistancia, DbType.Decimal);
+            p.Add("_TiempoTolerancia",     dto.TiempoTolerancia,     DbType.Int16);
+            p.Add("_TiempoCorte",          dto.TiempoCorte,          DbType.Int16);
+            p.Add("_TimerAdministrativo",  dto.TimerAdministrativo,  DbType.Int16);
+            p.Add("_TimerCliente",         dto.TimerCliente,         DbType.Int16);
+            p.Add("_ZonaHoraria",          dto.ZonaHoraria,          DbType.String);
+            p.Add("_MinutosCerca",         dto.MinutosCerca,         DbType.Int16);
+            p.Add("_MinutosMedio",         dto.MinutosMedio,         DbType.Int16);
+            p.Add("_CoordLatMaps",         dto.CoordLatMaps,         DbType.String);
+            p.Add("_CoordLonMaps",         dto.CoordLonMaps,         DbType.String);
+            p.Add("_MetrosCercania",       dto.MetrosCercania,       DbType.Decimal);
+            p.Add("_ActualizadoPor",       actualizadoPor,           DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_UpdParametroOperativo(@_TiempoMargenManiobra, @_TiempoRetornoBase, @_UmbralLargaDistancia, @_TiempoTolerancia, @_TiempoCorte, @_TimerAdministrativo, @_TimerCliente, @_ZonaHoraria, @_MinutosCerca, @_MinutosMedio, @_CoordLatMaps, @_CoordLonMaps, @_MetrosCercania, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new ConfigResultDto { Exitoso = p.Get<int>("_Exitoso"), Mensaje = p.Get<string>("_Mensaje") };
+        }
+        catch (OperationCanceledException)
+        {
+            return new ConfigResultDto { Exitoso = 2, Mensaje = "La operación tardó demasiado. Verifique si el cambio fue aplicado." };
+        }
+        catch (Exception ex)
+        {
+            return new ConfigResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
 }

@@ -2381,6 +2381,113 @@ END;
 $$;
 
 
+-- ── sp_UpdTarifarioGlobal ────────────────────────────────────
+DROP PROCEDURE IF EXISTS sp_UpdTarifarioGlobal(INT, DECIMAL, DECIMAL, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdTarifarioGlobal(
+    _Id             INT,
+    _TarifaBase     DECIMAL(10,2),
+    _TarifaKm       DECIMAL(10,2),
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    UPDATE "TarifarioGlobal"
+    SET    "TarifaBase"         = _TarifaBase,
+           "TarifaKm"           = _TarifaKm,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _Id;
+
+    IF NOT FOUND THEN
+        _Mensaje := 'No se encontró el tarifario global con Id ' || _Id || '.';
+        RETURN;
+    END IF;
+
+    _Exitoso := 1;
+    _Mensaje  := 'Tarifario global actualizado correctamente.';
+END;
+$$;
+
+
+-- ── sp_UpdParametroOperativo ─────────────────────────────────
+-- Actualiza todos los parámetros operativos del sistema
+-- (registro único en la tabla ParametroOperativo).
+--
+-- Parámetros:
+--   _TiempoMargenManiobra → Minutos adicionales para carga y descarga
+--   _TiempoRetornoBase    → Minutos de reposicionamiento en viajes cortos
+--   _UmbralLargaDistancia → Km a partir de los cuales se aplica retorno
+--   _TiempoTolerancia     → Margen de minutos para redondeo de horarios
+--   _TiempoCorte          → Anticipación mínima para aceptar reservas (horas)
+--   _TimerAdministrativo  → Tiempo máximo de gestión interna (minutos)
+--   _TimerCliente         → Tiempo máximo de espera visible para el cliente (minutos)
+--   _ZonaHoraria          → Identificador IANA de zona horaria (ej. America/Lima)
+--   _MinutosCerca         → Umbral de minutos para clasificar grúa como "Cerca"
+--   _MinutosMedio         → Umbral de minutos para clasificar grúa como "Medio"
+--   _CoordLatMaps         → Latitud del centro de operaciones (grados decimales)
+--   _CoordLonMaps         → Longitud del centro de operaciones (grados decimales)
+--   _MetrosCercania       → Radio en metros para búsqueda de unidades cercanas
+--   _ActualizadoPor       → ID del usuario administrador que realiza el cambio
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdParametroOperativo(SMALLINT, SMALLINT, DECIMAL, SMALLINT, SMALLINT, SMALLINT, SMALLINT, VARCHAR, SMALLINT, SMALLINT, VARCHAR, VARCHAR, DECIMAL, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdParametroOperativo(
+    _TiempoMargenManiobra SMALLINT,
+    _TiempoRetornoBase    SMALLINT,
+    _UmbralLargaDistancia DECIMAL(10,2),
+    _TiempoTolerancia     SMALLINT,
+    _TiempoCorte          SMALLINT,
+    _TimerAdministrativo  SMALLINT,
+    _TimerCliente         SMALLINT,
+    _ZonaHoraria          VARCHAR(50),
+    _MinutosCerca         SMALLINT,
+    _MinutosMedio         SMALLINT,
+    _CoordLatMaps         VARCHAR(20),
+    _CoordLonMaps         VARCHAR(20),
+    _MetrosCercania       DECIMAL(10,2),
+    _ActualizadoPor       INT,
+    INOUT _Exitoso        INT,
+    INOUT _Mensaje        TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    UPDATE "ParametroOperativo"
+    SET    "TiempoMargenManiobra" = _TiempoMargenManiobra,
+           "TiempoRetornoBase"    = _TiempoRetornoBase,
+           "UmbralLargaDistancia" = _UmbralLargaDistancia,
+           "TiempoTolerancia"     = _TiempoTolerancia,
+           "TiempoCorte"          = _TiempoCorte,
+           "TimerAdministrativo"  = _TimerAdministrativo,
+           "TimerCliente"         = _TimerCliente,
+           "ZonaHoraria"          = _ZonaHoraria,
+           "MinutosCerca"         = _MinutosCerca,
+           "MinutosMedio"         = _MinutosMedio,
+           "CoordLatMaps"         = _CoordLatMaps,
+           "CoordLonMaps"         = _CoordLonMaps,
+           "MetrosCercania"       = _MetrosCercania,
+           "FechaActualizacion"   = NOW(),
+           "ActualizadoPor"       = _ActualizadoPor;
+
+    IF NOT FOUND THEN
+        _Mensaje := 'No se encontró el registro de parámetros operativos.';
+        RETURN;
+    END IF;
+
+    _Exitoso := 1;
+    _Mensaje  := 'Parámetros operativos actualizados correctamente.';
+END;
+$$;
+
+
 -- ============================================================
 -- SECCIÓN 7: FUNCTIONS  (solo retornan filas, sin transacción)
 -- ============================================================
@@ -2790,12 +2897,13 @@ END;
 $$;
 
 -- ── fn_TarifarioGlobal ───────────────────────────────────────
+DROP FUNCTION IF EXISTS fn_TarifarioGlobal();
 CREATE OR REPLACE FUNCTION fn_TarifarioGlobal()
-RETURNS TABLE("TarifaBase" DECIMAL(10,2), "TarifaKm" DECIMAL(10,2), "Estado" VARCHAR(10))
+RETURNS TABLE("Id" INT, "TarifaBase" DECIMAL(10,2), "TarifaKm" DECIMAL(10,2), "Estado" VARCHAR(10))
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT tg."TarifaBase",tg."TarifaKm",tg."Estado"
+    SELECT tg."Id", tg."TarifaBase", tg."TarifaKm", tg."Estado"
     FROM   "TarifarioGlobal" tg LIMIT 1;
 END;
 $$;
@@ -5048,7 +5156,7 @@ CREATE OR REPLACE FUNCTION fn_ReporteServicios(
     _EstadoAdministrativo VARCHAR(20)
 )
 RETURNS TABLE(
-    "Id"                   TEXT,
+    "Id"                   INT,
     "Cliente"              TEXT,
     "Costo"                DECIMAL(10,2),
     "Origen"               TEXT,
@@ -5072,9 +5180,8 @@ RETURNS TABLE(
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT
-        --('SRV-' || LPAD(r."Id"::TEXT, 3, '0'))::TEXT,
-        'SRV' || r."Id"::TEXT,
+    SELECT --DISTINCT ON (r."Id")
+        r."Id",
         c."Empresa"::TEXT,
         (r."CostoBase" + r."CostoKm" * r."DistanciaKm")::DECIMAL(10,2),
         r."DireccionOrigen",
@@ -5132,9 +5239,9 @@ BEGIN
       AND  (_EstadoAdministrativo IS NULL OR _EstadoAdministrativo  = ''
             OR r."EstadoAdministrativo" = UPPER(_EstadoAdministrativo))
       AND  (_Busqueda IS NULL OR _Busqueda = ''
-            OR ('SRV-' || LPAD(r."Id"::TEXT, 3, '0')) ILIKE '%' || _Busqueda || '%'
+            OR r."Id"::TEXT ILIKE '%' || _Busqueda || '%'
             OR g."Placa" ILIKE '%' || _Busqueda || '%')
-    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."Id" DESC;
+    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC;
 END;
 $$;
 
