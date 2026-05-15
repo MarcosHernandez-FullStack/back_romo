@@ -30,7 +30,8 @@ public class JwtService : IJwtService
             new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
             new Claim(ClaimTypes.Name,           usuario.Alias),
             new Claim(ClaimTypes.Email,          usuario.Correo),
-            new Claim(ClaimTypes.Role,           usuario.Rol)
+            new Claim(ClaimTypes.Role,           usuario.Rol),
+            new Claim("IdCliente",               usuario.IdCliente?.ToString() ?? "")
         };
 
         var key         = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_key));

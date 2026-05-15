@@ -26,12 +26,21 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> ListarReservas(
         [FromQuery] string?   estadoOperacion,
         [FromQuery] int?      id,
-        [FromQuery] DateTime? fechaServicio,
+        [FromQuery] DateOnly? fechaServicioInicio,
+        [FromQuery] DateOnly? fechaServicioFin,
         [FromQuery] int?      idOperador,
         [FromQuery] int?      idGrua,
+        [FromQuery] string?   estadoAdministrativo,
         CancellationToken     ct)
     {
-        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicio, idOperador, idGrua, ct);
+        int? idCliente = null;
+        if (User.IsInRole("CLIENTE"))
+        {
+            var raw = User.FindFirstValue("IdCliente");
+            if (int.TryParse(raw, out var parsed)) idCliente = parsed;
+        }
+
+        var reservas = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaServicioInicio, fechaServicioFin, idOperador, idGrua, estadoAdministrativo, idCliente, ct);
         return Ok(reservas);
     }
 

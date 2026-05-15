@@ -29,13 +29,22 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateTime? fechaServicio, int? idOperador, int? idGrua, CancellationToken ct = default)
+    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaServicioInicio, DateOnly? fechaServicioFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
         var rows = await conn.QueryAsync<ReservaDapperRow>(new CommandDefinition(
-            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicio::date, @IdOperador, @IdGrua)",
-            new { EstadoOperacion = estadoOperacion, Id = id, FechaServicio = fechaServicio, IdOperador = idOperador, IdGrua = idGrua },
+            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicioInicio::date, @FechaServicioFin::date, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente)",
+            new {
+                EstadoOperacion      = estadoOperacion,
+                Id                   = id,
+                FechaServicioInicio  = fechaServicioInicio?.ToDateTime(TimeOnly.MinValue),
+                FechaServicioFin     = fechaServicioFin?.ToDateTime(TimeOnly.MinValue),
+                IdOperador           = idOperador,
+                IdGrua               = idGrua,
+                EstadoAdministrativo = estadoAdministrativo,
+                IdCliente            = idCliente,
+            },
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
@@ -62,12 +71,16 @@ public class OperacionRepository : IOperacionRepository
             TiempoRetorno    = r.TiempoRetorno,
             Estado           = r.Estado,
             EstadoOperacion  = r.EstadoOperacion,
-            NombreCliente    = r.NombreCliente,
-            GruaAsignada     = r.GruaAsignada,
-            OperadorAsignado = r.OperadorAsignado,
-            Vehiculos        = string.IsNullOrWhiteSpace(r.Vehiculos)
+            NombreCliente        = r.NombreCliente,
+            GruaAsignada         = r.GruaAsignada,
+            OperadorAsignado     = r.OperadorAsignado,
+            Vehiculos            = string.IsNullOrWhiteSpace(r.Vehiculos)
                 ? new()
                 : JsonSerializer.Deserialize<List<VehiculoItemDto>>(r.Vehiculos, options) ?? new(),
+            FechaHoraFormateada  = r.FechaHoraFormateada ?? string.Empty,
+            CantidadVehiculos    = r.CantidadVehiculos,
+            EstadoAdministrativo = r.EstadoAdministrativo ?? string.Empty,
+            Costo                = r.Costo,
         });
     }
 
@@ -403,9 +416,13 @@ public class OperacionRepository : IOperacionRepository
         public int       TiempoRetorno    { get; set; }
         public string    Estado           { get; set; } = string.Empty;
         public string    EstadoOperacion  { get; set; } = string.Empty;
-        public string?   NombreCliente    { get; set; }
-        public string?   GruaAsignada     { get; set; }
-        public string?   OperadorAsignado { get; set; }
-        public string?   Vehiculos        { get; set; }  // columna JSON → se deserializa manualmente
+        public string?   NombreCliente        { get; set; }
+        public string?   GruaAsignada         { get; set; }
+        public string?   OperadorAsignado     { get; set; }
+        public string?   Vehiculos            { get; set; }  // columna JSON → se deserializa manualmente
+        public string?   FechaHoraFormateada  { get; set; }
+        public int       CantidadVehiculos    { get; set; }
+        public string?   EstadoAdministrativo { get; set; }
+        public decimal   Costo                { get; set; }
     }
 }

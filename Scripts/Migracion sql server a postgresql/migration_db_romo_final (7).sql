@@ -2588,13 +2588,16 @@ $$;
 
 
 -- ── fn_ListReservas ──────────────────────────────────────────
-DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, INT, INT);
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
-    _EstadoOperacion VARCHAR(20),
-    _Id              INT,
-    _FechaServicio   DATE,
-    _IdOperador      INT,
-    _IdGrua          INT
+    _EstadoOperacion      VARCHAR(20),
+    _Id                   INT,
+    _FechaServicioInicio  DATE,
+    _FechaServicioFin     DATE,
+    _IdOperador           INT,
+    _IdGrua               INT,
+    _EstadoAdministrativo VARCHAR(50),
+    _IdCliente            INT
 )
 RETURNS TABLE(
     "Id"               INT,
@@ -2616,9 +2619,13 @@ RETURNS TABLE(
     "Estado"           VARCHAR(10),
     "EstadoOperacion"  VARCHAR(50),
     "NombreCliente"    TEXT,
-    "GruaAsignada"     TEXT,
-    "OperadorAsignado" TEXT,
-    "Vehiculos"        JSON
+    "GruaAsignada"        TEXT,
+    "OperadorAsignado"    TEXT,
+    "Vehiculos"           JSON,
+    "FechaHoraFormateada" TEXT,
+    "CantidadVehiculos"   INT,
+    "EstadoAdministrativo" VARCHAR(50),
+    "Costo"               DECIMAL(10,2)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -2653,20 +2660,27 @@ BEGIN
                FROM "Vehiculo" v
                WHERE v."IdReserva" = r."Id" AND v."Estado" = 'ACTIVO'),
                '[]'::json
-           )
+           ),
+           TO_CHAR(r."FechaServicio", 'DD/MM/YYYY') || ' · ' || TO_CHAR(r."HoraInicio", 'HH24:MI'),
+           (SELECT COUNT(*)::INT FROM "Vehiculo" v2 WHERE v2."IdReserva" = r."Id" AND v2."Estado" = 'ACTIVO'),
+           r."EstadoAdministrativo",
+           (r."CostoBase" + r."CostoKm" * r."DistanciaKm")::DECIMAL(10,2)
     FROM   "Reserva" r
     LEFT JOIN "Grua"     g   ON g."Id"        = r."IdGrua"
     LEFT JOIN "Operador" o   ON o."Id"        = r."IdOperador"
     LEFT JOIN "Usuario"  u   ON o."IdUsuario" = u."Id"
     LEFT JOIN "Cliente"  c   ON c."Id"        = r."IdCliente"
     LEFT JOIN "Usuario"  u_c ON u_c."Id"      = c."IdUsuario"
-    WHERE  (_EstadoOperacion IS NULL OR r."EstadoOperacion" = _EstadoOperacion)
-      AND  (_Id              IS NULL OR r."Id"              = _Id)
-      AND  (_FechaServicio   IS NULL OR r."FechaServicio"   = _FechaServicio)
-      AND  (_IdOperador      IS NULL OR r."IdOperador"      = _IdOperador)
-      AND  (_IdGrua          IS NULL OR r."IdGrua"          = _IdGrua)
+    WHERE  (_EstadoOperacion      IS NULL OR r."EstadoOperacion"      = _EstadoOperacion)
+      AND  (_Id                   IS NULL OR r."Id"                   = _Id)
+      AND  (_FechaServicioInicio  IS NULL OR r."FechaServicio" >= _FechaServicioInicio)
+      AND  (_FechaServicioFin    IS NULL OR r."FechaServicio" <= _FechaServicioFin)
+      AND  (_IdOperador           IS NULL OR r."IdOperador"           = _IdOperador)
+      AND  (_IdGrua               IS NULL OR r."IdGrua"               = _IdGrua)
+      AND  (_EstadoAdministrativo IS NULL OR r."EstadoAdministrativo" = _EstadoAdministrativo)
+      AND  (_IdCliente            IS NULL OR r."IdCliente"            = _IdCliente)
       AND  r."Estado" = 'ACTIVO'
-    ORDER BY r."FechaServicio", r."HoraInicio", r."HoraFin", r."Id";
+    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."HoraFin" DESC, r."Id" DESC;
 END;
 $$;
 
