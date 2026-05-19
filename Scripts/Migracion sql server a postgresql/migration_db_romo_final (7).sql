@@ -15,7 +15,7 @@
 --     sp_UpdEstadoOperador, sp_UpdEstadoAdministrativo,
 --     sp_CreUpdGrua, sp_UpdEstadoGrua,
 --     sp_IngresoTaller, sp_RetornoOperativa,
---     sp_UpdConfiguracionHorario
+--     sp_UpdConfiguracionHorario, sp_UpdEstadoUsuario
 --
 --   FUNCTION (retorna filas, sin transacción):
 --     fn_ListClientes, fn_ListHorariosDisponibles,
@@ -1951,6 +1951,60 @@ END;
 $$;
 
 
+-- ── sp_UpdEstadoUsuario ──────────────────────────────────────
+-- Cambia el Estado de un usuario admin/staff (ACTIVO ↔ INACTIVO).
+--
+-- Parámetros:
+--   _IdUsuario      → ID del usuario a modificar
+--   _NuevoEstado    → 'ACTIVO' | 'INACTIVO'
+--   _ActualizadoPor → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoUsuario(INT, VARCHAR, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoUsuario(
+    _IdUsuario      INT,
+    _NuevoEstado    VARCHAR(10),
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    IF NOT EXISTS (SELECT 1 FROM "Usuario" WHERE "Id" = _IdUsuario) THEN
+        _Mensaje := 'El usuario no existe.';
+        RETURN;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM "Usuario"
+        WHERE  "Id"     = _IdUsuario
+          AND  "Estado" = _NuevoEstado
+    ) THEN
+        _Mensaje := 'El usuario ya se encuentra en estado ' || _NuevoEstado || '.';
+        RETURN;
+    END IF;
+
+    UPDATE "Usuario"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdUsuario;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := CASE _NuevoEstado
+        WHEN 'INACTIVO' THEN 'Usuario dado de baja correctamente.'
+        WHEN 'ACTIVO'   THEN 'Usuario reactivado correctamente.'
+        ELSE                 'Estado actualizado correctamente.'
+    END;
+END;
+$$;
+
+
 -- ── sp_UpdEstadoAdministrativo ────────────────────────────────
 -- Actualiza el estado administrativo de una reserva finalizada
 -- (PENDIENTE → FACTURADO → PAGADO).
@@ -2546,25 +2600,37 @@ $$;
 -- con los campos necesarios para la gestión del panel de control.
 --
 -- Parámetros:
---   _Estado → 'ACTIVO' | 'INACTIVO' | NULL (todos)
---   _Id     → ID específico            | NULL (todos)
---   _Rol    → 'ADMINISTRADOR' | 'STAFF' | NULL (ambos)
+--   _Estado  → 'ACTIVO' | 'INACTIVO'           | NULL (todos)
+--   _Id      → ID exacto                        | NULL (todos)
+--   _Nombre  → búsqueda parcial en Nombres/Apellidos | NULL (sin filtro)
+--   _Correo  → búsqueda parcial en Correo       | NULL (sin filtro)
+--   _Rol     → 'ADMINISTRADOR' | 'STAFF'        | NULL (ambos)
+--   _Pagina  → número de página (1-based)       | NULL (sin paginación)
+--   _Tamano  → registros por página             | NULL (sin paginación)
+--
+-- "Total" devuelve el conteo total de filas que cumplen los filtros
+-- independientemente de la paginación (COUNT(*) OVER()).
 
-DROP FUNCTION IF EXISTS fn_ListUsuarios(VARCHAR, INT, VARCHAR);
+DROP FUNCTION IF EXISTS fn_ListUsuarios(VARCHAR, INT, VARCHAR,VARCHAR,VARCHAR,INT,INT);
 CREATE OR REPLACE FUNCTION fn_ListUsuarios(
-    _Estado VARCHAR(20),
-    _Id     INT,
-    _Rol    VARCHAR(100)
+    _Estado  VARCHAR(20)  DEFAULT NULL,
+    _Id      INT          DEFAULT NULL,
+    _Nombre  VARCHAR(100) DEFAULT NULL,
+    _Correo  VARCHAR(100) DEFAULT NULL,
+    _Rol     VARCHAR(100) DEFAULT NULL,
+    _Pagina  INT          DEFAULT NULL,
+    _Tamano  INT          DEFAULT NULL
 )
 RETURNS TABLE(
-    "Id"            INT,
-    "Nombres"       VARCHAR(100),
-    "Apellidos"     VARCHAR(100),
-    "Correo"        VARCHAR(100),
-    "Telefono"      VARCHAR(50),
-    "Rol"           VARCHAR(100),
-    "Estado"        VARCHAR(20),
-    "FechaCreacion" TIMESTAMP(6)
+    "Id"                  INT,
+    "Nombres"             VARCHAR(100),
+    "Apellidos"           VARCHAR(100),
+    "Correo"              VARCHAR(100),
+    "Telefono"            VARCHAR(50),
+    "Rol"                 VARCHAR(100),
+    "Estado"              VARCHAR(20),
+    "FechaCreacion"       TIMESTAMP(6),
+    "FechaCreacionFormat" VARCHAR(20)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -2576,13 +2642,26 @@ BEGIN
            u."Telefono",
            u."Rol",
            u."Estado",
-           u."FechaCreacion"
+           u."FechaCreacion",
+           (TO_CHAR(u."FechaCreacion", 'FMDD') || ' ' ||
+           CASE EXTRACT(MONTH FROM u."FechaCreacion")
+               WHEN 1  THEN 'ene' WHEN 2  THEN 'feb' WHEN 3  THEN 'mar'
+               WHEN 4  THEN 'abr' WHEN 5  THEN 'may' WHEN 6  THEN 'jun'
+               WHEN 7  THEN 'jul' WHEN 8  THEN 'ago' WHEN 9  THEN 'sep'
+               WHEN 10 THEN 'oct' WHEN 11 THEN 'nov' WHEN 12 THEN 'dic'
+           END || ' ' ||
+           TO_CHAR(u."FechaCreacion", 'YYYY'))::VARCHAR(20)
     FROM   "Usuario" u
     WHERE  u."Rol" IN ('ADMINISTRADOR', 'STAFF')
-      AND  (_Estado IS NULL OR u."Estado" = _Estado)
-      AND  (_Id     IS NULL OR u."Id"     = _Id)
-      AND  (_Rol    IS NULL OR u."Rol"    = _Rol)
-    ORDER BY u."FechaCreacion" ASC;
+      AND  (_Estado IS NULL OR u."Estado"    =     _Estado)
+      AND  (_Id     IS NULL OR u."Id"        =     _Id)
+      AND  (_Nombre IS NULL OR u."Nombres"   ILIKE '%' || _Nombre || '%'
+                            OR u."Apellidos" ILIKE '%' || _Nombre || '%')
+      AND  (_Correo IS NULL OR u."Correo"    ILIKE '%' || _Correo || '%')
+      AND  (_Rol    IS NULL OR u."Rol"       =     _Rol)
+    ORDER BY u."FechaCreacion" ASC
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 

@@ -9,5 +9,6 @@ public class UsuarioDto
     public string?  Telefono      { get; set; }
     public string   Rol           { get; set; } = string.Empty;
     public string   Estado        { get; set; } = string.Empty;
-    public DateTime FechaCreacion { get; set; }
+    public DateTime FechaCreacion       { get; set; }
+    public string   FechaCreacionFormat { get; set; } = string.Empty;
 }

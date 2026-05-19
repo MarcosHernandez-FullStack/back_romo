@@ -26,15 +26,19 @@ public class UsuariosController : ControllerBase
     public async Task<IActionResult> ListarUsuarios(
         [FromQuery] string? estado,
         [FromQuery] int?    id,
+        [FromQuery] string? nombre,
+        [FromQuery] string? correo,
         [FromQuery] string? rol,
+        [FromQuery] int?    pagina,
+        [FromQuery] int?    tamano,
         CancellationToken   ct)
     {
-        var usuarios = await _usuarioService.ListarUsuariosAsync(estado, id, rol, ct);
+        var result = await _usuarioService.ListarUsuariosAsync(estado, id, nombre, correo, rol, pagina, tamano, ct);
 
-        if (!usuarios.Any())
+        if (result.Total == 0)
             return NoContent();
 
-        return Ok(usuarios);
+        return Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]
@@ -70,6 +74,24 @@ public class UsuariosController : ControllerBase
 
         if (result.Exitoso == 0) return Conflict(result);
         if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPatch("{idUsuario:int}/estado")]
+    public async Task<IActionResult> ActualizarEstadoUsuario(
+        int idUsuario,
+        [FromBody] UpdEstadoUsuarioDto dto,
+        CancellationToken ct)
+    {
+        dto.IdUsuario      = idUsuario;
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+
+        var result = await _usuarioService.ActualizarEstadoUsuarioAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
         return Ok(result);
     }
 }

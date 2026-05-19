@@ -15,16 +15,35 @@ public class UsuarioRepository : IUsuarioRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<UsuarioDto>> ListarUsuariosAsync(string? estado, int? id, string? rol, CancellationToken ct = default)
+    public async Task<UsuarioPagedDto> ListarUsuariosAsync(string? estado, int? id, string? nombre, string? correo, string? rol, int? pagina, int? tamano, CancellationToken ct = default)
     {
-        using var conn = _db.CreateConnection();
+        using var conn  = _db.CreateConnection();
+        var       param = new { Estado = estado, Id = id, Nombre = nombre, Correo = correo, Rol = rol, Pagina = pagina, Tamano = tamano };
 
-        return await conn.QueryAsync<UsuarioDto>(new CommandDefinition(
-            "SELECT * FROM fn_ListUsuarios(@Estado, @Id, @Rol)",
-            new { Estado = estado, Id = id, Rol = rol },
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListUsuarios(@Estado, @Id, @Nombre, @Correo, @Rol, @Pagina, @Tamano);
+            SELECT
+              COUNT(*)                                            AS Total,
+              COUNT(*) FILTER (WHERE "Rol" = 'ADMINISTRADOR')  AS TotalAdministradores,
+              COUNT(*) FILTER (WHERE "Rol" = 'STAFF')          AS TotalStaff
+            FROM fn_ListUsuarios(@Estado, @Id, @Nombre, @Correo, @Rol, NULL, NULL);
+            """,
+            param,
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
+
+        var datos = (await multi.ReadAsync<UsuarioDto>()).ToList();
+        var (total, admins, staff) = await multi.ReadFirstOrDefaultAsync<(long, long, long)>();
+
+        return new UsuarioPagedDto
+        {
+            Total                = total,
+            TotalAdministradores = admins,
+            TotalStaff           = staff,
+            Datos                = datos,
+        };
     }
 
     public async Task<UsuarioResultDto> CrearUsuarioAsync(CrearUsuarioDto dto, CancellationToken ct = default)
@@ -116,5 +135,35 @@ public class UsuarioRepository : IUsuarioRepository
             return new UsuarioResultDto { Exitoso = 0, Mensaje = ex.Message };
         }
     }
+
+    public async Task<UsuarioResultDto> ActualizarEstadoUsuarioAsync(UpdEstadoUsuarioDto dto, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdUsuario",      dto.IdUsuario,      DbType.Int32);
+            p.Add("_NuevoEstado",    dto.NuevoEstado,    DbType.String);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_UpdEstadoUsuario(@_IdUsuario, @_NuevoEstado, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new UsuarioResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje"),
+            };
+        }
+        catch (Exception ex)
+        {
+            return new UsuarioResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
+
 
 }
