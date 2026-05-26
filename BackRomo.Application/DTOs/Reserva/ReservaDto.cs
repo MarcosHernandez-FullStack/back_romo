@@ -10,9 +10,9 @@ public class ReservaDto
     public string    CoordLatDestino  { get; set; } = string.Empty;
     public string    CoordLonDestino  { get; set; } = string.Empty;
     public short     CantidadCarga    { get; set; }
-    public DateTime  FechaServicio    { get; set; }
-    public TimeSpan  HoraInicio       { get; set; }
-    public TimeSpan  HoraFin          { get; set; }
+    public string    FechaServicio    { get; set; } = string.Empty;
+    public string    HoraInicio       { get; set; } = string.Empty;
+    public string    HoraFin          { get; set; } = string.Empty;
     public int       NroBloques       { get; set; }
     public decimal   DistanciaKm      { get; set; }
     public int       TiempoEstimado   { get; set; }

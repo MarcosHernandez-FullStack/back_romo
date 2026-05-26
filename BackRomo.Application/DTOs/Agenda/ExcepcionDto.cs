@@ -3,7 +3,8 @@ namespace BackRomo.Application.DTOs.Agenda;
 public class ExcepcionDto
 {
     public int    Id                { get; set; }
-    public string Fecha             { get; set; } = string.Empty;
+    public string FechaFormatCorta  { get; set; } = string.Empty;
+    public string FechaFormatLarga  { get; set; } = string.Empty;
     public string Motivo            { get; set; } = string.Empty;
     public string Alcance           { get; set; } = string.Empty;
     public string TiempoInicio      { get; set; } = string.Empty;

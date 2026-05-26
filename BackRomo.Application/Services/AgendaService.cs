@@ -18,8 +18,8 @@ public class AgendaService
     public async Task<AgendaResultDto> ActualizarConfiguracionHorarioAsync(UpdConfiguracionHorarioDto dto, CancellationToken ct = default)
         => await _agendaRepository.ActualizarConfiguracionHorarioAsync(dto, ct);
 
-    public async Task<IEnumerable<ExcepcionDto>> ListarExcepcionesAsync(string? estado, int? id, CancellationToken ct = default)
-        => await _agendaRepository.ListarExcepcionesAsync(estado, id, ct);
+    public async Task<ExcepcionPagedDto> ListarExcepcionesAsync(string? estado, int? id, string? motivo, DateOnly? fechaInicio, DateOnly? fechaFin, int? pagina, int? tamano, CancellationToken ct = default)
+        => await _agendaRepository.ListarExcepcionesAsync(estado, id, motivo, fechaInicio, fechaFin, pagina, tamano, ct);
 
     public async Task<AgendaResultDto> CreUpdExcepcionAsync(CrearExcepcionDto dto, CancellationToken ct = default)
         => await _agendaRepository.CreUpdExcepcionAsync(dto, ct);

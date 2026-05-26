@@ -2554,10 +2554,14 @@ $$;
 --   TipoTarifaBase / TipoTarifaKm: 'GLOBAL' si el valor = 0
 --   (se aplica el tarifario global del sistema), 'CUSTOM' si > 0.
 
-DROP FUNCTION IF EXISTS fn_ListClientes(VARCHAR, INT);
+DROP FUNCTION IF EXISTS fn_ListClientes(VARCHAR, INT, VARCHAR, VARCHAR, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ListClientes(
-    _Estado VARCHAR(20),
-    _Id     INT
+    _Estado   VARCHAR(20)  DEFAULT NULL,
+    _Id       INT          DEFAULT NULL,
+    _Empresa  VARCHAR(100) DEFAULT NULL,
+    _Contacto VARCHAR(100) DEFAULT NULL,
+    _Pagina   INT          DEFAULT NULL,
+    _Tamano   INT          DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"              INT,
@@ -2590,8 +2594,13 @@ BEGIN
            rio."Contraseña"
     FROM   "Cliente" nte
     INNER JOIN "Usuario" rio ON nte."IdUsuario" = rio."Id"
-    WHERE  (_Estado IS NULL OR nte."Estado" = _Estado)
-      AND  (_Id     IS NULL OR nte."Id"     = _Id);
+    WHERE  (_Estado   IS NULL OR nte."Estado"      =     _Estado)
+      AND  (_Id       IS NULL OR nte."Id"           =     _Id)
+      AND  (_Empresa  IS NULL OR nte."Empresa"      ILIKE '%' || _Empresa  || '%')
+      AND  (_Contacto IS NULL OR nte."NomContacto"  ILIKE '%' || _Contacto || '%')
+    ORDER BY nte."Id" ASC
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 
@@ -2667,16 +2676,18 @@ $$;
 
 
 -- ── fn_ListReservas ──────────────────────────────────────────
-DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT);
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion      VARCHAR(20),
     _Id                   INT,
-    _FechaServicioInicio  DATE,
-    _FechaServicioFin     DATE,
+    _FechaInicio          DATE,
+    _FechaFin             DATE,
     _IdOperador           INT,
     _IdGrua               INT,
     _EstadoAdministrativo VARCHAR(50),
-    _IdCliente            INT
+    _IdCliente            INT,
+    _Pagina      INT DEFAULT NULL,
+    _Tamano      INT DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"               INT,
@@ -2687,9 +2698,9 @@ RETURNS TABLE(
     "CoordLatDestino"  VARCHAR(20),
     "CoordLonDestino"  VARCHAR(20),
     "CantidadCarga"    SMALLINT,
-    "FechaServicio"    DATE,
-    "HoraInicio"       TIME,
-    "HoraFin"          TIME,
+    "FechaServicio"    VARCHAR(10),
+    "HoraInicio"       VARCHAR(5),
+    "HoraFin"          VARCHAR(5),
     "NroBloques"       INT,
     "DistanciaKm"      DECIMAL(10,2),
     "TiempoEstimado"   INT,
@@ -2717,7 +2728,10 @@ BEGIN
            r."CoordLatDestino",
            r."CoordLonDestino",
            r."CantidadCarga",
-           r."FechaServicio",r."HoraInicio",r."HoraFin",r."NroBloques",
+           TO_CHAR(r."FechaServicio", 'YYYY-MM-DD')::VARCHAR(10),
+           TO_CHAR(r."HoraInicio",    'HH24:MI')::VARCHAR(5),
+           TO_CHAR(r."HoraFin",       'HH24:MI')::VARCHAR(5),
+           r."NroBloques",
            r."DistanciaKm",r."TiempoEstimado",r."TiempoManiobra",r."TiempoRetorno",
            r."Estado",r."EstadoOperacion",
            (u_c."Nombres" || ' ' || u_c."Apellidos")::TEXT,
@@ -2752,14 +2766,16 @@ BEGIN
     LEFT JOIN "Usuario"  u_c ON u_c."Id"      = c."IdUsuario"
     WHERE  (_EstadoOperacion      IS NULL OR r."EstadoOperacion"      = _EstadoOperacion)
       AND  (_Id                   IS NULL OR r."Id"                   = _Id)
-      AND  (_FechaServicioInicio  IS NULL OR r."FechaServicio" >= _FechaServicioInicio)
-      AND  (_FechaServicioFin    IS NULL OR r."FechaServicio" <= _FechaServicioFin)
+      AND  (_FechaInicio          IS NULL OR r."FechaServicio" >= _FechaInicio)
+      AND  (_FechaFin             IS NULL OR r."FechaServicio" <= _FechaFin)
       AND  (_IdOperador           IS NULL OR r."IdOperador"           = _IdOperador)
       AND  (_IdGrua               IS NULL OR r."IdGrua"               = _IdGrua)
       AND  (_EstadoAdministrativo IS NULL OR r."EstadoAdministrativo" = _EstadoAdministrativo)
       AND  (_IdCliente            IS NULL OR r."IdCliente"            = _IdCliente)
       AND  r."Estado" = 'ACTIVO'
-    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."HoraFin" DESC, r."Id" DESC;
+    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."HoraFin" DESC, r."Id" DESC
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 
@@ -5014,26 +5030,37 @@ END;
 $$;
 
 -- ── fn_ListExcepciones ──────────────────────────────────────
--- Retorna las excepciones de agenda filtradas por Estado e Id.
--- El campo Alcance se deriva: si TiempoInicio='00:00' y TiempoFinal='23:59',
--- es 'Día Completo'; en caso contrario, 'Rango de Horas'.
+-- Retorna las excepciones de agenda filtradas por Estado, Id, Motivo y rango de fechas.
+-- El campo Alcance se deriva: si TiempoInicio='00:00' y TiempoFinal='23:00'
+-- (primer y último slot del día), es 'Día Completo'; en caso contrario, 'Rango de Horas'.
+-- Los slots siempre son horas completas; no existe el valor 23:59.
 --
 -- Parámetros:
---   _Estado → 'ACTIVO' | 'INACTIVO' | NULL (todos)
---   _Id     → ID de la excepción | NULL (todos)
+--   _Estado    → 'ACTIVO' | 'INACTIVO' | NULL (todos)
+--   _Id        → ID de la excepción | NULL (todos)
+--   _Motivo    → 'Feriado' | 'Mantenimiento' | 'Bloqueo' | NULL (todos)
+--   _FechaInicio → Fecha mínima de la excepción | NULL (sin límite inferior)
+--   _FechaFin    → Fecha máxima de la excepción | NULL (sin límite superior)
 
-DROP FUNCTION IF EXISTS fn_ListExcepciones(VARCHAR, INT);
+DROP FUNCTION IF EXISTS fn_ListExcepciones(VARCHAR, INT, DATE, DATE, INT, INT);
+DROP FUNCTION IF EXISTS fn_ListExcepciones(VARCHAR, INT, VARCHAR, DATE, DATE, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ListExcepciones(
-    _Estado VARCHAR(20),
-    _Id     INT
+    _Estado      VARCHAR(20),
+    _Id          INT,
+    _Motivo      VARCHAR(50),
+    _FechaInicio DATE,
+    _FechaFin    DATE,
+    _Pagina      INT DEFAULT NULL,
+    _Tamano      INT DEFAULT NULL
 )
 RETURNS TABLE(
-    "Id"                INT,
-    "Fecha"             DATE,
+    "Id"               INT,
+    "FechaFormatCorta" VARCHAR(10),
+    "FechaFormatLarga" VARCHAR(50),
     "Motivo"            VARCHAR(50),
     "Alcance"           VARCHAR(15),
-    "TiempoInicio"      TIME(6),
-    "TiempoFinal"       TIME(6),
+    "TiempoInicio"      VARCHAR(5),
+    "TiempoFinal"       VARCHAR(5),
     "DescripcionMotivo" VARCHAR(100),
     "Estado"            VARCHAR(20)
 )
@@ -5042,21 +5069,55 @@ BEGIN
     RETURN QUERY
     SELECT
         e."Id"::INT,
-        e."Fecha",
+        TO_CHAR(e."Fecha", 'YYYY-MM-DD')::VARCHAR(10),
+        (
+        CASE EXTRACT(DOW FROM e."Fecha")
+            WHEN 0 THEN 'Domingo'
+            WHEN 1 THEN 'Lunes'
+            WHEN 2 THEN 'Martes'
+            WHEN 3 THEN 'Miércoles'
+            WHEN 4 THEN 'Jueves'
+            WHEN 5 THEN 'Viernes'
+            WHEN 6 THEN 'Sábado'
+        END
+        || ', ' ||
+        EXTRACT(DAY FROM e."Fecha") || ' de ' ||
+        CASE EXTRACT(MONTH FROM e."Fecha")
+            WHEN 1 THEN 'Enero'
+            WHEN 2 THEN 'Febrero'
+            WHEN 3 THEN 'Marzo'
+            WHEN 4 THEN 'Abril'
+            WHEN 5 THEN 'Mayo'
+            WHEN 6 THEN 'Junio'
+            WHEN 7 THEN 'Julio'
+            WHEN 8 THEN 'Agosto'
+            WHEN 9 THEN 'Septiembre'
+            WHEN 10 THEN 'Octubre'
+            WHEN 11 THEN 'Noviembre'
+            WHEN 12 THEN 'Diciembre'
+        END
+        || ' de ' ||
+        EXTRACT(YEAR FROM e."Fecha")
+        )::VARCHAR(50),
         e."Motivo",
         CASE
-            WHEN e."TiempoInicio" = '00:00:00' AND e."TiempoFinal" = '23:59:00'
+            WHEN e."TiempoInicio" = '00:00:00' AND e."TiempoFinal" = '00:00:00'
             THEN 'Día Completo'::VARCHAR(15)
             ELSE 'Rango de Horas'::VARCHAR(15)
         END AS "Alcance",
-        e."TiempoInicio",
-        e."TiempoFinal",
+        TO_CHAR(e."TiempoInicio", 'HH24:MI')::VARCHAR(5),
+        TO_CHAR(e."TiempoFinal",  'HH24:MI')::VARCHAR(5),
         e."DescripcionMotivo",
         e."Estado"
     FROM   "Excepcion" e
-    WHERE  (_Estado IS NULL OR e."Estado" = _Estado)
-      AND  (_Id     IS NULL OR e."Id"     = _Id)
-    ORDER  BY e."Fecha" DESC, e."TiempoInicio";
+    WHERE  (_Estado              IS NULL OR e."Estado"  = _Estado)
+      AND  (_Id                  IS NULL OR e."Id"      = _Id)
+      AND  (_Motivo              IS NULL OR e."Motivo" ILIKE '%' || _Motivo || '%')
+      AND  (_FechaInicio IS NULL OR e."Fecha" >= _FechaInicio)
+      AND  (_FechaFin    IS NULL OR e."Fecha" <= _FechaFin)
+    ORDER  BY e."Fecha" DESC, e."TiempoInicio"
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 

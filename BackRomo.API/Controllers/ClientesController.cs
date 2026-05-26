@@ -26,14 +26,18 @@ public class ClientesController : ControllerBase
     public async Task<IActionResult> ListarClientes(
         [FromQuery] string? estado,
         [FromQuery] int?    id,
+        [FromQuery] string? empresa,
+        [FromQuery] string? contacto,
+        [FromQuery] int?    pagina,
+        [FromQuery] int?    tamano,
         CancellationToken   ct)
     {
-        var clientes = await _clienteService.ListarClientesAsync(estado, id, ct);
+        var result = await _clienteService.ListarClientesAsync(estado, id, empresa, contacto, pagina, tamano, ct);
 
-        if (!clientes.Any())
+        if (result.Total == 0)
             return NoContent();
 
-        return Ok(clientes);
+        return Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]

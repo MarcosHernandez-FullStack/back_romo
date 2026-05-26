@@ -28,16 +28,35 @@ public class ClienteRepository : IClienteRepository
         );
     } */
 
-    public async Task<IEnumerable<ClienteDto>> ListarClientesAsync(string? estado, int? id, CancellationToken ct = default)
+    public async Task<ClientePagedDto> ListarClientesAsync(string? estado, int? id, string? empresa, string? contacto, int? pagina, int? tamano, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
+        var param = new { Estado = estado, Id = id, Empresa = empresa, Contacto = contacto, Pagina = pagina, Tamano = tamano };
 
-        return await conn.QueryAsync<ClienteDto>(new CommandDefinition(
-            "SELECT * FROM fn_ListClientes(@Estado, @Id)",
-            new { Estado = estado, Id = id },
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListClientes(@Estado, @Id, @Empresa, @Contacto, @Pagina, @Tamano);
+            SELECT
+                COUNT(*)                                        AS Total,
+                COUNT(*) FILTER (WHERE "Estado" = 'ACTIVO')    AS TotalActivos,
+                COUNT(*) FILTER (WHERE "Estado" = 'INACTIVO')  AS TotalInactivos
+            FROM fn_ListClientes(@Estado, @Id, @Empresa, @Contacto, NULL, NULL);
+            """,
+            param,
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
+
+        var datos = (await multi.ReadAsync<ClienteDto>()).ToList();
+        var (total, activos, inactivos) = await multi.ReadFirstOrDefaultAsync<(long, long, long)>();
+
+        return new ClientePagedDto
+        {
+            Total          = total,
+            TotalActivos   = activos,
+            TotalInactivos = inactivos,
+            Datos          = datos,
+        };
     }
 
     public async Task<ClienteResultDto> CrearClienteAsync(CrearClienteDto dto, CancellationToken ct = default)

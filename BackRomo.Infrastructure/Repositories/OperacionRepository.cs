@@ -1,5 +1,4 @@
 using System.Data;
-using System.Text.Json;
 using BackRomo.Application.DTOs.Operacion;
 using BackRomo.Application.DTOs.Reserva;
 using BackRomo.Application.Interfaces;
@@ -29,59 +28,49 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<IEnumerable<ReservaDto>> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaServicioInicio, DateOnly? fechaServicioFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, CancellationToken ct = default)
+    public async Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var rows = await conn.QueryAsync<ReservaDapperRow>(new CommandDefinition(
-            "SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaServicioInicio::date, @FechaServicioFin::date, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente)",
-            new {
-                EstadoOperacion      = estadoOperacion,
-                Id                   = id,
-                FechaServicioInicio  = fechaServicioInicio?.ToDateTime(TimeOnly.MinValue),
-                FechaServicioFin     = fechaServicioFin?.ToDateTime(TimeOnly.MinValue),
-                IdOperador           = idOperador,
-                IdGrua               = idGrua,
-                EstadoAdministrativo = estadoAdministrativo,
-                IdCliente            = idCliente,
-            },
+        var param = new DynamicParameters();
+        param.Add("EstadoOperacion",      estadoOperacion, DbType.String);
+        param.Add("Id",                   id);
+        param.Add("FechaInicio",          fechaInicio?.ToDateTime(TimeOnly.MinValue), DbType.Date);
+        param.Add("FechaFin",             fechaFin?.ToDateTime(TimeOnly.MinValue),    DbType.Date);
+        param.Add("IdOperador",           idOperador);
+        param.Add("IdGrua",               idGrua);
+        param.Add("EstadoAdministrativo", estadoAdministrativo);
+        param.Add("IdCliente",            idCliente);
+        param.Add("Pagina",               pagina);
+        param.Add("Tamano",               tamano);
+
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, @Pagina, @Tamano);
+            SELECT
+                COUNT(*)                                                                                 AS Total,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'RESERVADO')                                  AS TotalReservado,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ASIGNADO')                                   AS TotalAsignado,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ENCURSO')                                    AS TotalEnCurso
+            FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, NULL, NULL);
+            """,
+            param,
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
 
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var datos  = (await multi.ReadAsync<ReservaDto>()).ToList();
+        var (total, totalReservado, totalAsignado, totalEnCurso) =
+            await multi.ReadFirstOrDefaultAsync<(long, int, int, int)>();
 
-        return rows.Select(r => new ReservaDto
+        return new ReservaPagedDto
         {
-            Id               = r.Id,
-            DireccionOrigen  = r.DireccionOrigen,
-            CoordLatOrigen   = r.CoordLatOrigen,
-            CoordLonOrigen   = r.CoordLonOrigen,
-            DireccionDestino = r.DireccionDestino,
-            CoordLatDestino  = r.CoordLatDestino,
-            CoordLonDestino  = r.CoordLonDestino,
-            CantidadCarga    = r.CantidadCarga,
-            FechaServicio    = r.FechaServicio,
-            HoraInicio       = r.HoraInicio,
-            HoraFin          = r.HoraFin,
-            NroBloques       = r.NroBloques,
-            DistanciaKm      = r.DistanciaKm,
-            TiempoEstimado   = r.TiempoEstimado,
-            TiempoManiobra   = r.TiempoManiobra,
-            TiempoRetorno    = r.TiempoRetorno,
-            Estado           = r.Estado,
-            EstadoOperacion  = r.EstadoOperacion,
-            NombreCliente        = r.NombreCliente,
-            GruaAsignada         = r.GruaAsignada,
-            OperadorAsignado     = r.OperadorAsignado,
-            Vehiculos            = string.IsNullOrWhiteSpace(r.Vehiculos)
-                ? new()
-                : JsonSerializer.Deserialize<List<VehiculoItemDto>>(r.Vehiculos, options) ?? new(),
-            FechaHoraFormateada  = r.FechaHoraFormateada ?? string.Empty,
-            CantidadVehiculos    = r.CantidadVehiculos,
-            EstadoAdministrativo = r.EstadoAdministrativo ?? string.Empty,
-            Costo                = r.Costo,
-        });
+            Total          = total,
+            TotalReservado = totalReservado,
+            TotalAsignado  = totalAsignado,
+            TotalEnCurso   = totalEnCurso,
+            Datos          = datos,
+        };
     }
 
     /*
@@ -396,33 +385,4 @@ public class OperacionRepository : IOperacionRepository
         public string CoordLonOrigen { get; set; } = string.Empty;
     }
 
-    private class ReservaDapperRow
-    {
-        public int       Id               { get; set; }
-        public string    DireccionOrigen  { get; set; } = string.Empty;
-        public string    CoordLatOrigen   { get; set; } = string.Empty;
-        public string    CoordLonOrigen   { get; set; } = string.Empty;
-        public string    DireccionDestino { get; set; } = string.Empty;
-        public string    CoordLatDestino  { get; set; } = string.Empty;
-        public string    CoordLonDestino  { get; set; } = string.Empty;
-        public short     CantidadCarga    { get; set; }
-        public DateTime  FechaServicio    { get; set; }
-        public TimeSpan  HoraInicio       { get; set; }
-        public TimeSpan  HoraFin          { get; set; }
-        public int       NroBloques       { get; set; }
-        public decimal   DistanciaKm      { get; set; }
-        public int       TiempoEstimado   { get; set; }
-        public int       TiempoManiobra   { get; set; }
-        public int       TiempoRetorno    { get; set; }
-        public string    Estado           { get; set; } = string.Empty;
-        public string    EstadoOperacion  { get; set; } = string.Empty;
-        public string?   NombreCliente        { get; set; }
-        public string?   GruaAsignada         { get; set; }
-        public string?   OperadorAsignado     { get; set; }
-        public string?   Vehiculos            { get; set; }  // columna JSON → se deserializa manualmente
-        public string?   FechaHoraFormateada  { get; set; }
-        public int       CantidadVehiculos    { get; set; }
-        public string?   EstadoAdministrativo { get; set; }
-        public decimal   Costo                { get; set; }
-    }
 }

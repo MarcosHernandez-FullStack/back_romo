@@ -12,6 +12,12 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
+using BackRomo.Application.DTOs.Reserva;
+using BackRomo.Infrastructure.Data;
+using Dapper;
+
+SqlMapper.AddTypeHandler(new JsonTypeHandler<List<VehiculoItemDto>>());
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog((ctx, config) =>

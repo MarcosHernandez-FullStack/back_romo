@@ -139,28 +139,37 @@ public class AgendaRepository : IAgendaRepository
         }
     }
 
-    public async Task<IEnumerable<ExcepcionDto>> ListarExcepcionesAsync(string? estado, int? id, CancellationToken ct = default)
+    public async Task<ExcepcionPagedDto> ListarExcepcionesAsync(string? estado, int? id, string? motivo, DateOnly? fechaInicio, DateOnly? fechaFin, int? pagina, int? tamano, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
-        var rows = await conn.QueryAsync<ExcepcionDapperRow>(new CommandDefinition(
-            "SELECT * FROM fn_ListExcepciones(@Estado, @Id)",
-            new { Estado = estado, Id = id },
+        var param = new DynamicParameters();
+        param.Add("Estado",      estado);
+        param.Add("Id",          id);
+        param.Add("Motivo",      motivo);
+        param.Add("FechaInicio", fechaInicio?.ToDateTime(TimeOnly.MinValue), DbType.Date);
+        param.Add("FechaFin",    fechaFin?.ToDateTime(TimeOnly.MinValue),    DbType.Date);
+        param.Add("Pagina",      pagina);
+        param.Add("Tamano",      tamano);
+
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListExcepciones(@Estado, @Id, @Motivo, @FechaInicio, @FechaFin, @Pagina, @Tamano);
+            SELECT COUNT(*) FROM fn_ListExcepciones(@Estado, @Id, @Motivo, @FechaInicio, @FechaFin, NULL, NULL);
+            """,
+            param,
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
 
-        return rows.Select(r => new ExcepcionDto
+        var datos = (await multi.ReadAsync<ExcepcionDto>()).ToList();
+        var total = await multi.ReadFirstOrDefaultAsync<long>();
+
+        return new ExcepcionPagedDto
         {
-            Id                = r.Id,
-            Fecha             = r.Fecha.ToString("yyyy-MM-dd"),
-            Motivo            = r.Motivo,
-            Alcance           = r.Alcance,
-            TiempoInicio      = TimeOnly.FromTimeSpan(r.TiempoInicio).ToString("HH:mm"),
-            TiempoFinal       = TimeOnly.FromTimeSpan(r.TiempoFinal).ToString("HH:mm"),
-            DescripcionMotivo = r.DescripcionMotivo,
-            Estado            = r.Estado,
-        });
+            Total = total,
+            Datos = datos
+        };
     }
 
     private class HorarioDapperRow
@@ -173,15 +182,4 @@ public class AgendaRepository : IAgendaRepository
         public TimeSpan HoraFinal  { get; set; }
     }
 
-    private class ExcepcionDapperRow
-    {
-        public int      Id                { get; set; }
-        public DateTime Fecha             { get; set; }
-        public string   Motivo            { get; set; } = string.Empty;
-        public string   Alcance           { get; set; } = string.Empty;
-        public TimeSpan TiempoInicio      { get; set; }
-        public TimeSpan TiempoFinal       { get; set; }
-        public string   DescripcionMotivo { get; set; } = string.Empty;
-        public string   Estado            { get; set; } = string.Empty;
-    }
 }

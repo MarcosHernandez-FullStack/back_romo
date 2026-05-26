@@ -41,16 +41,21 @@ public class AgendaController : ControllerBase
     [RequestTimeout("corto")]
     [HttpGet("excepciones")]
     public async Task<IActionResult> ListarExcepciones(
-        [FromQuery] string? estado,
-        [FromQuery] int?    id,
-        CancellationToken   ct)
+        [FromQuery] string?   estado,
+        [FromQuery] int?      id,
+        [FromQuery] string?   motivo,
+        [FromQuery] DateOnly? fechaInicio,
+        [FromQuery] DateOnly? fechaFin,
+        [FromQuery] int?      pagina,
+        [FromQuery] int?      tamano,
+        CancellationToken     ct)
     {
-        var excepciones = await _agendaService.ListarExcepcionesAsync(estado, id, ct);
+        var result = await _agendaService.ListarExcepcionesAsync(estado, id, motivo, fechaInicio, fechaFin, pagina, tamano, ct);
 
-        if (!excepciones.Any())
+        if (result.Total == 0)
             return NoContent();
 
-        return Ok(excepciones);
+        return Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]
