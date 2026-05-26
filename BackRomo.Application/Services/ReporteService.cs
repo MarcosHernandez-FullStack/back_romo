@@ -12,16 +12,20 @@ public class ReporteService
         _reporteRepository = reporteRepository;
     }
 
-    public async Task<IEnumerable<ReporteDto>> ListarReportesAsync(
-        string? busqueda,
+    public async Task<ReportePagedDto> ListarReportesAsync(
+        int?    id,
         int?    idCliente,
         string? fechaDesde,
         string? fechaHasta,
         string? estadoOperacion,
         string? estadoAdministrativo,
+        string? placa,
+        string? empresa,
+        int?    pagina,
+        int?    tamano,
         CancellationToken ct = default)
         => await _reporteRepository.ListarReportesAsync(
-            busqueda, idCliente, fechaDesde, fechaHasta, estadoOperacion, estadoAdministrativo, ct);
+            id, idCliente, fechaDesde, fechaHasta, estadoOperacion, estadoAdministrativo, placa, empresa, pagina, tamano, ct);
 
     public async Task<ReporteResultDto> UpdEstadoAdministrativoAsync(UpdEstadoAdministrativoDto dto, CancellationToken ct = default)
         => await _reporteRepository.UpdEstadoAdministrativoAsync(dto, ct);

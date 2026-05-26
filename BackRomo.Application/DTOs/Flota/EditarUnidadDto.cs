@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace BackRomo.Application.DTOs.Flota;
 
 public class EditarUnidadDto
@@ -6,6 +8,7 @@ public class EditarUnidadDto
     public string   Placa          { get; set; } = string.Empty;
     public string   Marca          { get; set; } = string.Empty;
     public string   Modelo         { get; set; } = string.Empty;
+    [JsonPropertyName("anioFabricacion")]
     public short    AñoFabricacion { get; set; }
     public short    Capacidad      { get; set; }
     public DateOnly FecVenSeg      { get; set; }

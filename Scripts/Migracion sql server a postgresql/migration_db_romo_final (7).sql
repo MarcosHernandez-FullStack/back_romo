@@ -2677,6 +2677,7 @@ $$;
 
 -- ── fn_ListReservas ──────────────────────────────────────────
 DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT);
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT, VARCHAR);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion      VARCHAR(20),
     _Id                   INT,
@@ -2686,8 +2687,9 @@ CREATE OR REPLACE FUNCTION fn_ListReservas(
     _IdGrua               INT,
     _EstadoAdministrativo VARCHAR(50),
     _IdCliente            INT,
-    _Pagina      INT DEFAULT NULL,
-    _Tamano      INT DEFAULT NULL
+    _Pagina               INT          DEFAULT NULL,
+    _Tamano               INT          DEFAULT NULL,
+    _Direccion            VARCHAR(200) DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"               INT,
@@ -2772,6 +2774,8 @@ BEGIN
       AND  (_IdGrua               IS NULL OR r."IdGrua"               = _IdGrua)
       AND  (_EstadoAdministrativo IS NULL OR r."EstadoAdministrativo" = _EstadoAdministrativo)
       AND  (_IdCliente            IS NULL OR r."IdCliente"            = _IdCliente)
+      AND  (_Direccion            IS NULL OR _Direccion = '' OR r."DireccionOrigen"  ILIKE '%' || _Direccion || '%'
+                                                             OR r."DireccionDestino" ILIKE '%' || _Direccion || '%')
       AND  r."Estado" = 'ACTIVO'
     ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."HoraFin" DESC, r."Id" DESC
     LIMIT  _Tamano
@@ -2938,8 +2942,22 @@ END;
 $$;
 
 -- ── fn_ListOperadores ────────────────────────────────────────
-DROP FUNCTION IF EXISTS fn_ListOperadores(VARCHAR);
-CREATE OR REPLACE FUNCTION fn_ListOperadores(_Estado VARCHAR)
+--   _Estado         → 'ACTIVO' | 'INACTIVO'               | NULL (todos)
+--   _Id             → ID exacto                            | NULL (todos)
+--   _NombreCompleto → búsqueda parcial en Nombres+Apellidos| NULL (sin filtro)
+--   _NroLicencia    → búsqueda parcial en NroLicencia      | NULL (sin filtro)
+--   _Pagina         → número de página (1-based)           | NULL (sin paginación)
+--   _Tamano         → registros por página                 | NULL (sin paginación)
+
+DROP FUNCTION IF EXISTS fn_ListOperadores(VARCHAR, INT, VARCHAR, VARCHAR, INT, INT);
+CREATE OR REPLACE FUNCTION fn_ListOperadores(
+    _Estado          VARCHAR(20)  DEFAULT NULL,
+    _Id              INT          DEFAULT NULL,
+    _NombreCompleto  VARCHAR(200) DEFAULT NULL,
+    _NroLicencia     VARCHAR(20)  DEFAULT NULL,
+    _Pagina          INT          DEFAULT NULL,
+    _Tamano          INT          DEFAULT NULL
+)
 RETURNS TABLE(
     "Id"                      INT,
     "Alias"                   VARCHAR(10),
@@ -3000,8 +3018,13 @@ BEGIN
         WHERE  d."IdOperador" = o."Id"
           AND  d."Estado"     = 'ACTIVO'
     ) disp ON TRUE
-    WHERE (_Estado IS NULL OR o."Estado" = _Estado)
-    ORDER BY o."Id";
+    WHERE (_Estado         IS NULL OR o."Estado"      =     _Estado)
+      AND (_Id             IS NULL OR o."Id"          =     _Id)
+      AND (_NombreCompleto IS NULL OR (u."Nombres" || ' ' || u."Apellidos") ILIKE '%' || _NombreCompleto || '%')
+      AND (_NroLicencia    IS NULL OR o."NroLicencia" ILIKE '%' || _NroLicencia    || '%')
+    ORDER BY o."Id"
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 
@@ -3503,10 +3526,16 @@ $$;
 
 -- ── fn_ListGruas ────────────────────────────────────────────
 --Retorna listado de grúas
+DROP FUNCTION IF EXISTS fn_ListGruas(VARCHAR, VARCHAR, INT, VARCHAR, VARCHAR, VARCHAR, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ListGruas(
-    _Estado          VARCHAR(20),
-    _EstadoOperacion VARCHAR(20),
-    _Id              INT
+    _Estado          VARCHAR(20)  DEFAULT NULL,
+    _EstadoOperacion VARCHAR(20)  DEFAULT NULL,
+    _Id              INT          DEFAULT NULL,
+    _Placa           VARCHAR(10)  DEFAULT NULL,
+    _Marca           VARCHAR(30)  DEFAULT NULL,
+    _Modelo          VARCHAR(30)  DEFAULT NULL,
+    _Pagina          INT          DEFAULT NULL,
+    _Tamano          INT          DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"              INT,
@@ -3516,6 +3545,7 @@ RETURNS TABLE(
     "AñoFabricacion"  SMALLINT,
     "Capacidad"       SMALLINT,
     "FecVenSeg"       TEXT,
+    "FecVenSegRaw"    DATE,
     "EstadoOperacion" VARCHAR(20),
     "Estado"          VARCHAR(20)
 )
@@ -3530,12 +3560,19 @@ BEGIN
         rua."AñoFabricacion",
         rua."Capacidad",
         TO_CHAR(rua."FecVenSeg", 'DD/MM/YYYY'),
+        rua."FecVenSeg",
         rua."EstadoOperacion",
         rua."Estado"
     FROM "Grua" AS rua
     WHERE (_EstadoOperacion IS NULL OR rua."EstadoOperacion" = _EstadoOperacion)
       AND (_Estado          IS NULL OR rua."Estado"          = _Estado)
-      AND (_Id              IS NULL OR rua."Id"              = _Id);
+      AND (_Id              IS NULL OR rua."Id"              = _Id)
+      AND (_Placa           IS NULL OR rua."Placa"  ILIKE '%' || _Placa  || '%')
+      AND (_Marca           IS NULL OR rua."Marca"  ILIKE '%' || _Marca  || '%')
+      AND (_Modelo          IS NULL OR rua."Modelo" ILIKE '%' || _Modelo || '%')
+    ORDER BY rua."Id"
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 
@@ -5294,20 +5331,27 @@ $$;
 -- CanceladoPor  se resuelve solo cuando EstadoOperacion='CANCELADO'
 --
 -- Parámetros (NULL o '' = sin filtro):
---   _Busqueda             → ID de servicio (ej. 'SRV-001') o placa de grúa
+--   _Id                   → ID exacto del servicio
+--   _Placa                → Placa de grúa (ILIKE)
+--   _Empresa              → Nombre de empresa cliente (ILIKE)
 --   _IdCliente            → ID de Cliente B2B (NULL = todos)
 --   _FechaDesde           → Límite inferior de FechaServicio
 --   _FechaHasta           → Límite superior de FechaServicio
 --   _EstadoOperacion      → 'Finalizado' | 'Cancelado' (NULL = todos)
 --   _EstadoAdministrativo → 'Pendiente'  | 'Facturado' | 'Pagado' (NULL = todos)
-DROP FUNCTION IF EXISTS fn_ReporteServicios(VARCHAR, INT, DATE, DATE, VARCHAR, VARCHAR);
+--   _Pagina / _Tamano     → Paginación server-side
+DROP FUNCTION IF EXISTS fn_ReporteServicios(INT, INT, DATE, DATE, VARCHAR, VARCHAR, VARCHAR, VARCHAR, INT, INT);
 CREATE OR REPLACE FUNCTION fn_ReporteServicios(
-    _Busqueda             VARCHAR(50),
-    _IdCliente            INT,
-    _FechaDesde           DATE,
-    _FechaHasta           DATE,
-    _EstadoOperacion      VARCHAR(20),
-    _EstadoAdministrativo VARCHAR(20)
+    _Id                   INT          DEFAULT NULL,
+    _IdCliente            INT          DEFAULT NULL,
+    _FechaDesde           DATE         DEFAULT NULL,
+    _FechaHasta           DATE         DEFAULT NULL,
+    _EstadoOperacion      VARCHAR(20)  DEFAULT NULL,
+    _EstadoAdministrativo VARCHAR(20)  DEFAULT NULL,
+    _Placa                VARCHAR(20)  DEFAULT NULL,
+    _Empresa              VARCHAR(100) DEFAULT NULL,
+    _Pagina               INT          DEFAULT NULL,
+    _Tamano               INT          DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"                   INT,
@@ -5392,10 +5436,12 @@ BEGIN
             OR r."EstadoOperacion"      = UPPER(_EstadoOperacion))
       AND  (_EstadoAdministrativo IS NULL OR _EstadoAdministrativo  = ''
             OR r."EstadoAdministrativo" = UPPER(_EstadoAdministrativo))
-      AND  (_Busqueda IS NULL OR _Busqueda = ''
-            OR r."Id"::TEXT ILIKE '%' || _Busqueda || '%'
-            OR g."Placa" ILIKE '%' || _Busqueda || '%')
-    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC;
+      AND  (_Id      IS NULL OR r."Id"      = _Id)
+      AND  (_Placa   IS NULL OR _Placa   = '' OR g."Placa"    ILIKE '%' || _Placa   || '%')
+      AND  (_Empresa IS NULL OR _Empresa = '' OR c."Empresa"  ILIKE '%' || _Empresa || '%')
+    ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC
+    LIMIT  _Tamano
+    OFFSET (COALESCE(_Pagina, 1) - 1) * COALESCE(_Tamano, 0);
 END;
 $$;
 

@@ -18,37 +18,37 @@ public class OperadorRepository : IOperadorRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<OperadorListDto>> ListarOperadoresAsync(string? estado, CancellationToken ct = default)
+    public async Task<OperadorPagedDto> ListarOperadoresAsync(string? estado, int? id, string? nombreCompleto, string? nroLicencia, int? pagina, int? tamano, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
+        var param = new { Estado = estado, Id = id, NombreCompleto = nombreCompleto, NroLicencia = nroLicencia, Pagina = pagina, Tamano = tamano };
 
-        var rows = await conn.QueryAsync<OperadorDapperRow>(new CommandDefinition(
-            "SELECT * FROM fn_ListOperadores(@Estado)",
-            new { Estado = estado },
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListOperadores(@Estado, @Id, @NombreCompleto, @NroLicencia, @Pagina, @Tamano);
+            SELECT
+                COUNT(*)                                                       AS Total,
+                COUNT(*) FILTER (WHERE "ProximaFechaServicio" = CURRENT_DATE) AS ConServiciosHoy,
+                COUNT(*) FILTER (WHERE "TotalServiciosAsignados" > 0)         AS ConServiciosAsignados,
+                COUNT(*) FILTER (WHERE "FecVenLic" < CURRENT_DATE)            AS LicenciasVencidas
+            FROM fn_ListOperadores(@Estado, @Id, @NombreCompleto, @NroLicencia, NULL, NULL);
+            """,
+            param,
+            commandType: CommandType.Text,
             cancellationToken: ct
         ));
 
-        return rows.Select(r => new OperadorListDto
+        var datos = (await multi.ReadAsync<OperadorListDto>()).ToList();
+        var (total, hoy, asignados, vencidas) = await multi.ReadFirstOrDefaultAsync<(long, long, long, long)>();
+
+        return new OperadorPagedDto
         {
-            Id                      = r.Id,
-            Alias                   = r.Alias,
-            NombresCompleto         = r.NombresCompleto,
-            Nombres                 = r.Nombres,
-            Apellidos               = r.Apellidos,
-            Correo                  = r.Correo,
-            Telefono                = r.Telefono,
-            NroLicencia             = r.NroLicencia,
-            FecVenLic               = DateOnly.FromDateTime(r.FecVenLic),
-            Estado                  = r.Estado,
-            ProximaFechaServicio    = r.ProximaFechaServicio.HasValue
-                                        ? DateOnly.FromDateTime(r.ProximaFechaServicio.Value)
-                                        : null,
-            ProximaHoraServicio     = r.ProximaHoraServicio.HasValue
-                                        ? TimeOnly.FromTimeSpan(r.ProximaHoraServicio.Value)
-                                        : null,
-            TotalServiciosAsignados = r.TotalServiciosAsignados,
-            TotalHorasSemanales     = r.TotalHorasSemanales,
-        });
+            Total                 = total,
+            ConServiciosHoy       = hoy,
+            ConServiciosAsignados = asignados,
+            LicenciasVencidas     = vencidas,
+            Datos                 = datos,
+        };
     }
 
     public async Task<DispOperadorDto> ObtenerDispOperadorAsync(int idOperador, CancellationToken ct = default)
@@ -271,24 +271,6 @@ public class OperadorRepository : IOperadorRepository
     {
         var hashBytes = MD5.HashData(Encoding.UTF8.GetBytes(input));
         return new Guid(hashBytes).ToString().ToUpper();
-    }
-
-    private class OperadorDapperRow
-    {
-        public int      Id                      { get; set; }
-        public string   Alias                   { get; set; } = string.Empty;
-        public string   NombresCompleto         { get; set; } = string.Empty;
-        public string   Nombres                 { get; set; } = string.Empty;
-        public string   Apellidos               { get; set; } = string.Empty;
-        public string   Correo                  { get; set; } = string.Empty;
-        public string?  Telefono                { get; set; }
-        public string   NroLicencia             { get; set; } = string.Empty;
-        public DateTime FecVenLic               { get; set; }
-        public string   Estado                  { get; set; } = string.Empty;
-        public DateTime? ProximaFechaServicio   { get; set; }
-        public TimeSpan? ProximaHoraServicio    { get; set; }
-        public int      TotalServiciosAsignados { get; set; }
-        public int      TotalHorasSemanales     { get; set; }
     }
 
     private class DispDapperRow

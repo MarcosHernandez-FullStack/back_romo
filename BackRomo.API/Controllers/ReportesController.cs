@@ -21,24 +21,25 @@ public class ReportesController : ControllerBase
 
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("lectura")]
-    [RequestTimeout("corto")]
+    [RequestTimeout("largo")]
     [HttpGet]
     public async Task<IActionResult> ListarReportes(
-        [FromQuery] string? busqueda,
+        [FromQuery] int?    id,
         [FromQuery] int?    idCliente,
         [FromQuery] string? fechaDesde,
         [FromQuery] string? fechaHasta,
         [FromQuery] string? estadoOperacion,
         [FromQuery] string? estadoAdministrativo,
+        [FromQuery] string? placa,
+        [FromQuery] string? empresa,
+        [FromQuery] int?    pagina,
+        [FromQuery] int?    tamano,
         CancellationToken   ct)
     {
-        var reportes = await _reporteService.ListarReportesAsync(
-            busqueda, idCliente, fechaDesde, fechaHasta, estadoOperacion, estadoAdministrativo, ct);
+        var result = await _reporteService.ListarReportesAsync(
+            id, idCliente, fechaDesde, fechaHasta, estadoOperacion, estadoAdministrativo, placa, empresa, pagina, tamano, ct);
 
-        if (!reportes.Any())
-            return NoContent();
-
-        return Ok(reportes);
+        return result.Total == 0 ? NoContent() : Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]

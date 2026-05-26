@@ -4,7 +4,7 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IFlotaRepository
 {
-    Task<IEnumerable<UnidadDto>>  ListarGruasAsync(string? estado, string? estadoOperacion, int? id, CancellationToken ct = default);
+    Task<GruaPagedDto> ListarGruasAsync(string? estado, string? estadoOperacion, int? id, string? placa, string? marca, string? modelo, int? pagina, int? tamano, CancellationToken ct = default);
     Task<UnidadResultDto>         CrearGruaAsync  (CrearUnidadDto dto, CancellationToken ct = default);
     Task<UnidadResultDto>         EditarGruaAsync   (EditarUnidadDto dto,    CancellationToken ct = default);
     Task<UnidadResultDto>          ActualizarEstadoAsync (UpdEstadoGruaDto     dto, CancellationToken ct = default);

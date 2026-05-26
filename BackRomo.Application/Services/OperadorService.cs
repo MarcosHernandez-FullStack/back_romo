@@ -12,8 +12,8 @@ public class OperadorService
         _repo = repo;
     }
 
-    public Task<IEnumerable<OperadorListDto>> ListarOperadoresAsync(string? estado, CancellationToken ct = default)
-        => _repo.ListarOperadoresAsync(estado, ct);
+    public Task<OperadorPagedDto> ListarOperadoresAsync(string? estado, int? id, string? nombreCompleto, string? nroLicencia, int? pagina, int? tamano, CancellationToken ct = default)
+        => _repo.ListarOperadoresAsync(estado, id, nombreCompleto, nroLicencia, pagina, tamano, ct);
 
     public Task<DispOperadorDto> ObtenerDispOperadorAsync(int idOperador, CancellationToken ct = default)
         => _repo.ObtenerDispOperadorAsync(idOperador, ct);

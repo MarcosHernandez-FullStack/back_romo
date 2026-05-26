@@ -21,16 +21,24 @@ public class FlotaController : ControllerBase
 
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("lectura")]
-    [RequestTimeout("corto")]
+    [RequestTimeout("largo")]
     [HttpGet]
     public async Task<IActionResult> ListarGruas(
         [FromQuery] string? estado,
         [FromQuery] string? estadoOperacion,
         [FromQuery] int?    id,
+        [FromQuery] string? placa,
+        [FromQuery] string? marca,
+        [FromQuery] string? modelo,
+        [FromQuery] int?    pagina,
+        [FromQuery] int?    tamano,
         CancellationToken   ct)
     {
-        var gruas = await _flotaService.ListarGruasAsync(estado, estadoOperacion, id, ct);
-        return Ok(gruas);
+        var result = await _flotaService.ListarGruasAsync(estado, estadoOperacion, id, placa, marca, modelo, pagina, tamano, ct);
+
+        if (result.Total == 0) 
+            return NoContent();
+        return Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]

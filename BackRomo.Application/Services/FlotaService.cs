@@ -12,8 +12,8 @@ public class FlotaService
         _flotaRepository = flotaRepository;
     }
 
-    public async Task<IEnumerable<UnidadDto>> ListarGruasAsync(string? estado, string? estadoOperacion, int? id, CancellationToken ct = default)
-        => await _flotaRepository.ListarGruasAsync(estado, estadoOperacion, id, ct);
+    public Task<GruaPagedDto> ListarGruasAsync(string? estado, string? estadoOperacion, int? id, string? placa, string? marca, string? modelo, int? pagina, int? tamano, CancellationToken ct = default)
+        => _flotaRepository.ListarGruasAsync(estado, estadoOperacion, id, placa, marca, modelo, pagina, tamano, ct);
 
     public async Task<UnidadResultDto> CrearGruaAsync(CrearUnidadDto dto, CancellationToken ct = default)
         => await _flotaRepository.CrearGruaAsync(dto, ct);

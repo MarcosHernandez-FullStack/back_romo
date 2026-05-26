@@ -28,7 +28,7 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, CancellationToken ct = default)
+    public async Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, string? direccion, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
@@ -43,16 +43,19 @@ public class OperacionRepository : IOperacionRepository
         param.Add("IdCliente",            idCliente);
         param.Add("Pagina",               pagina);
         param.Add("Tamano",               tamano);
+        param.Add("Direccion",            string.IsNullOrWhiteSpace(direccion) ? null : direccion, DbType.String);
 
         using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
             """
-            SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, @Pagina, @Tamano);
+            SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, @Pagina, @Tamano, @Direccion);
             SELECT
-                COUNT(*)                                                                                 AS Total,
-                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'RESERVADO')                                  AS TotalReservado,
-                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ASIGNADO')                                   AS TotalAsignado,
-                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ENCURSO')                                    AS TotalEnCurso
-            FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, NULL, NULL);
+                COUNT(*)                                                                                                          AS Total,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'RESERVADO')                                                           AS TotalReservado,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ASIGNADO')                                                            AS TotalAsignado,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ENCURSO')                                                             AS TotalEnCurso,
+                COALESCE(SUM("Costo") FILTER (WHERE "EstadoAdministrativo" IN ('PENDIENTE', 'FACTURADO')), 0)                     AS MontoPendiente,
+                COALESCE(SUM("Costo") FILTER (WHERE "EstadoAdministrativo" = 'PAGADO'), 0)                                        AS MontoLiquidado
+            FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, NULL, NULL, @Direccion);
             """,
             param,
             commandType: CommandType.Text,
@@ -60,8 +63,8 @@ public class OperacionRepository : IOperacionRepository
         ));
 
         var datos  = (await multi.ReadAsync<ReservaDto>()).ToList();
-        var (total, totalReservado, totalAsignado, totalEnCurso) =
-            await multi.ReadFirstOrDefaultAsync<(long, int, int, int)>();
+        var (total, totalReservado, totalAsignado, totalEnCurso, montoPendiente, montoLiquidado) =
+            await multi.ReadFirstOrDefaultAsync<(long, int, int, int, decimal, decimal)>();
 
         return new ReservaPagedDto
         {
@@ -69,6 +72,8 @@ public class OperacionRepository : IOperacionRepository
             TotalReservado = totalReservado,
             TotalAsignado  = totalAsignado,
             TotalEnCurso   = totalEnCurso,
+            MontoPendiente = montoPendiente,
+            MontoLiquidado = montoLiquidado,
             Datos          = datos,
         };
     }

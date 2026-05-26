@@ -15,16 +15,37 @@ public class FlotaRepository : IFlotaRepository
         _db = db;
     }
 
-    public async Task<IEnumerable<UnidadDto>> ListarGruasAsync(string? estado, string? estadoOperacion, int? id, CancellationToken ct = default)
+    public async Task<GruaPagedDto> ListarGruasAsync(string? estado, string? estadoOperacion, int? id, string? placa, string? marca, string? modelo, int? pagina, int? tamano, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
+        var param = new { Estado = estado, EstadoOperacion = estadoOperacion, Id = id, Placa = placa, Marca = marca, Modelo = modelo, Pagina = pagina, Tamano = tamano };
 
-        return await conn.QueryAsync<UnidadDto>(new CommandDefinition(
-            "SELECT * FROM fn_ListGruas(@Estado, @EstadoOperacion, @Id)",
-            new { Estado = estado, EstadoOperacion = estadoOperacion, Id = id },
+        using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
+            """
+            SELECT * FROM fn_ListGruas(@Estado, @EstadoOperacion, @Id, @Placa, @Marca, @Modelo, @Pagina, @Tamano);
+            SELECT
+                COUNT(*)                                                                              AS Total,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'OPERATIVA')                              AS Operativas,
+                COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ENTALLER')                               AS EnTaller,
+                COUNT(*) FILTER (WHERE "FecVenSegRaw" <= CURRENT_DATE + INTERVAL '30 days')          AS SegurosCriticos
+            FROM fn_ListGruas(@Estado, @EstadoOperacion, @Id, @Placa, @Marca, @Modelo, NULL, NULL);
+            """,
+            param,
             commandType: CommandType.Text,
             cancellationToken: ct
         ));
+
+        var datos = (await multi.ReadAsync<UnidadDto>()).ToList();
+        var (total, operativas, enTaller, segurosCriticos) = await multi.ReadFirstOrDefaultAsync<(long, long, long, long)>();
+
+        return new GruaPagedDto
+        {
+            Total           = total,
+            Operativas      = operativas,
+            EnTaller        = enTaller,
+            SegurosCriticos = segurosCriticos,
+            Datos           = datos,
+        };
     }
 
     public async Task<IEnumerable<BitaMantDto>> ListarBitaMantAsync(int idGrua, CancellationToken ct = default)

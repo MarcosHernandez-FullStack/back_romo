@@ -17,6 +17,10 @@ using BackRomo.Infrastructure.Data;
 using Dapper;
 
 SqlMapper.AddTypeHandler(new JsonTypeHandler<List<VehiculoItemDto>>());
+SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+SqlMapper.AddTypeHandler(new NullableDateOnlyTypeHandler());
+SqlMapper.AddTypeHandler(new TimeOnlyTypeHandler());
+SqlMapper.AddTypeHandler(new NullableTimeOnlyTypeHandler());
 
 var builder = WebApplication.CreateBuilder(args);
 

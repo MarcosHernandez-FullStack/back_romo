@@ -4,7 +4,7 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IOperadorRepository
 {
-    Task<IEnumerable<OperadorListDto>> ListarOperadoresAsync(string? estado, CancellationToken ct = default);
+    Task<OperadorPagedDto> ListarOperadoresAsync(string? estado, int? id, string? nombreCompleto, string? nroLicencia, int? pagina, int? tamano, CancellationToken ct = default);
     Task<DispOperadorDto>              ObtenerDispOperadorAsync(int idOperador, CancellationToken ct = default);
     Task<DispResultDto>                GuardarDispOperadorAsync(AsignarDispOperadorDto dto, CancellationToken ct = default);
     Task<OperadorResultDto>            CrearOperadorAsync(CrearOperadorDto dto, CancellationToken ct = default);

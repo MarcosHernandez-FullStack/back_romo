@@ -25,10 +25,19 @@ public class OperadoresController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> ListarOperadores(
         [FromQuery] string? estado,
+        [FromQuery] int?    id,
+        [FromQuery] string? nombreCompleto,
+        [FromQuery] string? nroLicencia,
+        [FromQuery] int?    pagina,
+        [FromQuery] int?    tamano,
         CancellationToken   ct)
     {
-        var operadores = await _operadorService.ListarOperadoresAsync(estado, ct);
-        return Ok(operadores);
+        var result = await _operadorService.ListarOperadoresAsync(estado, id, nombreCompleto, nroLicencia, pagina, tamano, ct);
+
+        if (result.Total == 0)
+            return NoContent();
+
+        return Ok(result);
     }
 
     [Authorize(Roles = "ADMINISTRADOR")]

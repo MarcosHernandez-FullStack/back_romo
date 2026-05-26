@@ -33,6 +33,7 @@ public class OperacionesController : ControllerBase
         [FromQuery] string?   estadoAdministrativo,
         [FromQuery] int?      pagina,
         [FromQuery] int?      tamano,
+        [FromQuery] string?   direccion,
         CancellationToken     ct)
     {
         int? idCliente = null;
@@ -42,8 +43,8 @@ public class OperacionesController : ControllerBase
             if (int.TryParse(raw, out var parsed)) idCliente = parsed;
         }
 
-        var result = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaInicio, fechaFin, idOperador, idGrua, estadoAdministrativo, idCliente, pagina, tamano, ct);
-        if (result.Total == 0 && result.TotalReservado == 0 && result.TotalAsignado == 0 && result.TotalEnCurso == 0)
+        var result = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaInicio, fechaFin, idOperador, idGrua, estadoAdministrativo, idCliente, pagina, tamano, direccion, ct);
+        if (result.Total == 0)
             return NoContent();
         return Ok(result);
     }
