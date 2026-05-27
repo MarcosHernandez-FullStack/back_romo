@@ -66,13 +66,14 @@ public class UsuarioRepository : IUsuarioRepository
             p.Add("_Rol",         dto.Rol,        DbType.String);
             p.Add("_NroLicencia", null,           DbType.String);
             p.Add("_FecVenLic",   null,           DbType.Date);
-            p.Add("_CreadoPor",   dto.CreadoPor,  DbType.Int32);
+            p.Add("_CreadoPor",      dto.CreadoPor,  DbType.Int32);
+            p.Add("_ActualizadoPor", null,           DbType.Int32);
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
             p.Add("_IdNuevo", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_CreUpdUsuario(@_IdUsuario, @_Alias, @_Contrasena, @_Nombres, @_Apellidos, @_Telefono, @_Correo, @_Rol, @_NroLicencia, @_FecVenLic, @_CreadoPor, @_Exitoso, @_Mensaje, @_IdNuevo)",
+                "CALL sp_CreUpdUsuario(@_IdUsuario, @_Alias, @_Contrasena, @_Nombres, @_Apellidos, @_Telefono, @_Correo, @_Rol, @_NroLicencia, @_FecVenLic, @_CreadoPor, @_ActualizadoPor, @_Exitoso, @_Mensaje, @_IdNuevo)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 
@@ -109,13 +110,14 @@ public class UsuarioRepository : IUsuarioRepository
             p.Add("_Rol",         dto.Rol,            DbType.String);
             p.Add("_NroLicencia", null,               DbType.String);
             p.Add("_FecVenLic",   null,               DbType.Date);
-            p.Add("_CreadoPor",   dto.ActualizadoPor, DbType.Int32);
+            p.Add("_CreadoPor",      null,               DbType.Int32);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
             p.Add("_IdNuevo", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_CreUpdUsuario(@_IdUsuario, @_Alias, @_Contrasena, @_Nombres, @_Apellidos, @_Telefono, @_Correo, @_Rol, @_NroLicencia, @_FecVenLic, @_CreadoPor, @_Exitoso, @_Mensaje, @_IdNuevo)",
+                "CALL sp_CreUpdUsuario(@_IdUsuario, @_Alias, @_Contrasena, @_Nombres, @_Apellidos, @_Telefono, @_Correo, @_Rol, @_NroLicencia, @_FecVenLic, @_CreadoPor, @_ActualizadoPor, @_Exitoso, @_Mensaje, @_IdNuevo)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 

@@ -142,4 +142,33 @@ public class ClienteRepository : IClienteRepository
             return new ClienteResultDto { Exitoso = 0, Mensaje = ex.Message };
         }
     }
+
+    public async Task<ClienteResultDto> ActualizarEstadoClienteAsync(UpdEstadoClienteDto dto, CancellationToken ct = default)
+    {
+        using var conn = _db.CreateConnection();
+        try
+        {
+            var p = new DynamicParameters();
+            p.Add("_IdCliente",      dto.IdCliente,      DbType.Int32);
+            p.Add("_NuevoEstado",    dto.NuevoEstado,    DbType.String);
+            p.Add("_ActualizadoPor", dto.ActualizadoPor, DbType.Int32);
+            p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
+            p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
+
+            await conn.ExecuteAsync(new CommandDefinition(
+                "CALL sp_UpdEstadoCliente(@_IdCliente, @_NuevoEstado, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                p, commandType: CommandType.Text, cancellationToken: ct
+            ));
+
+            return new ClienteResultDto
+            {
+                Exitoso = p.Get<int>("_Exitoso"),
+                Mensaje = p.Get<string>("_Mensaje"),
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ClienteResultDto { Exitoso = 0, Mensaje = ex.Message };
+        }
+    }
 }

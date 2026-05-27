@@ -11,7 +11,7 @@
 --   PROCEDURE (con COMMIT/ROLLBACK + INOUT escalares):
 --     sp_AsignarServicio, sp_CancelarReserva, sp_CreateReserva,
 --     sp_ReprogramarReserva, sp_ValidarHorario, sp_DeleteTimerReserva,
---     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_CreUpdCliente,
+--     sp_AsignarDispOperador, sp_CreUpdUsuario, sp_CreUpdCliente, sp_UpdEstadoCliente,
 --     sp_UpdEstadoOperador, sp_UpdEstadoAdministrativo,
 --     sp_CreUpdGrua, sp_UpdEstadoGrua,
 --     sp_IngresoTaller, sp_RetornoOperativa,
@@ -1538,7 +1538,8 @@ $$;
 --   _Rol         → Rol del usuario: 'OPERADOR', 'CLIENTE', 'STAFF', 'ADMINISTRADOR'
 --   _NroLicencia → Número de licencia (requerido si _Rol = 'OPERADOR')
 --   _FecVenLic   → Fecha de vencimiento de licencia (requerido si _Rol = 'OPERADOR')
---   _CreadoPor   → ID del usuario que ejecuta la operación (CreadoPor en INSERT, ActualizadoPor en UPDATE)
+--   _CreadoPor      → ID del usuario que crea el registro (solo se usa en INSERT)
+--   _ActualizadoPor → ID del usuario que actualiza el registro (solo se usa en UPDATE)
 --
 -- Valores de salida _Exitoso:
 --   0 → Error de validación o error interno (ver _Mensaje)
@@ -1550,6 +1551,7 @@ $$;
 --   · _Telefono vacío o NULL se almacena como NULL.
 
 DROP PROCEDURE IF EXISTS sp_CreUpdUsuario(INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, DATE, INT, INT, TEXT, INT);
+DROP PROCEDURE IF EXISTS sp_CreUpdUsuario(INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, VARCHAR, DATE, INT, INT, INT, TEXT, INT);
 CREATE OR REPLACE PROCEDURE sp_CreUpdUsuario(
     _IdUsuario      INT,
     _Alias          VARCHAR,
@@ -1562,6 +1564,7 @@ CREATE OR REPLACE PROCEDURE sp_CreUpdUsuario(
     _NroLicencia    VARCHAR,
     _FecVenLic      DATE,
     _CreadoPor      INT,
+    _ActualizadoPor INT,
     INOUT _Exitoso  INT  DEFAULT 0,
     INOUT _Mensaje  TEXT DEFAULT '',
     INOUT _IdNuevo  INT  DEFAULT 0
@@ -1697,7 +1700,7 @@ BEGIN
                "Telefono"           = NULLIF(TRIM(_Telefono), ''),
                "Correo"             = _Correo,
                "FechaActualizacion" = NOW(),
-               "ActualizadoPor"     = _CreadoPor
+               "ActualizadoPor"     = _ActualizadoPor
         WHERE  "Id" = _IdUsuario;
 
         -- Actualizar tabla derivada según rol
@@ -1707,7 +1710,7 @@ BEGIN
                 SET    "NroLicencia"        = _NroLicencia,
                     "FecVenLic"          = _FecVenLic,
                     "FechaActualizacion" = NOW(),
-                    "ActualizadoPor"     = _CreadoPor
+                    "ActualizadoPor"     = _ActualizadoPor
                 WHERE  "IdUsuario" = _IdUsuario;
             WHEN _Rol IN ('STAFF', 'ADMINISTRADOR') THEN
                 UPDATE "Usuario"
@@ -1875,6 +1878,78 @@ BEGIN
 
     END IF;
 
+END;
+$$;
+
+
+-- ── sp_UpdEstadoCliente ──────────────────────────────────────
+-- Cambia el Estado de un cliente (ACTIVO ↔ INACTIVO).
+-- Actualiza tanto "Cliente" como "Usuario" para sincronizar
+-- el acceso a la app con el estado en el sistema.
+--
+-- Parámetros:
+--   _IdCliente      → ID de la tabla Cliente
+--   _NuevoEstado    → 'ACTIVO' | 'INACTIVO'
+--   _ActualizadoPor → ID del usuario que realiza la acción
+--
+-- _Exitoso: 0=error, 1=éxito
+
+DROP PROCEDURE IF EXISTS sp_UpdEstadoCliente(INT, VARCHAR, INT, INT, TEXT);
+CREATE OR REPLACE PROCEDURE sp_UpdEstadoCliente(
+    _IdCliente      INT,
+    _NuevoEstado    VARCHAR(10),
+    _ActualizadoPor INT,
+    INOUT _Exitoso  INT,
+    INOUT _Mensaje  TEXT
+)
+LANGUAGE plpgsql AS $$
+DECLARE
+    v_IdUsuario INT;
+BEGIN
+    _Exitoso := 0;
+    _Mensaje  := '';
+
+    -- Verificar que el cliente existe y obtener su IdUsuario
+    SELECT "IdUsuario" INTO v_IdUsuario
+    FROM   "Cliente"
+    WHERE  "Id" = _IdCliente;
+
+    IF NOT FOUND THEN
+        _Mensaje := 'El cliente no existe.';
+        RETURN;
+    END IF;
+
+    -- Verificar que no se intenta asignar el mismo estado actual
+    IF EXISTS (
+        SELECT 1 FROM "Cliente"
+        WHERE  "Id"     = _IdCliente
+          AND  "Estado" = _NuevoEstado
+    ) THEN
+        _Mensaje := 'El cliente ya se encuentra en estado ' || _NuevoEstado || '.';
+        RETURN;
+    END IF;
+
+    -- Actualizar estado en Cliente
+    UPDATE "Cliente"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _IdCliente;
+
+    -- Actualizar estado en Usuario (controla acceso a la app)
+    UPDATE "Usuario"
+    SET    "Estado"             = _NuevoEstado,
+           "FechaActualizacion" = NOW(),
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = v_IdUsuario;
+
+    COMMIT;
+    _Exitoso := 1;
+    _Mensaje  := CASE _NuevoEstado
+        WHEN 'INACTIVO' THEN 'Cliente desactivado correctamente.'
+        WHEN 'ACTIVO'   THEN 'Cliente reactivado correctamente.'
+        ELSE                 'Estado actualizado correctamente.'
+    END;
 END;
 $$;
 

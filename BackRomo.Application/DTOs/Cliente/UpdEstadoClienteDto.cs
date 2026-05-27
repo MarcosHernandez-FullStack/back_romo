@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BackRomo.Application.DTOs.Usuario;
+namespace BackRomo.Application.DTOs.Cliente;
 
-public class UpdEstadoUsuarioDto
+public class UpdEstadoClienteDto
 {
-    public int IdUsuario { get; set; }
+    public int IdCliente { get; set; }
 
     [Required(ErrorMessage = "El nuevo estado es obligatorio.")]
     [RegularExpression("^(ACTIVO|INACTIVO)$",

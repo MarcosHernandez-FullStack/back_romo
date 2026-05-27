@@ -81,6 +81,22 @@ builder.Services.AddHttpClient<IGoogleMapsService, GoogleMapsService>();
 
 // Controllers
 builder.Services.AddControllers();
+builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = ctx =>
+    {
+        var errores = ctx.ModelState
+            .Where(e => e.Value?.Errors.Count > 0)
+            .SelectMany(e => e.Value!.Errors.Select(x => x.ErrorMessage))
+            .ToList();
+
+        return new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(new
+        {
+            exitoso = 0,
+            mensaje = string.Join("\n", errores.Select(e => $"• {e}")),
+        });
+    };
+});
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

@@ -49,6 +49,8 @@ public class ClientesController : ControllerBase
         CancellationToken ct)
     {
         dto.CreadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.CreadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _clienteService.CrearClienteAsync(dto, ct);
 
@@ -66,13 +68,41 @@ public class ClientesController : ControllerBase
         [FromBody] EditarClienteDto dto,
         CancellationToken ct)
     {
+        if (idCliente <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del cliente no es válido." });
+
         dto.IdCliente      = idCliente;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _clienteService.EditarClienteAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
         if (result.Exitoso == 2) return Accepted(result);
+        return Ok(result);
+    }
+
+    [Authorize(Roles = "ADMINISTRADOR")]
+    [EnableRateLimiting("escritura")]
+    [RequestTimeout("corto")]
+    [HttpPatch("{idCliente:int}/estado")]
+    public async Task<IActionResult> ActualizarEstadoCliente(
+        int idCliente,
+        [FromBody] UpdEstadoClienteDto dto,
+        CancellationToken ct)
+    {
+        if (idCliente <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del cliente no es válido." });
+
+        dto.IdCliente      = idCliente;
+        dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
+
+        var result = await _clienteService.ActualizarEstadoClienteAsync(dto, ct);
+
+        if (result.Exitoso == 0) return Conflict(result);
         return Ok(result);
     }
 }

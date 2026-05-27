@@ -50,6 +50,8 @@ public class UsuariosController : ControllerBase
         CancellationToken ct)
     {
         dto.CreadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.CreadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _usuarioService.CrearUsuarioAsync(dto, ct);
 
@@ -67,8 +69,12 @@ public class UsuariosController : ControllerBase
         [FromBody] EditarUsuarioDto dto,
         CancellationToken ct)
     {
+        if (idUsuario <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del usuario no es válido." });
         dto.IdUsuario      = idUsuario;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _usuarioService.EditarUsuarioAsync(dto, ct);
 
@@ -86,8 +92,13 @@ public class UsuariosController : ControllerBase
         [FromBody] UpdEstadoUsuarioDto dto,
         CancellationToken ct)
     {
+        if (idUsuario <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del usuario no es válido." });
+
         dto.IdUsuario      = idUsuario;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _usuarioService.ActualizarEstadoUsuarioAsync(dto, ct);
 

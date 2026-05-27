@@ -20,4 +20,7 @@ public class ClienteService
 
     public async Task<ClienteResultDto> EditarClienteAsync(EditarClienteDto dto, CancellationToken ct = default)
         => await _clienteRepository.EditarClienteAsync(dto, ct);
+
+    public async Task<ClienteResultDto> ActualizarEstadoClienteAsync(UpdEstadoClienteDto dto, CancellationToken ct = default)
+        => await _clienteRepository.ActualizarEstadoClienteAsync(dto, ct);
 }
