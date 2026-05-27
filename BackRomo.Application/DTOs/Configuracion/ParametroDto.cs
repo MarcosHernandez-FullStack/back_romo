@@ -2,6 +2,7 @@ namespace BackRomo.Application.DTOs.Configuracion;
 
 public class ParametroDto
 {
+    public int      Id                      { get; set; }
     public int      TiempoMargenManiobra    { get; set; }
     public int      TiempoRetornoBase       { get; set; }
     public decimal  UmbralLargaDistancia    { get; set; }

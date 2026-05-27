@@ -59,6 +59,8 @@ public class OperadoresController : ControllerBase
         CancellationToken ct)
     {
         dto.CreadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.CreadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _operadorService.CrearOperadorAsync(dto, ct);
 
@@ -76,8 +78,12 @@ public class OperadoresController : ControllerBase
         [FromBody] EditarOperadorDto dto,
         CancellationToken ct)
     {
+        if (idOperador <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del operador no es válido." });
         dto.IdOperador     = idOperador;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _operadorService.EditarOperadorAsync(dto, ct);
 
@@ -95,7 +101,11 @@ public class OperadoresController : ControllerBase
         [FromBody] UpdEstadoOperadorDto dto,
         CancellationToken ct)
     {
+        if (idOperador <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del operador no es válido." });
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _operadorService.ActualizarEstadoAsync(idOperador, dto, ct);
 
@@ -123,8 +133,12 @@ public class OperadoresController : ControllerBase
         [FromBody] AsignarDispOperadorDto dto,
         CancellationToken ct)
     {
+        if (idOperador <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del operador no es válido." });
         dto.IdOperador     = idOperador;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _operadorService.GuardarDispOperadorAsync(dto, ct);
 

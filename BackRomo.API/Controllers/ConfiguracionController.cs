@@ -67,7 +67,12 @@ public class ConfiguracionController : ControllerBase
     [HttpPut("tarifario-global")]
     public async Task<IActionResult> ActualizarTarifarioGlobal([FromBody] UpdTarifarioDto dto, CancellationToken ct)
     {
+        if (dto.Id <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del tarifario no es válido." });
         var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (actualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
+
         var result = await _configuracionService.ActualizarTarifarioGlobalAsync(dto, actualizadoPor, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -78,11 +83,16 @@ public class ConfiguracionController : ControllerBase
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
-    [HttpPatch("reserva-cliente-on")]
-    public async Task<IActionResult> ActualizarReservaClienteOn([FromBody] bool value, CancellationToken ct)
+    [HttpPatch("{id:int}/reserva-cliente-on")]
+    public async Task<IActionResult> ActualizarReservaClienteOn(int id, [FromBody] bool value, CancellationToken ct)
     {
+        if (id <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del parámetro no es válido." });
         var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-        var result = await _configuracionService.ActualizarReservaClienteOnAsync(value, actualizadoPor, ct);
+        if (actualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
+
+        var result = await _configuracionService.ActualizarReservaClienteOnAsync(id, value, actualizadoPor, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
         if (result.Exitoso == 2) return Accepted(result);
@@ -92,10 +102,16 @@ public class ConfiguracionController : ControllerBase
     [Authorize(Roles = "ADMINISTRADOR")]
     [EnableRateLimiting("escritura")]
     [RequestTimeout("corto")]
-    [HttpPut("parametro-operativo")]
-    public async Task<IActionResult> ActualizarParametroOperativo([FromBody] UpdParametroDto dto, CancellationToken ct)
+    [HttpPut("{id:int}/parametro-operativo")]
+    public async Task<IActionResult> ActualizarParametroOperativo(int id, [FromBody] UpdParametroDto dto, CancellationToken ct)
     {
+        if (id <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id del parámetro no es válido." });
+        dto.Id = id;
         var actualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (actualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
+
         var result = await _configuracionService.ActualizarParametroOperativoAsync(dto, actualizadoPor, ct);
 
         if (result.Exitoso == 0) return Conflict(result);

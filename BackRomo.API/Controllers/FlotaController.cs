@@ -50,6 +50,7 @@ public class FlotaController : ControllerBase
         CancellationToken ct)
     {
         dto.CreadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.CreadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _flotaService.CrearGruaAsync(dto, ct);
 
@@ -67,8 +68,10 @@ public class FlotaController : ControllerBase
         [FromBody] EditarUnidadDto dto,
         CancellationToken ct)
     {
+        if (idGrua <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id de la grúa no es válido." });
         dto.IdGrua         = idGrua;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _flotaService.EditarGruaAsync(dto, ct);
 
@@ -106,8 +109,10 @@ public class FlotaController : ControllerBase
         [FromBody] IngresoTallerDto dto,
         CancellationToken ct)
     {
+        if (idGrua <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id de la grúa no es válido." });
         dto.IdGrua         = idGrua;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _flotaService.IngresoTallerAsync(dto, ct);
 
@@ -125,8 +130,10 @@ public class FlotaController : ControllerBase
         [FromBody] RetornoOperativaDto dto,
         CancellationToken ct)
     {
+        if (idGrua <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id de la grúa no es válido." });
         dto.IdGrua         = idGrua;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _flotaService.RetornoOperativaAsync(dto, ct);
 
@@ -144,8 +151,10 @@ public class FlotaController : ControllerBase
         [FromBody] UpdEstadoGruaDto dto,
         CancellationToken ct)
     {
+        if (idGrua <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id de la grúa no es válido." });
         dto.IdGrua         = idGrua;
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _flotaService.ActualizarEstadoAsync(dto, ct);
 

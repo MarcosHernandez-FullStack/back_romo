@@ -61,19 +61,20 @@ public class ConfiguracionRepository : IConfiguracionRepository
         ));
     }
 
-    public async Task<ConfigResultDto> ActualizarReservaClienteOnAsync(bool value, int actualizadoPor, CancellationToken ct = default)
+    public async Task<ConfigResultDto> ActualizarReservaClienteOnAsync(int id, bool value, int actualizadoPor, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
         try
         {
             var p = new DynamicParameters();
+            p.Add("_Id",             id,             DbType.Int32);
             p.Add("_Activo",         value,          DbType.Boolean);
             p.Add("_ActualizadoPor", actualizadoPor, DbType.Int32);
             p.Add("_Exitoso", value: 0,  dbType: DbType.Int32,  direction: ParameterDirection.InputOutput);
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_UpdReservaClienteOn(@_Activo, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                "CALL sp_UpdReservaClienteOn(@_Id, @_Activo, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 
@@ -125,6 +126,7 @@ public class ConfiguracionRepository : IConfiguracionRepository
         try
         {
             var p = new DynamicParameters();
+            p.Add("_Id",                   dto.Id,                   DbType.Int32);
             p.Add("_TiempoMargenManiobra", dto.TiempoMargenManiobra, DbType.Int16);
             p.Add("_TiempoRetornoBase",    dto.TiempoRetornoBase,    DbType.Int16);
             p.Add("_UmbralLargaDistancia", dto.UmbralLargaDistancia, DbType.Decimal);
@@ -143,7 +145,7 @@ public class ConfiguracionRepository : IConfiguracionRepository
             p.Add("_Mensaje", value: "", dbType: DbType.String, direction: ParameterDirection.InputOutput, size: 500);
 
             await conn.ExecuteAsync(new CommandDefinition(
-                "CALL sp_UpdParametroOperativo(@_TiempoMargenManiobra, @_TiempoRetornoBase, @_UmbralLargaDistancia, @_TiempoTolerancia, @_TiempoCorte, @_TimerAdministrativo, @_TimerCliente, @_ZonaHoraria, @_MinutosCerca, @_MinutosMedio, @_CoordLatMaps, @_CoordLonMaps, @_MetrosCercania, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
+                "CALL sp_UpdParametroOperativo(@_Id, @_TiempoMargenManiobra, @_TiempoRetornoBase, @_UmbralLargaDistancia, @_TiempoTolerancia, @_TiempoCorte, @_TimerAdministrativo, @_TimerCliente, @_ZonaHoraria, @_MinutosCerca, @_MinutosMedio, @_CoordLatMaps, @_CoordLonMaps, @_MetrosCercania, @_ActualizadoPor, @_Exitoso, @_Mensaje)",
                 p, commandType: CommandType.Text, cancellationToken: ct
             ));
 

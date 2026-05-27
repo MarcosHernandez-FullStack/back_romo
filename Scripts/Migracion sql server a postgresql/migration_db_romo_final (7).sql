@@ -2481,8 +2481,9 @@ $$;
 --
 -- _Exitoso: 0=error, 1=éxito
 
-DROP PROCEDURE IF EXISTS sp_UpdReservaClienteOn(BOOLEAN, INT, INT, TEXT);
+DROP PROCEDURE IF EXISTS sp_UpdReservaClienteOn(INT, BOOLEAN, INT, INT, TEXT);
 CREATE OR REPLACE PROCEDURE sp_UpdReservaClienteOn(
+    _Id             INT,
     _Activo         BOOLEAN,
     _ActualizadoPor INT,
     INOUT _Exitoso  INT,
@@ -2496,7 +2497,8 @@ BEGIN
     UPDATE "ParametroOperativo"
     SET    "ReservaClienteOn"   = _Activo,
            "FechaActualizacion" = NOW(),
-           "ActualizadoPor"     = _ActualizadoPor;
+           "ActualizadoPor"     = _ActualizadoPor
+    WHERE  "Id" = _Id;
 
     IF NOT FOUND THEN
         _Mensaje := 'No se encontró el registro de parámetros operativos.';
@@ -2565,8 +2567,9 @@ $$;
 --
 -- _Exitoso: 0=error, 1=éxito
 
-DROP PROCEDURE IF EXISTS sp_UpdParametroOperativo(SMALLINT, SMALLINT, DECIMAL, SMALLINT, SMALLINT, SMALLINT, SMALLINT, VARCHAR, SMALLINT, SMALLINT, VARCHAR, VARCHAR, DECIMAL, INT, INT, TEXT);
+DROP PROCEDURE IF EXISTS sp_UpdParametroOperativo(INT, SMALLINT, SMALLINT, DECIMAL, SMALLINT, SMALLINT, SMALLINT, SMALLINT, VARCHAR, SMALLINT, SMALLINT, VARCHAR, VARCHAR, DECIMAL, INT, INT, TEXT);
 CREATE OR REPLACE PROCEDURE sp_UpdParametroOperativo(
+    _Id                   INT,
     _TiempoMargenManiobra SMALLINT,
     _TiempoRetornoBase    SMALLINT,
     _UmbralLargaDistancia DECIMAL(10,2),
@@ -2604,7 +2607,8 @@ BEGIN
            "CoordLonMaps"         = _CoordLonMaps,
            "MetrosCercania"       = _MetrosCercania,
            "FechaActualizacion"   = NOW(),
-           "ActualizadoPor"       = _ActualizadoPor;
+           "ActualizadoPor"       = _ActualizadoPor
+    WHERE  "Id" = _Id;
 
     IF NOT FOUND THEN
         _Mensaje := 'No se encontró el registro de parámetros operativos.';
@@ -2982,6 +2986,7 @@ $$;
 DROP FUNCTION IF EXISTS fn_ParametroOperativo();
 CREATE OR REPLACE FUNCTION fn_ParametroOperativo()
 RETURNS TABLE(
+    "Id"                   INT,
     "TiempoMargenManiobra" SMALLINT,
     "TiempoRetornoBase"    SMALLINT,
     "UmbralLargaDistancia" DECIMAL(10,2),
@@ -3005,14 +3010,16 @@ RETURNS TABLE(
 LANGUAGE plpgsql AS $$
 BEGIN
     RETURN QUERY
-    SELECT p."TiempoMargenManiobra",p."TiempoRetornoBase",p."UmbralLargaDistancia",
+    SELECT p."Id",p."TiempoMargenManiobra",p."TiempoRetornoBase",p."UmbralLargaDistancia",
            p."TiempoTolerancia",p."FechaCreacion",p."FechaActualizacion",
            p."CreadoPor",p."ActualizadoPor",p."Estado",p."TiempoCorte",
            p."TimerAdministrativo",p."TimerCliente",p."ZonaHoraria",
            p."MinutosCerca",p."MinutosMedio",
            p."CoordLatMaps",p."CoordLonMaps",p."MetrosCercania",
            p."ReservaClienteOn"
-    FROM   "ParametroOperativo" p LIMIT 1;
+    FROM   "ParametroOperativo" p
+    WHERE  p."Estado"='ACTIVO'
+    LIMIT 1;
 END;
 $$;
 

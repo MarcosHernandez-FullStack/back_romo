@@ -67,6 +67,8 @@ public class AgendaController : ControllerBase
         CancellationToken ct)
     {
         dto.UsuarioId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.UsuarioId == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _agendaService.CreUpdExcepcionAsync(dto, ct);
 
@@ -84,7 +86,11 @@ public class AgendaController : ControllerBase
         [FromBody] UpdEstadoExcepcionDto dto,
         CancellationToken ct)
     {
+        if (id <= 0)
+            return BadRequest(new { exitoso = 0, mensaje = "El id de la excepción no es válido." });
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _agendaService.UpdEstadoExcepcionAsync(id, dto, ct);
 
@@ -102,6 +108,8 @@ public class AgendaController : ControllerBase
         CancellationToken ct)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.ActualizadoPor == 0)
+            return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
 
         var result = await _agendaService.ActualizarConfiguracionHorarioAsync(dto, ct);
 
