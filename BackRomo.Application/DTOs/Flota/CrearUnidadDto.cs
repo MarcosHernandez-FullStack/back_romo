@@ -18,6 +18,7 @@ public class CrearUnidadDto
     public string   Modelo         { get; set; } = string.Empty;
     [JsonPropertyName("anioFabricacion")]
     public short    AñoFabricacion { get; set; }
+    [Range(1, short.MaxValue, ErrorMessage = "La capacidad debe ser mayor o igual a 1.")]
     public short    Capacidad      { get; set; }
     public DateOnly FecVenSeg      { get; set; }
     public int      CreadoPor      { get; set; }  // se asigna desde el JWT en el controller

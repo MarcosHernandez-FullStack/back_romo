@@ -80,7 +80,16 @@ builder.Services.AddScoped<ReporteService>();
 builder.Services.AddHttpClient<IGoogleMapsService, GoogleMapsService>();
 
 // Controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddMvcOptions(options =>
+    {
+        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((value, name) =>
+            $"El valor '{value}' no es válido para el campo '{name}'.");
+        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(name =>
+            $"El campo '{name}' es requerido.");
+        options.ModelBindingMessageProvider.SetNonPropertyAttemptedValueIsInvalidAccessor(value =>
+            $"El valor '{value}' no es válido.");
+    });
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = ctx =>

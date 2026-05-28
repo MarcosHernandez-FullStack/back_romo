@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using BackRomo.Application.DTOs.Reserva;
 using BackRomo.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -61,6 +62,10 @@ public class ReservasController : ControllerBase
     [HttpPost("validar-horario")]
     public async Task<IActionResult> ValidarHorario([FromBody] CrearReservaDto dto, CancellationToken ct)
     {
+        dto.CreadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        dto.Rol       = User.FindFirstValue(ClaimTypes.Role) ?? "";
+        if (dto.CreadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
+        if (dto.IdCliente <= 0) return BadRequest(new   { exitoso = 0, mensaje = "El id del cliente no es válido." });
         var result = await _reservaService.ValidarHorarioAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -75,6 +80,8 @@ public class ReservasController : ControllerBase
     [HttpPost("crear-reserva")]
     public async Task<IActionResult> CrearReserva([FromBody] ConfirmarReservaDto dto, CancellationToken ct)
     {
+        dto.Rol = User.FindFirstValue(ClaimTypes.Role) ?? "";
+        if (dto.IdTimerReserva <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id del timer de reserva no es válido." });
         var result = await _reservaService.CrearReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -89,6 +96,7 @@ public class ReservasController : ControllerBase
     [HttpDelete("timer/{id}")]
     public async Task<IActionResult> EliminarTimer(int id, CancellationToken ct)
     {
+        if (id <= 0) return BadRequest(new { exitoso = 0, mensaje = "El id del timer no es válido." });
         var result = await _reservaService.EliminarTimerAsync(id, ct);
 
         if (result.Exitoso == 0) return Conflict(result);

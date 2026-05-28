@@ -5,5 +5,5 @@ public class AsignarServicioDto
     public int    IdReserva     { get; set; }
     public int    IdGrua        { get; set; }
     public int    IdOperador    { get; set; }
-    public int ActualizadoPor { get; set; }
+    public int    ActualizadoPor { get; set; }
 }

@@ -56,6 +56,8 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> IniciarReserva([FromBody] IniciarReservaDto dto, CancellationToken ct)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.IdReserva    <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la reserva no es válido." });
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
         var result = await _operacionService.IniciarReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -71,6 +73,8 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> FinalizarReserva([FromBody] FinalizarReservaDto dto, CancellationToken ct)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.IdReserva    <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la reserva no es válido." });
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
         var result = await _operacionService.FinalizarReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -86,6 +90,8 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> CancelarReserva([FromBody] CancelarServicioDto dto, CancellationToken ct)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+        if (dto.Id           <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la reserva no es válido." });
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
         var result = await _operacionService.CancelarReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -111,7 +117,10 @@ public class OperacionesController : ControllerBase
     public async Task<IActionResult> AsignarServicio([FromBody] AsignarServicioDto dto, CancellationToken ct)
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
-
+        if (dto.IdReserva    <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la reserva no es válido." });
+        if (dto.IdGrua       <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la grúa no es válido." });
+        if (dto.IdOperador   <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id del operador no es válido." });
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
         var result = await _operacionService.AsignarReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
@@ -128,7 +137,8 @@ public class OperacionesController : ControllerBase
     {
         dto.ActualizadoPor = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
         dto.Rol            = User.FindFirstValue(ClaimTypes.Role) ?? "ADMINISTRADOR";
-
+        if (dto.IdReserva    <= 0) return BadRequest(new  { exitoso = 0, mensaje = "El id de la reserva no es válido." });
+        if (dto.ActualizadoPor == 0) return Unauthorized(new { exitoso = 0, mensaje = "No se pudo identificar al usuario autenticado." });
         var result = await _operacionService.ReprogramarReservaAsync(dto, ct);
 
         if (result.Exitoso == 0) return Conflict(result);
