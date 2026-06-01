@@ -2838,7 +2838,7 @@ BEGIN
            TO_CHAR(r."FechaServicio", 'DD/MM/YYYY') || ' · ' || TO_CHAR(r."HoraInicio", 'HH24:MI'),
            (SELECT COUNT(*)::INT FROM "Vehiculo" v2 WHERE v2."IdReserva" = r."Id" AND v2."Estado" = 'ACTIVO'),
            r."EstadoAdministrativo",
-           (r."CostoBase" + r."CostoKm" * r."DistanciaKm")::DECIMAL(10,2)
+           ((r."CostoKm" * r."DistanciaKm" + r."CostoBase") * r."CantidadCarga")::DECIMAL(10,2)
     FROM   "Reserva" r
     LEFT JOIN "Grua"     g   ON g."Id"        = r."IdGrua"
     LEFT JOIN "Operador" o   ON o."Id"        = r."IdOperador"
@@ -5463,7 +5463,7 @@ BEGIN
     SELECT --DISTINCT ON (r."Id")
         r."Id",
         c."Empresa"::TEXT,
-        (r."CostoBase" + r."CostoKm" * r."DistanciaKm")::DECIMAL(10,2),
+        ((r."CostoKm" * r."DistanciaKm" + r."CostoBase") * r."CantidadCarga")::DECIMAL(10,2),
         r."DireccionOrigen",
         r."DireccionDestino",
         r."DistanciaKm",
@@ -5509,8 +5509,9 @@ BEGIN
     LEFT JOIN "Operador" o   ON o."Id"   = r."IdOperador"
     LEFT JOIN "Usuario"  u_o ON u_o."Id" = o."IdUsuario"
     LEFT JOIN "Usuario"  u_a ON u_a."Id" = r."ActualizadoPor"
-    WHERE  r."EstadoOperacion" IN ('FINALIZADO', 'CANCELADO')
-      AND  r."Estado" = 'ACTIVO'
+    WHERE  
+      r."Estado" = 'ACTIVO'
+      AND r."EstadoOperacion" IN ('FINALIZADO', 'CANCELADO')
       AND  (_IdCliente            IS NULL OR r."IdCliente"          = _IdCliente)
       AND  (_FechaDesde           IS NULL OR r."FechaServicio"      >= _FechaDesde)
       AND  (_FechaHasta           IS NULL OR r."FechaServicio"      <= _FechaHasta)
