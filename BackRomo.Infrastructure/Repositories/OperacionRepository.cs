@@ -28,7 +28,7 @@ public class OperacionRepository : IOperacionRepository
             commandType: CommandType.StoredProcedure
         );
     } */
-    public async Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, string? direccion, CancellationToken ct = default)
+    public async Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, string? direccion, string? nombreOperador, string? placaGrua, string? nombreCliente, CancellationToken ct = default)
     {
         using var conn = _db.CreateConnection();
 
@@ -43,11 +43,14 @@ public class OperacionRepository : IOperacionRepository
         param.Add("IdCliente",            idCliente);
         param.Add("Pagina",               pagina);
         param.Add("Tamano",               tamano);
-        param.Add("Direccion",            string.IsNullOrWhiteSpace(direccion) ? null : direccion, DbType.String);
+        param.Add("Direccion",            string.IsNullOrWhiteSpace(direccion)       ? null : direccion,       DbType.String);
+        param.Add("NombreOperador",       string.IsNullOrWhiteSpace(nombreOperador)  ? null : nombreOperador,  DbType.String);
+        param.Add("PlacaGrua",            string.IsNullOrWhiteSpace(placaGrua)       ? null : placaGrua,       DbType.String);
+        param.Add("NombreCliente",        string.IsNullOrWhiteSpace(nombreCliente)   ? null : nombreCliente,   DbType.String);
 
         using var multi = await conn.QueryMultipleAsync(new CommandDefinition(
             """
-            SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, @Pagina, @Tamano, @Direccion);
+            SELECT * FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, @Pagina, @Tamano, @Direccion, @NombreOperador, @PlacaGrua, @NombreCliente);
             SELECT
                 COUNT(*)                                                                                                          AS Total,
                 COUNT(*) FILTER (WHERE "EstadoOperacion" = 'RESERVADO')                                                           AS TotalReservado,
@@ -55,7 +58,7 @@ public class OperacionRepository : IOperacionRepository
                 COUNT(*) FILTER (WHERE "EstadoOperacion" = 'ENCURSO')                                                             AS TotalEnCurso,
                 COALESCE(SUM("Costo") FILTER (WHERE "EstadoAdministrativo" IN ('PENDIENTE', 'FACTURADO')), 0)                     AS MontoPendiente,
                 COALESCE(SUM("Costo") FILTER (WHERE "EstadoAdministrativo" = 'PAGADO'), 0)                                        AS MontoLiquidado
-            FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, NULL, NULL, @Direccion);
+            FROM fn_ListReservas(@EstadoOperacion, @Id, @FechaInicio, @FechaFin, @IdOperador, @IdGrua, @EstadoAdministrativo, @IdCliente, NULL, NULL, @Direccion, @NombreOperador, @PlacaGrua, @NombreCliente);
             """,
             param,
             commandType: CommandType.Text,

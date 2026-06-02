@@ -5,7 +5,7 @@ namespace BackRomo.Application.Interfaces;
 
 public interface IOperacionRepository
 {
-    Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, string? direccion, CancellationToken ct = default);
+    Task<ReservaPagedDto> ListarReservasAsync(string? estadoOperacion, int? id, DateOnly? fechaInicio, DateOnly? fechaFin, int? idOperador, int? idGrua, string? estadoAdministrativo, int? idCliente, int? pagina, int? tamano, string? direccion, string? nombreOperador, string? placaGrua, string? nombreCliente, CancellationToken ct = default);
     Task<OperacionResultDto> IniciarReservaAsync(IniciarReservaDto dto, CancellationToken ct = default);
     Task<OperacionResultDto> FinalizarReservaAsync(FinalizarReservaDto dto, CancellationToken ct = default);
     Task<OperacionResultDto> CancelarReservaAsync(CancelarServicioDto dto, CancellationToken ct = default);

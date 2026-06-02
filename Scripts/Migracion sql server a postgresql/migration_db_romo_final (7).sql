@@ -2755,8 +2755,7 @@ $$;
 
 
 -- ── fn_ListReservas ──────────────────────────────────────────
-DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT);
-DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT, VARCHAR);
+DROP FUNCTION IF EXISTS fn_ListReservas(VARCHAR, INT, DATE, DATE, INT, INT, VARCHAR, INT, INT, INT, VARCHAR, VARCHAR, VARCHAR, VARCHAR);
 CREATE OR REPLACE FUNCTION fn_ListReservas(
     _EstadoOperacion      VARCHAR(20),
     _Id                   INT,
@@ -2768,7 +2767,10 @@ CREATE OR REPLACE FUNCTION fn_ListReservas(
     _IdCliente            INT,
     _Pagina               INT          DEFAULT NULL,
     _Tamano               INT          DEFAULT NULL,
-    _Direccion            VARCHAR(200) DEFAULT NULL
+    _Direccion            VARCHAR(200) DEFAULT NULL,
+    _NombreOperador       VARCHAR(200) DEFAULT NULL,
+    _PlacaGrua            VARCHAR(20)  DEFAULT NULL,
+    _NombreCliente        VARCHAR(200) DEFAULT NULL
 )
 RETURNS TABLE(
     "Id"               INT,
@@ -2795,8 +2797,12 @@ RETURNS TABLE(
     "Vehiculos"           JSON,
     "FechaHoraFormateada" TEXT,
     "CantidadVehiculos"   INT,
-    "EstadoAdministrativo" VARCHAR(50),
-    "Costo"               DECIMAL(10,2)
+    "EstadoAdministrativo"     VARCHAR(50),
+    "Costo"                    DECIMAL(10,2),
+    "NombreCompletoOperador"   TEXT,
+    "PlacaGrua"                VARCHAR(20),
+    "CostoKm"                  DECIMAL(10,2),
+    "CostoBase"                DECIMAL(10,2)
 )
 LANGUAGE plpgsql AS $$
 BEGIN
@@ -2838,7 +2844,11 @@ BEGIN
            TO_CHAR(r."FechaServicio", 'DD/MM/YYYY') || ' · ' || TO_CHAR(r."HoraInicio", 'HH24:MI'),
            (SELECT COUNT(*)::INT FROM "Vehiculo" v2 WHERE v2."IdReserva" = r."Id" AND v2."Estado" = 'ACTIVO'),
            r."EstadoAdministrativo",
-           ((r."CostoKm" * r."DistanciaKm" + r."CostoBase") * r."CantidadCarga")::DECIMAL(10,2)
+           ((r."CostoKm" * r."DistanciaKm" + r."CostoBase") * r."CantidadCarga")::DECIMAL(10,2),
+           CASE WHEN o."Id" IS NOT NULL THEN (u."Nombres" || ' ' || u."Apellidos")::TEXT ELSE NULL END,
+           g."Placa"::VARCHAR(20),
+           r."CostoKm"::DECIMAL(10,2),
+           r."CostoBase"::DECIMAL(10,2)
     FROM   "Reserva" r
     LEFT JOIN "Grua"     g   ON g."Id"        = r."IdGrua"
     LEFT JOIN "Operador" o   ON o."Id"        = r."IdOperador"
@@ -2855,6 +2865,9 @@ BEGIN
       AND  (_IdCliente            IS NULL OR r."IdCliente"            = _IdCliente)
       AND  (_Direccion            IS NULL OR _Direccion = '' OR r."DireccionOrigen"  ILIKE '%' || _Direccion || '%'
                                                              OR r."DireccionDestino" ILIKE '%' || _Direccion || '%')
+      AND  (_NombreOperador      IS NULL OR _NombreOperador = '' OR (u."Nombres"   || ' ' || u."Apellidos")   ILIKE '%' || _NombreOperador || '%')
+      AND  (_PlacaGrua           IS NULL OR _PlacaGrua = ''     OR g."Placa"                                  ILIKE '%' || _PlacaGrua     || '%')
+      AND  (_NombreCliente       IS NULL OR _NombreCliente = ''  OR (u_c."Nombres" || ' ' || u_c."Apellidos") ILIKE '%' || _NombreCliente  || '%')
       AND  r."Estado" = 'ACTIVO'
     ORDER BY r."FechaServicio" DESC, r."HoraInicio" DESC, r."HoraFin" DESC, r."Id" DESC
     LIMIT  _Tamano

@@ -34,6 +34,9 @@ public class OperacionesController : ControllerBase
         [FromQuery] int?      pagina,
         [FromQuery] int?      tamano,
         [FromQuery] string?   direccion,
+        [FromQuery] string?   nombreOperador,
+        [FromQuery] string?   placaGrua,
+        [FromQuery] string?   nombreCliente,
         CancellationToken     ct)
     {
         int? idCliente = null;
@@ -43,7 +46,7 @@ public class OperacionesController : ControllerBase
             if (int.TryParse(raw, out var parsed)) idCliente = parsed;
         }
 
-        var result = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaInicio, fechaFin, idOperador, idGrua, estadoAdministrativo, idCliente, pagina, tamano, direccion, ct);
+        var result = await _operacionService.ListarReservasAsync(estadoOperacion, id, fechaInicio, fechaFin, idOperador, idGrua, estadoAdministrativo, idCliente, pagina, tamano, direccion, nombreOperador, placaGrua, nombreCliente, ct);
         if (result.Total == 0)
             return NoContent();
         return Ok(result);

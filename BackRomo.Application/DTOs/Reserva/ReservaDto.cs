@@ -26,6 +26,10 @@ public class ReservaDto
     public List<VehiculoItemDto> Vehiculos { get; set; } = new();
     public string    FechaHoraFormateada  { get; set; } = string.Empty;
     public int       CantidadVehiculos    { get; set; }
-    public string    EstadoAdministrativo { get; set; } = string.Empty;
-    public decimal   Costo                { get; set; }
+    public string    EstadoAdministrativo     { get; set; } = string.Empty;
+    public decimal   Costo                    { get; set; }
+    public string?   NombreCompletoOperador   { get; set; }
+    public string?   PlacaGrua                { get; set; }
+    public decimal   CostoKm                  { get; set; }
+    public decimal   CostoBase                { get; set; }
 }
