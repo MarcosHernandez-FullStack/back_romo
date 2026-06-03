@@ -1590,6 +1590,18 @@ BEGIN
             RETURN;
         END IF;
 
+        -- Correo único entre usuarios activos
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Correo" = _Correo
+              AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe un usuario activo con el correo"' || _Correo || '".';
+            RETURN;
+        END IF;
+
         -- Validaciones específicas por rol
         CASE _Rol
             WHEN 'OPERADOR' THEN
@@ -1664,6 +1676,19 @@ BEGIN
             RETURN;
         END IF;
 
+        -- Correo único excluyendo el usuario actual
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Correo" = _Correo
+              AND  "Estado" = 'ACTIVO'
+              AND  "Id"    <> _IdUsuario
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe un usuario activo con el correo"' || _Correo || '".';
+            RETURN;
+        END IF;
+
         -- Validaciones específicas por rol (actualización)
         CASE _Rol
             WHEN 'OPERADOR' THEN
@@ -1734,6 +1759,7 @@ END;
 $$;
 
 
+
 -- ── sp_CreUpdCliente ───────────────────────────────────────────
 -- Crea o actualiza un cliente B2B junto a su registro en Usuario.
 --
@@ -1794,6 +1820,19 @@ BEGIN
             RETURN;
         END IF;
 
+        -- Correo único entre usuarios activos
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Correo" = TRIM(_CorreoContacto)
+            AND  "Estado" = 'ACTIVO'
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe un usuario activo con el correo "' || TRIM(_CorreoContacto) || '".';
+            RETURN;
+        END IF;
+
+
         -- Insertar en Usuario con rol CLIENTE
         INSERT INTO "Usuario" (
             "Alias", "Contraseña", "Correo", "Nombres", "Apellidos",
@@ -1843,6 +1882,19 @@ BEGIN
             ROLLBACK;
             _Exitoso := 0;
             _Mensaje := 'El cliente no existe o no está activo.';
+            RETURN;
+        END IF;
+
+        -- Correo único excluyendo el usuario actual
+        IF EXISTS (
+            SELECT 1 FROM "Usuario"
+            WHERE  "Correo" = TRIM(_CorreoContacto)
+            AND  "Estado" = 'ACTIVO'
+            AND  "Id"    <> v_IdUsuario
+        ) THEN
+            ROLLBACK;
+            _Exitoso := 0;
+            _Mensaje := 'Ya existe otro usuario activo con el correo "' || TRIM(_CorreoContacto) || '".';
             RETURN;
         END IF;
 
