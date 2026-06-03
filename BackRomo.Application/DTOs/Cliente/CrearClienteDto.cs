@@ -28,8 +28,13 @@ public class CrearClienteDto
     [EmailAddress(ErrorMessage = "El correo de contacto no tiene un formato válido.")]
     public string CorreoContacto { get; set; } = string.Empty;
 
+    [Range(typeof(decimal), "0.01", "99999999.99",
+        ErrorMessage = "La tarifa base debe ser mayor a 0.")]
     public decimal TarifaBase { get; set; }
-    public decimal TarifaKm   { get; set; }
+
+    [Range(typeof(decimal), "0.01", "99999999.99",
+        ErrorMessage = "La tarifa por km debe ser mayor a 0.")]
+    public decimal TarifaKm { get; set; }
 
     public int CreadoPor { get; set; }  // set from JWT in controller
 }

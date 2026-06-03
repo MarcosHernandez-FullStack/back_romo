@@ -5233,7 +5233,7 @@ BEGIN
         )::VARCHAR(50),
         e."Motivo",
         CASE
-            WHEN e."TiempoInicio" = '00:00:00' AND e."TiempoFinal" = '00:00:00'
+            WHEN e."TiempoInicio" = '00:00:00' AND e."TiempoFinal" = '23:59:00'
             THEN 'Día Completo'::VARCHAR(15)
             ELSE 'Rango de Horas'::VARCHAR(15)
         END AS "Alcance",
