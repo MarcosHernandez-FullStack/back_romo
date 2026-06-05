@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BackRomo.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cfdc1f0cfa39cb4c6df60168bf0bd7e67d57c5e8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b350621370e528eaeba97843baedb3dd51b340e")]
 [assembly: System.Reflection.AssemblyProductAttribute("BackRomo.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BackRomo.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
